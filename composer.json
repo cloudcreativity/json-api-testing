@@ -37,6 +37,7 @@
     },
     "extra": {
         "branch-alias": {
+            "dev-hotfix/0.1.1": "0.1.x-dev",
             "dev-develop": "0.2.x-dev"
         }
     },

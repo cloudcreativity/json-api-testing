@@ -25,25 +25,16 @@ use stdClass;
 /**
  * Class ResourceTester
  *
- * @package CloudCreativity\JsonApi
+ * @package CloudCreativity\JsonApi\Testing
  */
-class ResourceObjectTester
+class ResourceObjectTester extends ObjectTester
 {
-
-    const KEYWORD_TYPE = 'type';
-    const KEYWORD_ID = 'id';
-    const KEYWORD_ATTRIBUTES = 'attributes';
-    const KEYWORD_RELATIONSHIPS = 'relationships';
 
     /**
      * @var stdClass
+     * @deprecated
      */
     private $resource;
-
-    /**
-     * @var int|null
-     */
-    private $index;
 
     /**
      * ResourceTester constructor.
@@ -54,9 +45,9 @@ class ResourceObjectTester
      */
     public function __construct(stdClass $resource, $index = null)
     {
+        parent::__construct($resource, $index);
         $this->resource = $resource;
-        $this->index = $index;
-        $this->isComplete();
+        $this->assertComplete();
     }
 
     /**
@@ -86,20 +77,58 @@ class ResourceObjectTester
     }
 
     /**
+     * Assert that the resource matches the expected structure.
+     *
+     * @param array $expected
+     *      the expected array representation of the resource.
+     * @return $this
+     */
+    public function assertMatches(array $expected)
+    {
+        if (!isset($expected[self::KEYWORD_TYPE])) {
+            PHPUnit::fail('Expected resource data must contain a type key.');
+        }
+
+        $attributes = isset($expected[self::KEYWORD_ATTRIBUTES]) ?
+            $expected[self::KEYWORD_ATTRIBUTES] : [];
+
+        $relationships = isset($expected[self::KEYWORD_RELATIONSHIPS]) ?
+            $this->normalizeRelationships($expected[self::KEYWORD_RELATIONSHIPS]) : [];
+
+        /** Have we got the correct resource id? */
+        if (isset($expected[self::KEYWORD_ID])) {
+            $this->assertIs($expected[self::KEYWORD_TYPE], $expected[self::KEYWORD_ID]);
+        } else {
+            $this->assertTypeIs($expected[self::KEYWORD_TYPE]);
+        }
+
+        /** Have we got the correct attributes? */
+        $this->assertAttributesSubset($attributes);
+
+        /** Have we got the correct relationships? */
+        $this->assertRelationshipsSubset($relationships);
+
+        return $this;
+    }
+
+    /**
      * Assert that the resource matches the expected type and id.
      *
-     * @param $type
-     * @param $id
+     * @param $expectedType
+     * @param $expectedId
      * @param string|null $message
      * @return $this
      */
-    public function assertIs($type, $id, $message = null)
+    public function assertIs($expectedType, $expectedId, $message = null)
     {
-        $expected = sprintf('%s:%s', $type, $id);
-        $actual = sprintf('%s:%s', $this->getType(), $this->getId());
-        $message = $message ?: "Resource [$actual] does not match expected resource [$expected]";
+        $actualType = isset($this->object->{self::KEYWORD_TYPE}) ? $this->object->{self::KEYWORD_TYPE} : null;
+        $actualId = isset($this->object->{self::KEYWORD_ID}) ? $this->object->{self::KEYWORD_ID} : null;
+        $expected = sprintf('%s:%s', $expectedType, $expectedId);
+        $actual = sprintf('%s:%s', $actualType, $actualId);
 
-        PHPUnit::assertTrue($this->is($type, $id), $this->withIndex($message));
+        $message = $message ?: "Resource object [$actual] does not match expected resource [$expected]";
+
+        PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
 
         return $this;
     }
@@ -118,30 +147,11 @@ class ResourceObjectTester
      *
      * @param string|null $message
      * @return $this
+     * @deprecated use `assertHasType`
      */
     public function assertType($message = null)
     {
-        $actual = $this->getType();
-        $message = $message ?: 'Resource does not have a type';
-        PHPUnit::assertTrue(is_string($actual) && !empty($actual), $this->withIndex($message));
-
-        return $this;
-    }
-
-    /**
-     * Assert that the resource type matches the expected type.
-     *
-     * @param $expected
-     * @param string|null $message
-     * @return $this
-     */
-    public function assertTypeIs($expected, $message = null)
-    {
-        $actual = $this->getResource();
-        $message = $message ?: sprintf('Unexpected resource type [%s]', $actual);
-        PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
-
-        return $this;
+        return $this->assertHasType($message);
     }
 
     /**
@@ -222,7 +232,7 @@ class ResourceObjectTester
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource attributes') . ': ' . json_encode($actual);
 
-        PHPUnit::assertArraySubset($expected, $actual, $message);
+        PHPUnit::assertArraySubset($expected, $actual, false, $message);
 
         return $this;
     }
@@ -251,28 +261,15 @@ class ResourceObjectTester
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource relationships') . ': ' . json_encode($actual);
 
-        PHPUnit::assertArraySubset($expected, $actual, $message);
+        PHPUnit::assertArraySubset($expected, $actual, false, $message);
 
         return $this;
     }
 
     /**
-     * @param $message
-     * @return string
-     */
-    protected function withIndex($message)
-    {
-        if (is_int($this->index)) {
-            $message .= " at index [$this->index]";
-        }
-
-        return $message;
-    }
-
-    /**
      * @return void
      */
-    private function isComplete()
+    private function assertComplete()
     {
         $type = $this->getType();
 
@@ -287,5 +284,26 @@ class ResourceObjectTester
         } elseif (is_string($id) && empty($id)) {
             PHPUnit::fail($this->withIndex('Resource has an empty string id member'));
         }
+    }
+
+    /**
+     * @param array $relationships
+     * @return array
+     */
+    private function normalizeRelationships(array $relationships)
+    {
+        $normalized = [];
+
+        foreach ($relationships as $key => $value) {
+
+            if (is_numeric($key)) {
+                $key = $value;
+                $value = [];
+            }
+
+            $normalized[$key] = $value;
+        }
+
+        return $normalized;
     }
 }
