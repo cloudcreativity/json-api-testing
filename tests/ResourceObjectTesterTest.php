@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Testing;
 /**
  * Class ResourceTesterTest
  *
- * @package CloudCreativity\JsonApi
+ * @package CloudCreativity\JsonApi\Testing
  */
 class ResourceObjectTesterTest extends TestCase
 {

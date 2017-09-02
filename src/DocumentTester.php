@@ -24,7 +24,7 @@ use stdClass;
 /**
  * Class DocumentTester
  *
- * @package CloudCreativity\JsonApi
+ * @package CloudCreativity\JsonApi\Testing
  */
 class DocumentTester
 {

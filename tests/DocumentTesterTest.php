@@ -20,7 +20,7 @@ namespace CloudCreativity\JsonApi\Testing;
 /**
  * Class DocumentTesterTest
  *
- * @package CloudCreativity\JsonApi
+ * @package CloudCreativity\JsonApi\Testing
  */
 class DocumentTesterTest extends TestCase
 {
