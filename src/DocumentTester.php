@@ -179,4 +179,18 @@ class DocumentTester extends ObjectTester
 
         return new ErrorsTester($this->object->{self::KEYWORD_ERRORS});
     }
+
+    /**
+     * Assert that the document does not have errors, and output the errors if it does.
+     *
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertNoErrors($message = null)
+    {
+        $message = $message ?: "Unexpected JSON API errors.\n" . json_encode($this->object, JSON_PRETTY_PRINT);
+        $this->assertMemberMissing(self::KEYWORD_ERRORS, $message);
+
+        return $this;
+    }
 }

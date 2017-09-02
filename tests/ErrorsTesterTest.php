@@ -38,6 +38,7 @@ class ErrorsTesterTest extends TestCase
 JSON_API;
 
         $document = DocumentTester::create($content);
+        $document->assertNoErrors();
 
         $this->willFail(function () use ($document) {
             $document->assertErrors();
@@ -47,12 +48,15 @@ JSON_API;
     public function testEmptyErrors()
     {
         $content = '{"errors": []}';
-        $errors = DocumentTester::create($content)
-            ->assertErrors()
-            ->assertEmpty();
+        $document = DocumentTester::create($content);
+        $errors = $document->assertErrors()->assertEmpty();
 
         $this->willFail(function () use ($errors) {
             $errors->assertNotEmpty();
+        });
+
+        $this->willFail(function () use ($document) {
+            $document->assertNoErrors();
         });
     }
 
