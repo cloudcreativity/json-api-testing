@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
 /**
  * Class TestCase
  *
- * @package CloudCreativity\JsonApi
+ * @package CloudCreativity\JsonApi\Testing
  */
 class TestCase extends BaseTestCase
 {

@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Testing;
 /**
  * Class ResourceTesterTest
  *
- * @package CloudCreativity\JsonApi
+ * @package CloudCreativity\JsonApi\Testing
  */
 class ResourceObjectTesterTest extends TestCase
 {
@@ -64,6 +64,53 @@ JSON_API;
         });
     }
 
+    public function testTypeIs()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $resource = DocumentTester::create($content)->assertResource();
+        $resource->assertTypeIs('posts');
+        $resource->assertTypeIs(['comments', 'posts']);
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertTypeIs('comments');
+        });
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertTypeIs(['comments', 'tags']);
+        });
+    }
+
+    public function testIs()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $resource = DocumentTester::create($content)->assertResource();
+        $resource->assertIs('posts', '123');
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIs('posts', '999');
+        });
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIs('comments', '123');
+        });
+    }
+
     public function testNoId()
     {
         $content = <<<JSON_API
@@ -102,6 +149,30 @@ JSON_API;
         });
     }
 
+    public function testIdIs()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $resource = DocumentTester::create($content)->assertResource();
+        $resource->assertIdIs('123');
+        $resource->assertIdIs(['999', '123']);
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIdIs('999');
+        });
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIdIs(['1', '2']);
+        });
+    }
+
     /**
      * @return ResourceObjectTester
      */
@@ -125,7 +196,19 @@ JSON_API;
 
         $resource = DocumentTester::create($content)->assertResource();
 
-        $resource->assertAttribute('title', 'My First Post')
+        $expected = [
+            'type' => 'posts',
+            'id' => '123',
+            'attributes' => [
+                'title' => 'My First Post',
+                'tags' => ['news', 'misc'],
+                'content' => 'This is my first post',
+                'rank' => 1,
+            ],
+        ];
+
+        $resource->assertMatches($expected)
+            ->assertAttribute('title', 'My First Post')
             ->assertAttribute('rank', '1')
             ->assertAttributeIs('rank', 1);
 
@@ -135,6 +218,15 @@ JSON_API;
 
         $this->willFail(function () use ($resource) {
             $resource->assertAttributeIs('rank', '1');
+        });
+
+        $this->willFail(function () use ($resource, $expected) {
+            $expected['attributes']['tags'][] = 'another';
+            $resource->assertMatches($expected);
+        });
+
+        $this->willFail(function () use ($content) {
+            DocumentTester::create($content)->assertResourceIdentifier();
         });
 
         return $resource;

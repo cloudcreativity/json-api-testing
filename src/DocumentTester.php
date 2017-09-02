@@ -24,17 +24,14 @@ use stdClass;
 /**
  * Class DocumentTester
  *
- * @package CloudCreativity\JsonApi
+ * @package CloudCreativity\JsonApi\Testing
  */
-class DocumentTester
+class DocumentTester extends ObjectTester
 {
-
-    const KEYWORD_DATA = 'data';
-    const KEYWORD_INCLUDED = 'included';
-    const KEYWORD_ERRORS = 'errors';
 
     /**
      * @var stdClass
+     * @deprecated
      */
     private $document;
 
@@ -66,6 +63,7 @@ class DocumentTester
      */
     public function __construct(stdClass $document)
     {
+        parent::__construct($document);
         $this->document = $document;
     }
 
@@ -92,13 +90,42 @@ class DocumentTester
      *
      * @param string|null $message
      * @return $this
+     * @deprecated use `assertHasData`
      */
     public function assertData($message = null)
     {
-        $message = $message ?: 'Document does not have a data member.';
-        Assert::assertObjectHasAttribute(self::KEYWORD_DATA, $this->document, $message);
+        return $this->assertHasData($message);
+    }
+
+    /**
+     * Assert that the data member exists and it is null.
+     *
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertDataNull($message = null)
+    {
+        $this->assertMemberInternalType(self::KEYWORD_DATA, 'null', $message);
 
         return $this;
+    }
+
+    /**
+     * Assert that the data member is a resource identifier.
+     *
+     * @param string|null $message
+     * @return ResourceIdentifierTester
+     */
+    public function assertResourceIdentifier($message = null)
+    {
+        $this->assertMemberInternalType(self::KEYWORD_DATA, 'object', $message);
+        $identifier = new ResourceIdentifierTester($this->object->{self::KEYWORD_DATA});
+
+        /** Check that these members do not exist, otherwise it's a resource not a resource identifier. */
+        $identifier->assertMemberMissing(self::KEYWORD_ATTRIBUTES, $message);
+        $identifier->assertMemberMissing(self::KEYWORD_RELATIONSHIPS, $message);
+
+        return $identifier;
     }
 
     /**
@@ -109,12 +136,9 @@ class DocumentTester
      */
     public function assertResource($message = null)
     {
-        $message = $message ?: 'Document does not have a resource in its data member.';
-        $resource = $this->getData();
+        $this->assertMemberInternalType(self::KEYWORD_DATA, 'object', $message);
 
-        Assert::assertInternalType('object', $resource, $message);
-
-        return new ResourceObjectTester($resource);
+        return new ResourceObjectTester($this->object->{self::KEYWORD_DATA});
     }
 
     /**
@@ -125,12 +149,9 @@ class DocumentTester
      */
     public function assertResourceCollection($message = null)
     {
-        $message = $message ?: 'Document does not have a resource collection in its data member.';
-        $collection = $this->getData();
+        $this->assertMemberInternalType(self::KEYWORD_DATA, 'array', $message);
 
-        Assert::assertInternalType('array', $collection, $message);
-
-        return new ResourceObjectsTester($collection);
+        return new ResourceObjectsTester($this->object->{self::KEYWORD_DATA});
     }
 
     /**
@@ -141,10 +162,9 @@ class DocumentTester
      */
     public function assertIncluded($message = null)
     {
-        $message = $message ?: 'Document does not contain an included member.';
-        Assert::assertObjectHasAttribute(self::KEYWORD_INCLUDED, $this->document, $message);
+        $this->assertMemberInternalType(self::KEYWORD_INCLUDED, 'array', $message);
 
-        return new ResourceObjectsTester((array) $this->document->{self::KEYWORD_INCLUDED});
+        return new ResourceObjectsTester($this->object->{self::KEYWORD_INCLUDED});
     }
 
     /**
@@ -155,9 +175,22 @@ class DocumentTester
      */
     public function assertErrors($message = null)
     {
-        $message = $message ?: 'Document does not contain errors.';
-        Assert::assertObjectHasAttribute(self::KEYWORD_ERRORS, $this->document, $message);
+        $this->assertMemberInternalType(self::KEYWORD_ERRORS, 'array', $message);
 
-        return new ErrorsTester((array) $this->document->{self::KEYWORD_ERRORS});
+        return new ErrorsTester($this->object->{self::KEYWORD_ERRORS});
+    }
+
+    /**
+     * Assert that the document does not have errors, and output the errors if it does.
+     *
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertNoErrors($message = null)
+    {
+        $message = $message ?: "Unexpected JSON API errors.\n" . json_encode($this->object, JSON_PRETTY_PRINT);
+        $this->assertMemberMissing(self::KEYWORD_ERRORS, $message);
+
+        return $this;
     }
 }
