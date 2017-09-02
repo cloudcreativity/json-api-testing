@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [0.2.0] - 2017-09-02
+
+### Removed
+- This package no longer supports PHP 5.6.
+- Updated to PHPUnit v6.
+
 ## [0.1.1] - 2017-09-02
 
 ### Added

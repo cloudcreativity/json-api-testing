@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\Utils\Object\Obj;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 use stdClass;
 
 /**
@@ -86,7 +86,7 @@ class ResourceObjectTester extends ObjectTester
     public function assertMatches(array $expected)
     {
         if (!isset($expected[self::KEYWORD_TYPE])) {
-            PHPUnit::fail('Expected resource data must contain a type key.');
+            Assert::fail('Expected resource data must contain a type key.');
         }
 
         $attributes = isset($expected[self::KEYWORD_ATTRIBUTES]) ?
@@ -128,7 +128,7 @@ class ResourceObjectTester extends ObjectTester
 
         $message = $message ?: "Resource object [$actual] does not match expected resource [$expected]";
 
-        PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
+        Assert::assertEquals($expected, $actual, $this->withIndex($message));
 
         return $this;
     }
@@ -195,7 +195,7 @@ class ResourceObjectTester extends ObjectTester
     {
         $message = $message ?: "Unexpected attribute [$key]";
         $actual = $this->getAttribute($key);
-        PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
+        Assert::assertEquals($expected, $actual, $this->withIndex($message));
 
         return $this;
     }
@@ -212,7 +212,7 @@ class ResourceObjectTester extends ObjectTester
     {
         $message = $message ?: "Unexpected attribute [$key]";
         $actual = $this->getAttribute($key);
-        PHPUnit::assertSame($expected, $actual, $this->withIndex($message));
+        Assert::assertSame($expected, $actual, $this->withIndex($message));
 
         return $this;
     }
@@ -232,7 +232,7 @@ class ResourceObjectTester extends ObjectTester
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource attributes') . ': ' . json_encode($actual);
 
-        PHPUnit::assertArraySubset($expected, $actual, false, $message);
+        Assert::assertArraySubset($expected, $actual, false, $message);
 
         return $this;
     }
@@ -261,7 +261,7 @@ class ResourceObjectTester extends ObjectTester
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource relationships') . ': ' . json_encode($actual);
 
-        PHPUnit::assertArraySubset($expected, $actual, false, $message);
+        Assert::assertArraySubset($expected, $actual, false, $message);
 
         return $this;
     }
@@ -274,15 +274,15 @@ class ResourceObjectTester extends ObjectTester
         $type = $this->getType();
 
         if (!is_string($type) || empty($type)) {
-            PHPUnit::fail($this->withIndex('Resource does not have a type member'));
+            Assert::fail($this->withIndex('Resource does not have a type member'));
         }
 
         $id = $this->getId();
 
         if (!is_string($id) && !is_int($id)) {
-            PHPUnit::fail($this->withIndex('Resource does not have an id member'));
+            Assert::fail($this->withIndex('Resource does not have an id member'));
         } elseif (is_string($id) && empty($id)) {
-            PHPUnit::fail($this->withIndex('Resource has an empty string id member'));
+            Assert::fail($this->withIndex('Resource has an empty string id member'));
         }
     }
 

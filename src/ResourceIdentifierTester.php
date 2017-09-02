@@ -18,7 +18,7 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use stdClass;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 
 /**
  * Class ResourceIdentifierTester
@@ -57,7 +57,7 @@ class ResourceIdentifierTester extends ObjectTester
 
         $message = $message ?: "Resource identifier [$actual] does not match expected identifier [$expected]";
 
-        PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
+        Assert::assertEquals($expected, $actual, $this->withIndex($message));
 
         return $this;
     }

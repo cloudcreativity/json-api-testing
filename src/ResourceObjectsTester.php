@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use Generator;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 
 /**
  * Class ResourcesTester
@@ -52,7 +52,7 @@ class ResourceObjectsTester extends AbstractTraversableTester
         foreach ($this->stack as $index => $resource) {
 
             if (!is_object($resource)) {
-                PHPUnit::fail(sprintf('Encountered a resource that is not an object at index %d', $index));
+                Assert::fail(sprintf('Encountered a resource that is not an object at index %d', $index));
             }
 
             yield $index => new ResourceObjectTester($resource, $index);
@@ -112,7 +112,7 @@ class ResourceObjectsTester extends AbstractTraversableTester
             $actual[$type] = $type;
         }
 
-        PHPUnit::assertEquals($expected, $actual, 'Unexpected resource types in data collection.');
+        Assert::assertEquals($expected, $actual, 'Unexpected resource types in data collection.');
 
         return $this;
     }
@@ -153,7 +153,7 @@ class ResourceObjectsTester extends AbstractTraversableTester
         }
 
         $message = $message ?: "Expected resource [$type:$id] does not exist in collection.";
-        PHPUnit::assertNotNull($match, $message);
+        Assert::assertNotNull($match, $message);
 
         return $match;
     }
@@ -183,7 +183,7 @@ class ResourceObjectsTester extends AbstractTraversableTester
             json_encode($expected)
         );
 
-        PHPUnit::assertEquals($this->normalizeIdentifiers($expected), $actual, $message);
+        Assert::assertEquals($this->normalizeIdentifiers($expected), $actual, $message);
 
         return $this;
     }

@@ -18,7 +18,7 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use stdClass;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 
 /**
  * Class ObjectTester
@@ -69,7 +69,7 @@ class ObjectTester
     public function assertMemberExists($name, $message = null)
     {
         $message = $this->withIndex($message ?: "JSON API object does not have expected member [$name]");
-        PHPUnit::assertObjectHasAttribute($name, $this->object, $message);
+        Assert::assertObjectHasAttribute($name, $this->object, $message);
 
         return $this;
     }
@@ -84,7 +84,7 @@ class ObjectTester
     public function assertMemberMissing($name, $message = null)
     {
         $message = $this->withIndex($message ?: "JSON API object has unexpected member [$name]");
-        PHPUnit::assertObjectNotHasAttribute($name, $this->object, $message);
+        Assert::assertObjectNotHasAttribute($name, $this->object, $message);
 
         return $this;
     }
@@ -101,7 +101,7 @@ class ObjectTester
     {
         $this->assertMemberExists($name, $message);
         $message = $message ?: "JSON API member $name is not expected type [$type]";
-        PHPUnit::assertInternalType($type, $this->object->{$name}, $this->withIndex($message));
+        Assert::assertInternalType($type, $this->object->{$name}, $this->withIndex($message));
 
         return $this;
     }
@@ -116,7 +116,7 @@ class ObjectTester
     public function assertMemberEmpty($name, $message = null)
     {
         $actual = isset($this->object->{$name}) ? $this->object->{$name} : null;
-        PHPUnit::assertEmpty($actual, $this->withIndex($message ?: "JSON API member $name must be empty"));
+        Assert::assertEmpty($actual, $this->withIndex($message ?: "JSON API member $name must be empty"));
 
         return $this;
     }
@@ -131,7 +131,7 @@ class ObjectTester
     public function assertMemberNotEmpty($name, $message = null)
     {
         $actual = isset($this->object->{$name}) ? $this->object->{$name} : null;
-        PHPUnit::assertNotEmpty($actual, $this->withIndex($message ?: "JSON API member $name must not be empty"));
+        Assert::assertNotEmpty($actual, $this->withIndex($message ?: "JSON API member $name must not be empty"));
 
         return $this;
     }
@@ -176,9 +176,9 @@ class ObjectTester
         $message = $message ?: "Unexpected JSON API object type: " . implode(',', (array) $expected);
 
         if (!is_array($expected)) {
-            PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
+            Assert::assertEquals($expected, $actual, $this->withIndex($message));
         } else {
-            PHPUnit::assertContains($actual, $expected, $this->withIndex($message));
+            Assert::assertContains($actual, $expected, $this->withIndex($message));
         }
 
         return $this;
@@ -211,9 +211,9 @@ class ObjectTester
         $message = $message ?: sprintf("Unexpected JSON API object id [%s]", implode(',', (array) $expected));
 
         if (!is_array($expected)) {
-            PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
+            Assert::assertEquals($expected, $actual, $this->withIndex($message));
         } else {
-            PHPUnit::assertContains($actual, $expected, $this->withIndex($message));
+            Assert::assertContains($actual, $expected, $this->withIndex($message));
         }
 
         return $this;

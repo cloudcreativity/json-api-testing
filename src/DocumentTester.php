@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 use stdClass;
 
 /**
@@ -46,11 +46,11 @@ class DocumentTester extends ObjectTester
         $decoded = json_decode($responseContent);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            PHPUnit::fail('Invalid response JSON: ' . json_last_error_msg());
+            Assert::fail('Invalid response JSON: ' . json_last_error_msg());
         }
 
         if (!is_object($decoded)) {
-            PHPUnit::fail('Invalid JSON API response content.');
+            Assert::fail('Invalid JSON API response content.');
         }
 
         return new self($decoded);
