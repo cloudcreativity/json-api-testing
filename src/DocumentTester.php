@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 use stdClass;
 
 /**
@@ -49,11 +49,11 @@ class DocumentTester
         $decoded = json_decode($responseContent);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            PHPUnit::fail('Invalid response JSON: ' . json_last_error_msg());
+            Assert::fail('Invalid response JSON: ' . json_last_error_msg());
         }
 
         if (!is_object($decoded)) {
-            PHPUnit::fail('Invalid JSON API response content.');
+            Assert::fail('Invalid JSON API response content.');
         }
 
         return new self($decoded);
@@ -96,7 +96,7 @@ class DocumentTester
     public function assertData($message = null)
     {
         $message = $message ?: 'Document does not have a data member.';
-        PHPUnit::assertObjectHasAttribute(self::KEYWORD_DATA, $this->document, $message);
+        Assert::assertObjectHasAttribute(self::KEYWORD_DATA, $this->document, $message);
 
         return $this;
     }
@@ -112,7 +112,7 @@ class DocumentTester
         $message = $message ?: 'Document does not have a resource in its data member.';
         $resource = $this->getData();
 
-        PHPUnit::assertInternalType('object', $resource, $message);
+        Assert::assertInternalType('object', $resource, $message);
 
         return new ResourceObjectTester($resource);
     }
@@ -128,7 +128,7 @@ class DocumentTester
         $message = $message ?: 'Document does not have a resource collection in its data member.';
         $collection = $this->getData();
 
-        PHPUnit::assertInternalType('array', $collection, $message);
+        Assert::assertInternalType('array', $collection, $message);
 
         return new ResourceObjectsTester($collection);
     }
@@ -142,7 +142,7 @@ class DocumentTester
     public function assertIncluded($message = null)
     {
         $message = $message ?: 'Document does not contain an included member.';
-        PHPUnit::assertObjectHasAttribute(self::KEYWORD_INCLUDED, $this->document, $message);
+        Assert::assertObjectHasAttribute(self::KEYWORD_INCLUDED, $this->document, $message);
 
         return new ResourceObjectsTester((array) $this->document->{self::KEYWORD_INCLUDED});
     }
@@ -156,7 +156,7 @@ class DocumentTester
     public function assertErrors($message = null)
     {
         $message = $message ?: 'Document does not contain errors.';
-        PHPUnit::assertObjectHasAttribute(self::KEYWORD_ERRORS, $this->document, $message);
+        Assert::assertObjectHasAttribute(self::KEYWORD_ERRORS, $this->document, $message);
 
         return new ErrorsTester((array) $this->document->{self::KEYWORD_ERRORS});
     }

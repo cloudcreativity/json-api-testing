@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use Generator;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 
 /**
  * Class ErrorsTester
@@ -52,7 +52,7 @@ class ErrorsTester extends AbstractTraversableTester
         foreach ($this->errors as $index => $error) {
 
             if (!is_object($error)) {
-                PHPUnit::fail(sprintf('Encountered an error that is not an object at index %d', $index));
+                Assert::fail(sprintf('Encountered an error that is not an object at index %d', $index));
             }
 
             yield $index => new ErrorTester($error);
@@ -84,7 +84,7 @@ class ErrorsTester extends AbstractTraversableTester
     public function assertOne($message = '')
     {
         $message = $message ?: 'Expecting only one error in the error collection.';
-        PHPUnit::assertSame(1, $this->count(), $message);
+        Assert::assertSame(1, $this->count(), $message);
 
         return current($this->getArrayCopy());
     }
@@ -102,7 +102,7 @@ class ErrorsTester extends AbstractTraversableTester
         });
 
         foreach ((array) $codes as $expected) {
-            PHPUnit::assertContains($expected, $actual, sprintf(
+            Assert::assertContains($expected, $actual, sprintf(
                 'Error code %s not found in codes: [%s]', $expected, implode(',', $actual)
             ));
         }
@@ -123,7 +123,7 @@ class ErrorsTester extends AbstractTraversableTester
         });
 
         foreach ((array) $statuses as $expected) {
-            PHPUnit::assertContains($expected, $actual, sprintf(
+            Assert::assertContains($expected, $actual, sprintf(
                 'Error status %s not found in statuses: [%s]', $expected, implode(',', $actual)
             ));
         }
@@ -145,7 +145,7 @@ class ErrorsTester extends AbstractTraversableTester
         });
 
         foreach ((array) $pointers as $expected) {
-            PHPUnit::assertContains($expected, $actual, sprintf(
+            Assert::assertContains($expected, $actual, sprintf(
                 'Error pointer %s not found in pointers: [%s]', $expected, implode(',', $actual)
             ));
         }
@@ -167,7 +167,7 @@ class ErrorsTester extends AbstractTraversableTester
         });
 
         foreach ((array) $parameters as $expected) {
-            PHPUnit::assertContains($expected, $actual, sprintf(
+            Assert::assertContains($expected, $actual, sprintf(
                 'Error parameter %s not found in parameters: [%s]', $expected, implode(',', $actual)
             ));
         }

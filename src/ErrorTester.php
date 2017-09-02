@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 use stdClass;
 
 /**
@@ -99,7 +99,7 @@ class ErrorTester
     public function assertCode($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid code at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->getCode(), $message);
+        Assert::assertEquals($expected, $this->getCode(), $message);
 
         return $this;
     }
@@ -123,7 +123,7 @@ class ErrorTester
     public function assertStatus($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid status at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->getStatus(), $message);
+        Assert::assertEquals($expected, $this->getStatus(), $message);
 
         return $this;
     }
@@ -137,7 +137,7 @@ class ErrorTester
             $this->error->{self::KEYWORD_SOURCE} : null;
 
         if (!is_null($source) && !$source instanceof stdClass) {
-            PHPUnit::fail(sprintf('Invalid error source at index %d', $this->index));
+            Assert::fail(sprintf('Invalid error source at index %d', $this->index));
         }
 
         return $source;
@@ -173,7 +173,7 @@ class ErrorTester
     public function assertPointer($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid source pointer at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->getSourcePointer(), $message);
+        Assert::assertEquals($expected, $this->getSourcePointer(), $message);
 
         return $this;
     }
@@ -188,7 +188,7 @@ class ErrorTester
     public function assertParameter($expected, $message = null)
     {
         $message = $message ?: sprintf('Invalid source parameter at error index %d', $this->index);
-        PHPUnit::assertEquals($expected, $this->getSourceParameter(), $message);
+        Assert::assertEquals($expected, $this->getSourceParameter(), $message);
 
         return $this;
     }

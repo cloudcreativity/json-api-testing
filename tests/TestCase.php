@@ -19,7 +19,7 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use Closure;
-use PHPUnit_Framework_AssertionFailedError;
+use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
@@ -40,7 +40,7 @@ class TestCase extends BaseTestCase
 
         try {
             $closure();
-        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+        } catch (AssertionFailedError $e) {
             $didFail = true;
         }
 

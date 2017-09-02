@@ -21,7 +21,7 @@ namespace CloudCreativity\JsonApi\Testing;
 use Closure;
 use Countable;
 use IteratorAggregate;
-use PHPUnit_Framework_Assert as PHPUnit;
+use PHPUnit\Framework\Assert;
 
 /**
  * Class AbstractTraversableTester
@@ -79,7 +79,7 @@ abstract class AbstractTraversableTester implements IteratorAggregate, Countable
      */
     public function assertEmpty($message = '')
     {
-        PHPUnit::assertEmpty($this, $message);
+        Assert::assertEmpty($this, $message);
 
         return $this;
     }
@@ -90,7 +90,7 @@ abstract class AbstractTraversableTester implements IteratorAggregate, Countable
      */
     public function assertNotEmpty($message = '')
     {
-        PHPUnit::assertNotEmpty($this, $message);
+        Assert::assertNotEmpty($this, $message);
 
         return $this;
     }
