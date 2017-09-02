@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## Unreleased
+## [0.1.1] - 2017-09-02
 
 ### Added
 - Can now assert that a resource object is one of multiple types using `assertTypeIs()`.
