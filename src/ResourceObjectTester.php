@@ -137,7 +137,7 @@ class ResourceObjectTester
      */
     public function assertTypeIs($expected, $message = null)
     {
-        $actual = $this->getResource();
+        $actual = $this->getType();
         $message = $message ?: sprintf('Unexpected resource type [%s]', $actual);
         PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
 
@@ -222,7 +222,7 @@ class ResourceObjectTester
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource attributes') . ': ' . json_encode($actual);
 
-        PHPUnit::assertArraySubset($expected, $actual, $message);
+        PHPUnit::assertArraySubset($expected, $actual, false, $message);
 
         return $this;
     }
@@ -251,7 +251,7 @@ class ResourceObjectTester
             $this->withIndex($message) :
             $this->withIndex('Unexpected resource relationships') . ': ' . json_encode($actual);
 
-        PHPUnit::assertArraySubset($expected, $actual, $message);
+        PHPUnit::assertArraySubset($expected, $actual, false, $message);
 
         return $this;
     }

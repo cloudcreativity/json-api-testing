@@ -64,6 +64,48 @@ JSON_API;
         });
     }
 
+    public function testTypeIs()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $resource = DocumentTester::create($content)->assertResource();
+        $resource->assertTypeIs('posts');
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertTypeIs('comments');
+        });
+    }
+
+    public function testIs()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $resource = DocumentTester::create($content)->assertResource();
+        $resource->assertIs('posts', '123');
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIs('posts', '999');
+        });
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIs('comments', '123');
+        });
+    }
+
     public function testNoId()
     {
         $content = <<<JSON_API
