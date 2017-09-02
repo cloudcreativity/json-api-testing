@@ -1,0 +1,48 @@
+{
+    "name": "cloudcreativity/json-api-testing",
+    "description": "PHPUnit test helpers to check JSON API documents.",
+    "keywords": [
+        "jsonapi.org",
+        "json-api",
+        "jsonapi",
+        "cloudcreativity",
+        "json",
+        "api"
+    ],
+    "homepage": "https://github.com/cloudcreativity/json-api",
+    "support": {
+        "issues": "https://github.com/cloudcreativity/json-api/issues"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Cloud Creativity Ltd",
+            "email": "info@cloudcreativity.co.uk"
+        }
+    ],
+    "require": {
+        "php": "^5.6.4|^7.0",
+        "cloudcreativity/utils-object": "^1.0",
+        "phpunit/phpunit": "^5.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "CloudCreativity\\JsonApi\\Testing\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CloudCreativity\\JsonApi\\Testing\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.1.x-dev"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true
+    }
+}
