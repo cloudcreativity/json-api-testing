@@ -172,7 +172,19 @@ JSON_API;
 
         $resource = DocumentTester::create($content)->assertResource();
 
-        $resource->assertAttribute('title', 'My First Post')
+        $expected = [
+            'type' => 'posts',
+            'id' => '123',
+            'attributes' => [
+                'title' => 'My First Post',
+                'tags' => ['news', 'misc'],
+                'content' => 'This is my first post',
+                'rank' => 1,
+            ],
+        ];
+
+        $resource->assertMatches($expected)
+            ->assertAttribute('title', 'My First Post')
             ->assertAttribute('rank', '1')
             ->assertAttributeIs('rank', 1);
 
@@ -182,6 +194,11 @@ JSON_API;
 
         $this->willFail(function () use ($resource) {
             $resource->assertAttributeIs('rank', '1');
+        });
+
+        $this->willFail(function () use ($resource, $expected) {
+            $expected['attributes']['tags'][] = 'another';
+            $resource->assertMatches($expected);
         });
 
         return $resource;

@@ -56,7 +56,7 @@ class ResourceObjectTester
     {
         $this->resource = $resource;
         $this->index = $index;
-        $this->isComplete();
+        $this->assertComplete();
     }
 
     /**
@@ -83,6 +83,41 @@ class ResourceObjectTester
     public function is($type, $id)
     {
         return $this->getType() === $type && $this->getId() == $id;
+    }
+
+    /**
+     * Assert that the resource matches the expected structure.
+     *
+     * @param array $expected
+     *      the expected array representation of the resource.
+     * @return $this
+     */
+    public function assertMatches(array $expected)
+    {
+        if (!isset($expected[self::KEYWORD_TYPE])) {
+            PHPUnit::fail('Expected resource data must contain a type key.');
+        }
+
+        $attributes = isset($expected[self::KEYWORD_ATTRIBUTES]) ?
+            $expected[self::KEYWORD_ATTRIBUTES] : [];
+
+        $relationships = isset($expected[self::KEYWORD_RELATIONSHIPS]) ?
+            $this->normalizeRelationships($expected[self::KEYWORD_RELATIONSHIPS]) : [];
+
+        /** Have we got the correct resource id? */
+        if (isset($expected[self::KEYWORD_ID])) {
+            $this->assertIs($expected[self::KEYWORD_TYPE], $expected[self::KEYWORD_ID]);
+        } else {
+            $this->assertTypeIs($expected[self::KEYWORD_TYPE]);
+        }
+
+        /** Have we got the correct attributes? */
+        $this->assertAttributesSubset($attributes);
+
+        /** Have we got the correct relationships? */
+        $this->assertRelationshipsSubset($relationships);
+
+        return $this;
     }
 
     /**
@@ -277,7 +312,7 @@ class ResourceObjectTester
     /**
      * @return void
      */
-    private function isComplete()
+    private function assertComplete()
     {
         $type = $this->getType();
 
@@ -292,5 +327,26 @@ class ResourceObjectTester
         } elseif (is_string($id) && empty($id)) {
             PHPUnit::fail($this->withIndex('Resource has an empty string id member'));
         }
+    }
+
+    /**
+     * @param array $relationships
+     * @return array
+     */
+    private function normalizeRelationships(array $relationships)
+    {
+        $normalized = [];
+
+        foreach ($relationships as $key => $value) {
+
+            if (is_numeric($key)) {
+                $key = $value;
+                $value = [];
+            }
+
+            $normalized[$key] = $value;
+        }
+
+        return $normalized;
     }
 }
