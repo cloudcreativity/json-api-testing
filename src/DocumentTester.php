@@ -102,6 +102,22 @@ class DocumentTester
     }
 
     /**
+     * Assert that the data member exists and it is null.
+     *
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertDataNull($message = null)
+    {
+        $message = $message ?: 'Document data member is not null.';
+
+        $this->assertData();
+        PHPUnit::assertNull($this->getData(), $message);
+
+        return $this;
+    }
+
+    /**
      * Assert that the data member is an object and return a resource tester.
      *
      * @param string|null $message
