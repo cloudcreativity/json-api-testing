@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+- Can now assert that a resource object is one of multiple types using `assertTypeIs()`.
+
 ### Fixed
 - Resource object type assertion caused a PHP error.
 

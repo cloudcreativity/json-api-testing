@@ -129,9 +129,9 @@ class ResourceObjectTester
     }
 
     /**
-     * Assert that the resource type matches the expected type.
+     * Assert that the resource type matches the expected type(s)
      *
-     * @param $expected
+     * @param string|string[] $expected
      * @param string|null $message
      * @return $this
      */
@@ -139,7 +139,12 @@ class ResourceObjectTester
     {
         $actual = $this->getType();
         $message = $message ?: sprintf('Unexpected resource type [%s]', $actual);
-        PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
+
+        if (!is_array($expected)) {
+            PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
+        } else {
+            PHPUnit::assertContains($actual, $expected, $this->withIndex($message));
+        }
 
         return $this;
     }

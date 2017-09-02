@@ -77,9 +77,14 @@ JSON_API;
 
         $resource = DocumentTester::create($content)->assertResource();
         $resource->assertTypeIs('posts');
+        $resource->assertTypeIs(['comments', 'posts']);
 
         $this->willFail(function () use ($resource) {
             $resource->assertTypeIs('comments');
+        });
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertTypeIs(['comments', 'tags']);
         });
     }
 
