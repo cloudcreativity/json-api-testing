@@ -27,23 +27,14 @@ use stdClass;
  *
  * @package CloudCreativity\JsonApi\Testing
  */
-class ResourceObjectTester
+class ResourceObjectTester extends ObjectTester
 {
-
-    const KEYWORD_TYPE = 'type';
-    const KEYWORD_ID = 'id';
-    const KEYWORD_ATTRIBUTES = 'attributes';
-    const KEYWORD_RELATIONSHIPS = 'relationships';
 
     /**
      * @var stdClass
+     * @deprecated
      */
     private $resource;
-
-    /**
-     * @var int|null
-     */
-    private $index;
 
     /**
      * ResourceTester constructor.
@@ -54,8 +45,8 @@ class ResourceObjectTester
      */
     public function __construct(stdClass $resource, $index = null)
     {
+        parent::__construct($resource, $index);
         $this->resource = $resource;
-        $this->index = $index;
         $this->assertComplete();
     }
 
@@ -123,18 +114,21 @@ class ResourceObjectTester
     /**
      * Assert that the resource matches the expected type and id.
      *
-     * @param $type
-     * @param $id
+     * @param $expectedType
+     * @param $expectedId
      * @param string|null $message
      * @return $this
      */
-    public function assertIs($type, $id, $message = null)
+    public function assertIs($expectedType, $expectedId, $message = null)
     {
-        $expected = sprintf('%s:%s', $type, $id);
-        $actual = sprintf('%s:%s', $this->getType(), $this->getId());
-        $message = $message ?: "Resource [$actual] does not match expected resource [$expected]";
+        $actualType = isset($this->object->{self::KEYWORD_TYPE}) ? $this->object->{self::KEYWORD_TYPE} : null;
+        $actualId = isset($this->object->{self::KEYWORD_ID}) ? $this->object->{self::KEYWORD_ID} : null;
+        $expected = sprintf('%s:%s', $expectedType, $expectedId);
+        $actual = sprintf('%s:%s', $actualType, $actualId);
 
-        PHPUnit::assertTrue($this->is($type, $id), $this->withIndex($message));
+        $message = $message ?: "Resource object [$actual] does not match expected resource [$expected]";
+
+        PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
 
         return $this;
     }
@@ -153,35 +147,11 @@ class ResourceObjectTester
      *
      * @param string|null $message
      * @return $this
+     * @deprecated use `assertHasType`
      */
     public function assertType($message = null)
     {
-        $actual = $this->getType();
-        $message = $message ?: 'Resource does not have a type';
-        PHPUnit::assertTrue(is_string($actual) && !empty($actual), $this->withIndex($message));
-
-        return $this;
-    }
-
-    /**
-     * Assert that the resource type matches the expected type(s)
-     *
-     * @param string|string[] $expected
-     * @param string|null $message
-     * @return $this
-     */
-    public function assertTypeIs($expected, $message = null)
-    {
-        $actual = $this->getType();
-        $message = $message ?: sprintf('Unexpected resource type [%s]', $actual);
-
-        if (!is_array($expected)) {
-            PHPUnit::assertEquals($expected, $actual, $this->withIndex($message));
-        } else {
-            PHPUnit::assertContains($actual, $expected, $this->withIndex($message));
-        }
-
-        return $this;
+        return $this->assertHasType($message);
     }
 
     /**
@@ -294,19 +264,6 @@ class ResourceObjectTester
         PHPUnit::assertArraySubset($expected, $actual, false, $message);
 
         return $this;
-    }
-
-    /**
-     * @param $message
-     * @return string
-     */
-    protected function withIndex($message)
-    {
-        if (is_int($this->index)) {
-            $message .= " at index [$this->index]";
-        }
-
-        return $message;
     }
 
     /**

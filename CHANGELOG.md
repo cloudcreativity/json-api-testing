@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file. This projec
 - Can now assert that a resource object is one of multiple types using `assertTypeIs()`.
 - Can now assert that the `data` member of a document is `null`.
 - Can now assert that a resource object matches an expected structure.
+- Can now assert that the `data` member of a document is a resource identifier.
+
+### Changed
+- Added a generic JSON API object tester class containing common assertions.
 
 ### Fixed
 - Resource object type assertion caused a PHP error.

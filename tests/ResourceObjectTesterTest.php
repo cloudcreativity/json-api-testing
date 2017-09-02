@@ -149,6 +149,30 @@ JSON_API;
         });
     }
 
+    public function testIdIs()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $resource = DocumentTester::create($content)->assertResource();
+        $resource->assertIdIs('123');
+        $resource->assertIdIs(['999', '123']);
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIdIs('999');
+        });
+
+        $this->willFail(function () use ($resource) {
+            $resource->assertIdIs(['1', '2']);
+        });
+    }
+
     /**
      * @return ResourceObjectTester
      */
@@ -199,6 +223,10 @@ JSON_API;
         $this->willFail(function () use ($resource, $expected) {
             $expected['attributes']['tags'][] = 'another';
             $resource->assertMatches($expected);
+        });
+
+        $this->willFail(function () use ($content) {
+            DocumentTester::create($content)->assertResourceIdentifier();
         });
 
         return $resource;
