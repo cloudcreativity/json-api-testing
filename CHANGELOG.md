@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+- Object tester now had meta test helpers.
+- Can now assert the order of resources within the a resource object collection.
+
 ## [0.3.0] - 2018-02-08
 
 ### Added

@@ -102,6 +102,32 @@ JSON_API;
         });
     }
 
+    /**
+     * @param ResourceObjectsTester $collection
+     * @depends testTypes
+     */
+    public function testContainsExact(ResourceObjectsTester $collection)
+    {
+        $collection->assertContainsExact([
+            ['type' => 'posts', 'id' => '1'],
+            ['type' => 'posts', 'id' => '2'],
+        ]);
+
+        $this->willFail(function () use ($collection) {
+            $collection->assertContainsExact([
+                ['type' => 'posts', 'id' => '2'],
+                ['type' => 'posts', 'id' => '1'],
+            ]);
+        });
+
+        $this->willFail(function () use ($collection) {
+            $collection->assertContainsExact([
+                ['type' => 'posts', 'id' => '1'],
+                ['type' => 'comments', 'id' => '2'],
+            ]);
+        });
+    }
+
     public function testPolymorphicTypes()
     {
         $content = <<<JSON_API

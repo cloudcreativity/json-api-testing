@@ -70,4 +70,83 @@ JSON_API;
             $document->assertDataNull();
         });
     }
+
+    public function testIncludedResources()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "1",
+        "relationships": {
+            "author": {
+                "data": {
+                    "type": "users",
+                    "id": "2"
+                }
+            }
+        }
+    },
+    "included": [
+        {
+            "type": "users",
+            "id": "2",
+            "attributes": {}
+        }
+    ]
+}
+JSON_API;
+
+        $document = DocumentTester::create($content);
+
+        $included = $document->assertIncluded();
+
+        $this->assertInstanceOf(ResourceObjectsTester::class, $included);
+        $included->assertResource('users', 2);
+    }
+
+    public function testIncludedIsNotPresent()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123"
+    }
+}
+JSON_API;
+
+        $document = DocumentTester::create($content);
+
+        $this->willFail(function () use ($document) {
+            $document->assertIncluded();
+        });
+    }
+
+    public function testMeta()
+    {
+        $content = <<<JSON_API
+{
+    "meta": {
+        "page": 1,
+        "size": 15,
+        "last": 10
+    },
+    "data": []
+}
+JSON_API;
+
+        $document = DocumentTester::create($content);
+
+        $document->assertMetaSubset(['page' => 1, 'size' => 15]);
+        $document->assertMetaIs(['page' => 1, 'size' => 15, 'last' => 10]);
+
+        $this->willFail(function () use ($document) {
+            $document->assertMetaSubset(['page' => 2]);
+        });
+
+        $this->willFail(function () use ($document) {
+            $document->assertMetaIs(['page' => 2, 'size' => 15, 'last' => 10]);
+        });
+    }
 }

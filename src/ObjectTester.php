@@ -17,6 +17,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
+use CloudCreativity\Utils\Object\Obj;
 use stdClass;
 use PHPUnit\Framework\Assert;
 
@@ -35,6 +36,7 @@ class ObjectTester
     const KEYWORD_ID = 'id';
     const KEYWORD_ATTRIBUTES = 'attributes';
     const KEYWORD_RELATIONSHIPS = 'relationships';
+    const KEYWORD_META = 'meta';
 
     /**
      * @var stdClass
@@ -215,6 +217,47 @@ class ObjectTester
         } else {
             Assert::assertContains($actual, $expected, $this->withIndex($message));
         }
+
+        return $this;
+    }
+
+    /**
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertHasMeta($message = null)
+    {
+        $this->assertMemberInternalType(self::KEYWORD_META, 'object', $message);
+
+        return $this;
+    }
+
+    /**
+     * @param array $expected
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertMetaSubset(array $expected, $message = null)
+    {
+        $this->assertHasMeta($message);
+        $actual = $this->object->{self::KEYWORD_META};
+
+        Assert::assertArraySubset($expected, Obj::toArray($actual), false, $message);
+
+        return $this;
+    }
+
+    /**
+     * @param array $expected
+     * @param string|null $message
+     * @return $this
+     */
+    public function assertMetaIs(array $expected, $message = null)
+    {
+        $this->assertHasMeta($message);
+        $actual = $this->object->{self::KEYWORD_META};
+
+        Assert::assertEquals($expected, Obj::toArray($actual), $message);
 
         return $this;
     }
