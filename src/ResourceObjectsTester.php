@@ -142,10 +142,10 @@ class ResourceObjectsTester extends AbstractTraversableTester
      *
      * @param string $type
      * @param string|int $id
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertContainsResource($type, $id, $message = null)
+    public function assertContainsResource($type, $id, $message = '')
     {
         $this->assertResource($type, $id, $message);
 
@@ -157,10 +157,10 @@ class ResourceObjectsTester extends AbstractTraversableTester
      *
      * @param string $type
      * @param string|int $id
-     * @param string|null $message
+     * @param string $message
      * @return ResourceObjectTester|null
      */
-    public function assertResource($type, $id, $message = null)
+    public function assertResource($type, $id, $message = '')
     {
         $match = null;
 
@@ -191,10 +191,10 @@ class ResourceObjectsTester extends AbstractTraversableTester
      * collection contains any additional resources.
      *
      * @param array $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertContainsOnly(array $expected, $message = null)
+    public function assertContainsOnly(array $expected, $message = '')
     {
         $actual = $this->getIdentifiers();
         $message = $message ?: sprintf(
@@ -224,7 +224,7 @@ class ResourceObjectsTester extends AbstractTraversableTester
      * @param null $message
      * @return $this
      */
-    public function assertContainsExact(array $expected, $message = null)
+    public function assertContainsExact(array $expected, $message = '')
     {
         $actual = $this->getAllIdentifiers();
         $message = $message ?: sprintf(
