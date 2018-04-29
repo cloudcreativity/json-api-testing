@@ -93,10 +93,10 @@ class ErrorTester
      * Assert that the error code equals the expected code.
      *
      * @param $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertCode($expected, $message = null)
+    public function assertCode($expected, $message = '')
     {
         $message = $message ?: sprintf('Invalid code at error index %d', $this->index);
         Assert::assertEquals($expected, $this->getCode(), $message);
@@ -117,10 +117,10 @@ class ErrorTester
      * Assert that the error status equals the expected status.
      *
      * @param $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertStatus($expected, $message = null)
+    public function assertStatus($expected, $message = '')
     {
         $message = $message ?: sprintf('Invalid status at error index %d', $this->index);
         Assert::assertEquals($expected, $this->getStatus(), $message);
@@ -167,10 +167,10 @@ class ErrorTester
      * Assert that the error source pointer equals the expected pointer.
      *
      * @param $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertPointer($expected, $message = null)
+    public function assertPointer($expected, $message = '')
     {
         $message = $message ?: sprintf('Invalid source pointer at error index %d', $this->index);
         Assert::assertEquals($expected, $this->getSourcePointer(), $message);
@@ -182,10 +182,10 @@ class ErrorTester
      * Assert that the error source parameter equals the expected parameter.
      *
      * @param $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertParameter($expected, $message = null)
+    public function assertParameter($expected, $message = '')
     {
         $message = $message ?: sprintf('Invalid source parameter at error index %d', $this->index);
         Assert::assertEquals($expected, $this->getSourceParameter(), $message);

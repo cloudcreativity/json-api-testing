@@ -45,10 +45,10 @@ class ResourceIdentifierTester extends ObjectTester
      *
      * @param $expectedType
      * @param $expectedId
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertIs($expectedType, $expectedId, $message = null)
+    public function assertIs($expectedType, $expectedId, $message = '')
     {
         $actualType = isset($this->object->{self::KEYWORD_TYPE}) ? $this->object->{self::KEYWORD_TYPE} : null;
         $actualId = isset($this->object->{self::KEYWORD_ID}) ? $this->object->{self::KEYWORD_ID} : null;

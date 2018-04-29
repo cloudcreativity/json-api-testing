@@ -88,11 +88,11 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the document has a data member.
      *
-     * @param string|null $message
+     * @param string $message
      * @return $this
      * @deprecated use `assertHasData`
      */
-    public function assertData($message = null)
+    public function assertData($message = '')
     {
         return $this->assertHasData($message);
     }
@@ -100,10 +100,10 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the data member exists and it is null.
      *
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertDataNull($message = null)
+    public function assertDataNull($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_DATA, 'null', $message);
 
@@ -113,10 +113,10 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the data member is a resource identifier.
      *
-     * @param string|null $message
+     * @param string $message
      * @return ResourceIdentifierTester
      */
-    public function assertResourceIdentifier($message = null)
+    public function assertResourceIdentifier($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_DATA, 'object', $message);
         $identifier = new ResourceIdentifierTester($this->object->{self::KEYWORD_DATA});
@@ -131,10 +131,10 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the data member is an object and return a resource tester.
      *
-     * @param string|null $message
+     * @param string $message
      * @return ResourceObjectTester
      */
-    public function assertResource($message = null)
+    public function assertResource($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_DATA, 'object', $message);
 
@@ -144,10 +144,10 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the data member is a collection, and return it as a resource collection tester.
      *
-     * @param string|null $message
+     * @param string $message
      * @return ResourceObjectsTester
      */
-    public function assertResourceCollection($message = null)
+    public function assertResourceCollection($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_DATA, 'array', $message);
 
@@ -157,10 +157,10 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the included member is an array, and return it as a resource collection tester.
      *
-     * @param string|null $message
+     * @param string $message
      * @return ResourceObjectsTester
      */
-    public function assertIncluded($message = null)
+    public function assertIncluded($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_INCLUDED, 'array', $message);
 
@@ -170,10 +170,10 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the document has an errors key, and return an errors tester.
      *
-     * @param string|null $message
+     * @param string $message
      * @return ErrorsTester
      */
-    public function assertErrors($message = null)
+    public function assertErrors($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_ERRORS, 'array', $message);
 
@@ -183,10 +183,10 @@ class DocumentTester extends ObjectTester
     /**
      * Assert that the document does not have errors, and output the errors if it does.
      *
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertNoErrors($message = null)
+    public function assertNoErrors($message = '')
     {
         $message = $message ?: "Unexpected JSON API errors.\n" . json_encode($this->object, JSON_PRETTY_PRINT);
         $this->assertMemberMissing(self::KEYWORD_ERRORS, $message);

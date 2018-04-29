@@ -17,6 +17,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
+use CloudCreativity\Utils\Object\Obj;
 use stdClass;
 use PHPUnit\Framework\Assert;
 
@@ -35,6 +36,7 @@ class ObjectTester
     const KEYWORD_ID = 'id';
     const KEYWORD_ATTRIBUTES = 'attributes';
     const KEYWORD_RELATIONSHIPS = 'relationships';
+    const KEYWORD_META = 'meta';
 
     /**
      * @var stdClass
@@ -63,10 +65,10 @@ class ObjectTester
      * Assert that a JSON API member exists on the object.
      *
      * @param $name
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertMemberExists($name, $message = null)
+    public function assertMemberExists($name, $message = '')
     {
         $message = $this->withIndex($message ?: "JSON API object does not have expected member [$name]");
         Assert::assertObjectHasAttribute($name, $this->object, $message);
@@ -78,10 +80,10 @@ class ObjectTester
      * Assert that a JSON API member does not exist on the object.
      *
      * @param $name
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertMemberMissing($name, $message = null)
+    public function assertMemberMissing($name, $message = '')
     {
         $message = $this->withIndex($message ?: "JSON API object has unexpected member [$name]");
         Assert::assertObjectNotHasAttribute($name, $this->object, $message);
@@ -94,10 +96,10 @@ class ObjectTester
      *
      * @param $name
      * @param $type
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertMemberInternalType($name, $type, $message = null)
+    public function assertMemberInternalType($name, $type, $message = '')
     {
         $this->assertMemberExists($name, $message);
         $message = $message ?: "JSON API member $name is not expected type [$type]";
@@ -113,7 +115,7 @@ class ObjectTester
      * @param null $message
      * @return $this
      */
-    public function assertMemberEmpty($name, $message = null)
+    public function assertMemberEmpty($name, $message = '')
     {
         $actual = isset($this->object->{$name}) ? $this->object->{$name} : null;
         Assert::assertEmpty($actual, $this->withIndex($message ?: "JSON API member $name must be empty"));
@@ -128,7 +130,7 @@ class ObjectTester
      * @param null $message
      * @return $this
      */
-    public function assertMemberNotEmpty($name, $message = null)
+    public function assertMemberNotEmpty($name, $message = '')
     {
         $actual = isset($this->object->{$name}) ? $this->object->{$name} : null;
         Assert::assertNotEmpty($actual, $this->withIndex($message ?: "JSON API member $name must not be empty"));
@@ -139,10 +141,10 @@ class ObjectTester
     /**
      * Assert that the object has a data member.
      *
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertHasData($message = null)
+    public function assertHasData($message = '')
     {
         $this->assertMemberExists(self::KEYWORD_DATA, $message);
 
@@ -152,10 +154,10 @@ class ObjectTester
     /**
      * Assert that the object has a type member.
      *
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertHasType($message = null)
+    public function assertHasType($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_TYPE, 'string', $message);
         $this->assertMemberNotEmpty(self::KEYWORD_TYPE, $message);
@@ -167,10 +169,10 @@ class ObjectTester
      * Assert that the object type member matches the expected type(s)
      *
      * @param string|string[] $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertTypeIs($expected, $message = null)
+    public function assertTypeIs($expected, $message = '')
     {
         $actual = isset($this->object->{self::KEYWORD_TYPE}) ? $this->object->{self::KEYWORD_TYPE} : null;
         $message = $message ?: "Unexpected JSON API object type: " . implode(',', (array) $expected);
@@ -187,10 +189,10 @@ class ObjectTester
     /**
      * Assert that the object has an id member.
      *
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertHasId($message = null)
+    public function assertHasId($message = '')
     {
         $this->assertMemberInternalType(self::KEYWORD_ID, 'string', $message);
         $this->assertMemberNotEmpty(self::KEYWORD_ID, $message);
@@ -202,10 +204,10 @@ class ObjectTester
      * Assert that the object id member matches the expected id(s)
      *
      * @param string|string[] $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertIdIs($expected, $message = null)
+    public function assertIdIs($expected, $message = '')
     {
         $actual = isset($this->object->{self::KEYWORD_ID}) ? $this->object->{self::KEYWORD_ID} : null;
         $message = $message ?: sprintf("Unexpected JSON API object id [%s]", implode(',', (array) $expected));
@@ -220,10 +222,51 @@ class ObjectTester
     }
 
     /**
+     * @param string $message
+     * @return $this
+     */
+    public function assertHasMeta($message = '')
+    {
+        $this->assertMemberInternalType(self::KEYWORD_META, 'object', $message);
+
+        return $this;
+    }
+
+    /**
+     * @param array $expected
+     * @param string $message
+     * @return $this
+     */
+    public function assertMetaSubset(array $expected, $message = '')
+    {
+        $this->assertHasMeta($message);
+        $actual = $this->object->{self::KEYWORD_META};
+
+        Assert::assertArraySubset($expected, Obj::toArray($actual), false, $message);
+
+        return $this;
+    }
+
+    /**
+     * @param array $expected
+     * @param string $message
+     * @return $this
+     */
+    public function assertMetaIs(array $expected, $message = '')
+    {
+        $this->assertHasMeta($message);
+        $actual = $this->object->{self::KEYWORD_META};
+
+        Assert::assertEquals($expected, Obj::toArray($actual), $message);
+
+        return $this;
+    }
+
+    /**
      * @param $message
      * @return string
      */
-    protected function withIndex($message = null)
+    protected function withIndex($message = '')
     {
         if ($message && is_int($this->index)) {
             $message .= " at index [$this->index]";

@@ -78,7 +78,7 @@ class ErrorsTester extends AbstractTraversableTester
     /**
      * Assert that there is only one error in the collection, and return a tester for that error.
      *
-     * @param string|null $message
+     * @param string $message
      * @return ErrorTester
      */
     public function assertOne($message = '')

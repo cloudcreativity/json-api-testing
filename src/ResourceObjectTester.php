@@ -116,10 +116,10 @@ class ResourceObjectTester extends ObjectTester
      *
      * @param $expectedType
      * @param $expectedId
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertIs($expectedType, $expectedId, $message = null)
+    public function assertIs($expectedType, $expectedId, $message = '')
     {
         $actualType = isset($this->object->{self::KEYWORD_TYPE}) ? $this->object->{self::KEYWORD_TYPE} : null;
         $actualId = isset($this->object->{self::KEYWORD_ID}) ? $this->object->{self::KEYWORD_ID} : null;
@@ -145,11 +145,11 @@ class ResourceObjectTester extends ObjectTester
     /**
      * Assert that the resource has a type member.
      *
-     * @param string|null $message
+     * @param string $message
      * @return $this
      * @deprecated use `assertHasType`
      */
-    public function assertType($message = null)
+    public function assertType($message = '')
     {
         return $this->assertHasType($message);
     }
@@ -188,10 +188,10 @@ class ResourceObjectTester extends ObjectTester
      *
      * @param string $key
      * @param mixed $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertAttribute($key, $expected, $message = null)
+    public function assertAttribute($key, $expected, $message = '')
     {
         $message = $message ?: "Unexpected attribute [$key]";
         $actual = $this->getAttribute($key);
@@ -205,10 +205,10 @@ class ResourceObjectTester extends ObjectTester
      *
      * @param string $key
      * @param mixed $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertAttributeIs($key, $expected, $message = null)
+    public function assertAttributeIs($key, $expected, $message = '')
     {
         $message = $message ?: "Unexpected attribute [$key]";
         $actual = $this->getAttribute($key);
@@ -221,10 +221,10 @@ class ResourceObjectTester extends ObjectTester
      * Assert that the resource's attributes contains the provided subset.
      *
      * @param object|array $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertAttributesSubset($expected, $message = null)
+    public function assertAttributesSubset($expected, $message = '')
     {
         $expected = Obj::toArray($expected);
         $actual = Obj::toArray($this->getAttributes() ?: []);
@@ -250,10 +250,10 @@ class ResourceObjectTester extends ObjectTester
      * Assert that the resource's relationships contains the provided subset.
      *
      * @param object|array $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertRelationshipsSubset($expected, $message = null)
+    public function assertRelationshipsSubset($expected, $message = '')
     {
         $expected = Obj::toArray($expected);
         $actual = Obj::toArray($this->getRelationships() ?: []);

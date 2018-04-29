@@ -77,8 +77,28 @@ class ResourceObjectsTester extends AbstractTraversableTester
 
     /**
      * @return array
+     * @deprecated use `getIdentifiersByType`
      */
     public function getIdentifiers()
+    {
+        return $this->getIdentifiersByType();
+    }
+
+    /**
+     * @return array
+     */
+    public function getAllIdentifiers()
+    {
+        return $this->reduce(function (array $carry, ResourceObjectTester $resource) {
+            $carry[] = ['type' => $resource->getType(), 'id' => $resource->getId()];
+            return $carry;
+        }, []);
+    }
+
+    /**
+     * @return array
+     */
+    public function getIdentifiersByType()
     {
         $identifiers = $this->reduce(function (array $carry, ResourceObjectTester $resource) {
             $type = $resource->getType();
@@ -122,10 +142,10 @@ class ResourceObjectsTester extends AbstractTraversableTester
      *
      * @param string $type
      * @param string|int $id
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertContainsResource($type, $id, $message = null)
+    public function assertContainsResource($type, $id, $message = '')
     {
         $this->assertResource($type, $id, $message);
 
@@ -137,10 +157,10 @@ class ResourceObjectsTester extends AbstractTraversableTester
      *
      * @param string $type
      * @param string|int $id
-     * @param string|null $message
+     * @param string $message
      * @return ResourceObjectTester|null
      */
-    public function assertResource($type, $id, $message = null)
+    public function assertResource($type, $id, $message = '')
     {
         $match = null;
 
@@ -171,10 +191,10 @@ class ResourceObjectsTester extends AbstractTraversableTester
      * collection contains any additional resources.
      *
      * @param array $expected
-     * @param string|null $message
+     * @param string $message
      * @return $this
      */
-    public function assertContainsOnly(array $expected, $message = null)
+    public function assertContainsOnly(array $expected, $message = '')
     {
         $actual = $this->getIdentifiers();
         $message = $message ?: sprintf(
@@ -184,6 +204,36 @@ class ResourceObjectsTester extends AbstractTraversableTester
         );
 
         Assert::assertEquals($this->normalizeIdentifiers($expected), $actual, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the collection contains the specified resources in the exact order provided.
+     *
+     * The expected values must contain the identifiers in the order that is expected, e.g.:
+     *
+     * ```
+     * [
+     *   ['type' => 'posts', 'id' => '1'],
+     *   ['type' => 'posts', 'id' => '3']
+     * ]
+     * ```
+     *
+     * @param array $expected
+     * @param null $message
+     * @return $this
+     */
+    public function assertContainsExact(array $expected, $message = '')
+    {
+        $actual = $this->getAllIdentifiers();
+        $message = $message ?: sprintf(
+            'Collection contains [%s] resources, expecting [%s]',
+            json_encode($actual),
+            json_encode($expected)
+        );
+
+        Assert::assertEquals($expected, $actual, $message);
 
         return $this;
     }
