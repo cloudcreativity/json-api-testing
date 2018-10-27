@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file. This projec
 - Minimum PHP version is now `7.1`.
 
 ### Removed
-- Package no longer supports PHPUnit 5.
+- Package no longer supports PHPUnit 5 and 6.
 
 ## [0.4.0] - 2018-04-29
 
