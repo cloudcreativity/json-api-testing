@@ -85,6 +85,10 @@ class Document implements Arrayable, \JsonSerializable
      */
     public function get(string $pointer, $default = null)
     {
+        if ($pointer === '/') {
+            return $this->document;
+        }
+
         return Arr::get($this->document, $this->path($pointer), $default);
     }
 

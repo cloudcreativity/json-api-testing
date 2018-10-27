@@ -23,7 +23,7 @@ namespace CloudCreativity\JsonApi\Testing;
  *
  * @package CloudCreativity\JsonApi\Testing
  */
-class ResourceObjectTest extends TestCase
+class AssertDataTest extends TestCase
 {
 
     public function testNull()
@@ -32,8 +32,10 @@ class ResourceObjectTest extends TestCase
             'data' => null,
         ];
 
+        Assert::assertDataIsNull($content);
+
         $this->willFail(function () use ($content) {
-            Assert::assertHasResourceObject($content, 'posts', '123');
+            Assert::assertDocumentHasResourceObject($content, 'posts', '123');
         });
     }
 
@@ -59,7 +61,7 @@ JSON_API;
         ];
 
         $this->willFail(function () use ($content, $expected) {
-            Assert::assertResourceObjectSubset($content, $expected);
+            Assert::assertData($content, $expected);
         });
     }
 
@@ -77,7 +79,7 @@ JSON_API;
         $expected = ['type' => 'posts', 'id' => '123'];
 
         $this->willFail(function () use ($content, $expected) {
-            Assert::assertResourceObjectSubset($content, $expected);
+            Assert::assertData($content, $expected);
         });
     }
 
@@ -92,10 +94,10 @@ JSON_API;
 }
 JSON_API;
 
-        Assert::assertResourceObjectSubset($content, ['type' => 'posts']);
+        Assert::assertData($content, ['type' => 'posts']);
 
         $this->willFail(function () use ($content) {
-            Assert::assertResourceObjectSubset($content, ['type' => 'comments']);
+            Assert::assertData($content, ['type' => 'comments']);
         });
     }
 
@@ -110,14 +112,18 @@ JSON_API;
 }
 JSON_API;
 
-        Assert::assertHasResourceObject($content, 'posts', '123');
+        Assert::assertDocumentHasResourceObject($content, 'posts', '123');
 
         $this->willFail(function () use ($content) {
-            Assert::assertHasResourceObject($content, 'posts', '999');
+            Assert::assertDocumentHasResourceObject($content, 'posts', '999');
         });
 
         $this->willFail(function () use ($content) {
-            Assert::assertHasResourceObject($content, 'comments', '123');
+            Assert::assertDocumentHasResourceObject($content, 'comments', '123');
+        });
+
+        $this->willFail(function () use ($content) {
+            Assert::assertDataIsNull($content);
         });
     }
 
@@ -134,10 +140,8 @@ JSON_API;
 }
 JSON_API;
 
-        $document = DocumentTester::create($content);
-
-        $this->willFail(function () use ($document) {
-            $document->assertResource();
+        $this->willFail(function () use ($content) {
+            Assert::assertDocumentHasResourceObject($content, 'posts', '123');
         });
     }
 
@@ -152,10 +156,8 @@ JSON_API;
 }
 JSON_API;
 
-        $document = DocumentTester::create($content);
-
-        $this->willFail(function () use ($document) {
-            $document->assertResource();
+        $this->willFail(function () use ($content) {
+            Assert::assertDocumentHasResourceObject($content, 'posts', '123');
         });
     }
 
@@ -170,10 +172,10 @@ JSON_API;
 }
 JSON_API;
 
-        Assert::assertResourceObjectSubset($content, ['id' => '123']);
+        Assert::assertData($content, ['id' => '123']);
 
         $this->willFail(function () use ($content) {
-            Assert::assertResourceObjectSubset($content, ['id' => '999']);
+            Assert::assertData($content, ['id' => '999']);
         });
     }
 
@@ -205,12 +207,12 @@ JSON_API;
             ],
         ];
 
-        Assert::assertResourceObjectSubset($content, $expected);
+        Assert::assertData($content, $expected);
 
         $expected['attributes']['tags'] = ['news', 'other'];
 
         $this->willFail(function () use ($content, $expected) {
-            Assert::assertResourceObjectSubset($content, $expected);
+            Assert::assertData($content, $expected);
         });
     }
 
@@ -256,12 +258,81 @@ JSON_API;
             ],
         ];
 
-        Assert::assertResourceObjectSubset($content, $expected);
+        Assert::assertData($content, $expected);
 
         $expected['relationships']['author'] = ['data' => ['id' => '456']];
 
         $this->willFail(function () use ($content, $expected) {
-            Assert::assertResourceObjectSubset($content, $expected);
+            Assert::assertData($content, $expected);
+        });
+    }
+
+    public function testExactResourceObject()
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123",
+        "attributes": {
+            "title": "My First Post",
+            "content": "..."
+        },
+        "relationships": {
+            "author": {
+                "data": {
+                    "type": "users",
+                    "id": "123"
+                }
+            },
+            "comments": {
+                "data": [
+                    {"type": "comments", "id": "1"},
+                    {"type": "comments", "id": "2"}
+                ]
+            }
+        },
+        "links": {
+            "self": "/api/v1/posts/123"
+        }
+    }
+}
+JSON_API;
+
+        $expected = [
+            'type' => 'posts',
+            'id' => '123',
+            'attributes' => [
+                'title' => 'My First Post',
+                'content' => '...',
+            ],
+            'relationships' => [
+                'author' => [
+                    'data' => [
+                        'type' => 'users',
+                        'id' => '123',
+                    ],
+                ],
+                'comments' => [
+                    'data' => [
+                        ['type' => 'comments', 'id' => '1'],
+                        ['type' => 'comments', 'id' => '2'],
+                    ],
+                ],
+            ],
+            'links' => [
+                'self' => '/api/v1/posts/123',
+            ],
+        ];
+
+        Assert::assertExactData($content, $expected);
+
+        unset($expected['attributes']['content']);
+
+        Assert::assertData($content, $expected); // as this is a subset, it will pass.
+
+        $this->willFail(function () use ($content, $expected) {
+            Assert::assertExactData($content, $expected);
         });
     }
 }
