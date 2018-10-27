@@ -26,6 +26,7 @@ use stdClass;
  * Class ResourceTester
  *
  * @package CloudCreativity\JsonApi\Testing
+ * @deprecated 1.0.0
  */
 class ResourceObjectTester extends ObjectTester
 {

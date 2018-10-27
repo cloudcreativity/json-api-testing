@@ -25,6 +25,7 @@ use PHPUnit\Framework\Assert;
  * Class ResourcesTester
  *
  * @package CloudCreativity\JsonApi\Testing
+ * @deprecated 1.0.0
  */
 class ResourceObjectsTester extends AbstractTraversableTester
 {

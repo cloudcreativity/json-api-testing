@@ -25,6 +25,7 @@ use PHPUnit\Framework\Assert;
  * Class ObjectTester
  *
  * @package CloudCreativity\JsonApi\Testing
+ * @deprecated 1.0.0
  */
 class ObjectTester
 {

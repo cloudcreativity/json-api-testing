@@ -27,6 +27,7 @@ use PHPUnit\Framework\Assert;
  * Class AbstractTraversableTester
  *
  * @package CloudCreativity\JsonApi\Testing
+ * @deprecated 1.0.0
  */
 abstract class AbstractTraversableTester implements IteratorAggregate, Countable
 {

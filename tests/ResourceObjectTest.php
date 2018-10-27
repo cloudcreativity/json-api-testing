@@ -32,8 +32,6 @@ class ResourceObjectTest extends TestCase
             'data' => null,
         ];
 
-        Assert::assertHasResourceObject($content, 'posts', '123');
-
         $this->willFail(function () use ($content) {
             Assert::assertHasResourceObject($content, 'posts', '123');
         });

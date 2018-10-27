@@ -24,6 +24,7 @@ use PHPUnit\Framework\Assert;
  * Class ResourceIdentifierTester
  *
  * @package CloudCreativity\JsonApi\Testing
+ * @deprecated 1.0.0
  */
 class ResourceIdentifierTester extends ObjectTester
 {
