@@ -42,9 +42,6 @@ class TestCase extends BaseTestCase
             $closure();
         } catch (AssertionFailedError $e) {
             $didFail = true;
-        } catch (\PHPUnit_Framework_AssertionFailedError $e) {
-            /** @todo remove this catch block when dropping support for PHPUnit 5.7 */
-            $didFail = true;
         }
 
         $this->assertTrue($didFail, $message ?: 'Expecting test to fail.');
