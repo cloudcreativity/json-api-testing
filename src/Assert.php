@@ -236,4 +236,45 @@ class Assert
     {
         self::assertArrayContainsSubset($document, $expected, '/included', $strict);
     }
+
+    /**
+     * Assert the document contains a single error that matches the supplied error.
+     *
+     * @param $document
+     * @param array $error
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertError($document, array $error, bool $strict = true): void
+    {
+        self::assertArray($document, [$error], '/errors', $strict);
+    }
+
+    /**
+     * Assert the document contains the supplied errors.
+     *
+     * This does not assert the order of the errors, as the error order does not have any significance.
+     *
+     * @param $document
+     * @param array $errors
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertErrors($document, array $errors, bool $strict = true): void
+    {
+        self::assertArray($document, $errors, '/errors', $strict);
+    }
+
+    /**
+     * Assert the document contains the supplied error within its errors member.
+     *
+     * @param $document
+     * @param array $error
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertErrorsContains($document, array $error, bool $strict = true): void
+    {
+        self::assertArrayContainsSubset($document, $error, '/errors', $strict);
+    }
 }
