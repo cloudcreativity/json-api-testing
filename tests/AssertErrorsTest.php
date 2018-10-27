@@ -6,9 +6,14 @@ class AssertErrorsTest extends TestCase
 {
 
     /**
-     * @var array
+     * @var Document
      */
-    private $document;
+    private $single;
+
+    /**
+     * @var Document
+     */
+    private $multiple;
 
     /**
      * @return void
@@ -16,7 +21,7 @@ class AssertErrorsTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->document = [
+        $this->single = new Document($document = [
             'errors' => [
                 [
                     'title' => 'Invalid',
@@ -27,47 +32,50 @@ class AssertErrorsTest extends TestCase
                     ],
                 ],
             ],
-        ];
+        ]);
+
+        $document['errors'][] = ['title' => 'Bad Request', 'status' => '400'];
+        $this->multiple = new Document($document);
     }
 
     public function testNoErrors(): void
     {
-        $document = ['data' => null];
+        $document = new Document(['data' => null]);
 
         $this->willFail(function () use ($document) {
-            Assert::assertError($document, ['status' => '422']);
+            $document->assertError(['status' => '422']);
         });
 
         $this->willFail(function () use ($document) {
-            Assert::assertErrors($document, [['status' => '422']]);
+            $document->assertErrors([['status' => '422']]);
         });
 
         $this->willFail(function () use ($document) {
-            Assert::assertErrorsContains($document, ['status' => '422']);
+            $document->assertErrorsContains(['status' => '422']);
         });
     }
 
     public function testOneError(): void
     {
-        Assert::assertError($this->document, $error = [
+        $this->single->assertError($error = [
             'status' => '422',
             'source' => [
                 'pointer' => '/data/attributes/title',
             ],
         ]);
 
-        Assert::assertErrors($this->document, [$error]);
+        $this->single->assertErrors([$error]);
 
-        Assert::assertErrorsContains($this->document, $error);
+        $this->single->assertErrorsContains($error);
 
         $this->willFail(function () {
-            Assert::assertError($this->document, [
+            $this->single->assertError([
                 'status' => '400',
             ]);
         });
 
         $this->willFail(function () use ($error) {
-            Assert::assertErrors($this->document, [
+            $this->single->assertErrors([
                 $error,
                 ['status' => '400']
             ]);
@@ -76,32 +84,27 @@ class AssertErrorsTest extends TestCase
 
     public function testMultipleErrors(): void
     {
-        $this->document['errors'][] = [
-            'title' => 'Bad Request',
-            'status' => '400',
-        ];
-
-        Assert::assertErrors($this->document, [
+        $this->multiple->assertErrors([
             // order is not significant
             ['status' => '400'],
             $invalid = ['source' => ['pointer' => '/data/attributes/title']],
         ]);
 
-        Assert::assertErrorsContains($this->document, $invalid);
+        $this->multiple->assertErrorsContains($invalid);
 
         $this->willFail(function () use ($invalid) {
             // the error is present but it is not the only one.
-            Assert::assertError($this->document, $invalid);
+            $this->multiple->assertError($invalid);
         });
 
         $this->willFail(function () {
-            Assert::assertErrorsContains($this->document, ['status' => '500']);
+            $this->multiple->assertErrorsContains(['status' => '500']);
         });
 
         $this->willFail(function () {
-            $expected = $this->document['errors'];
+            $expected = $this->single['errors'];
             $expected[2] = ['status' => '500'];
-            Assert::assertErrors($this->document, $expected);
+            $this->multiple->assertErrors($expected);
         });
     }
 }

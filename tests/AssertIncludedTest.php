@@ -27,7 +27,7 @@ class AssertIncludedTest extends TestCase
 {
 
     /**
-     * @var array
+     * @var Document
      */
     private $document;
 
@@ -37,7 +37,7 @@ class AssertIncludedTest extends TestCase
     public function setUp()
     {
         parent::setUp();
-        $this->document = [
+        $this->document = new Document([
             'data' => [
                 'type' => 'posts',
                 'id' => '123',
@@ -64,21 +64,21 @@ class AssertIncludedTest extends TestCase
                     ],
                 ],
             ],
-        ];
+        ]);
     }
 
     public function testIncludedContains(): void
     {
-        Assert::assertIncludedContains($this->document, 'comments', '2');
+        $this->document->assertIncludedContains('comments', '2');
 
         $this->willFail(function () {
-            Assert::assertIncludedContains($this->document, 'comments', '99');
+            $this->document->assertIncludedContains('comments', '99');
         });
     }
 
     public function testIncludedContainsSubset(): void
     {
-        Assert::assertIncludedContainsSubset($this->document, [
+        $this->document->assertIncludedContainsSubset([
             'type' => 'comments',
             'id' => '1',
             'attributes' => [
@@ -87,7 +87,7 @@ class AssertIncludedTest extends TestCase
         ]);
 
         $this->willFail(function () {
-            Assert::assertIncludedContainsSubset($this->document, [
+            $this->document->assertIncludedContainsSubset([
                 'type' => 'comments',
                 'id' => '3',
                 'attributes' => [
@@ -101,13 +101,13 @@ class AssertIncludedTest extends TestCase
     {
         $unordered = collect($this->document['included'])->reverse()->all();
 
-        Assert::assertIncluded($this->document, $unordered);
+        $this->document->assertIncluded($unordered);
 
         $unexpected = $unordered;
         $unexpected[2] = ['type' => 'comments', 'id' => '3'];
 
         $this->willFail(function () use ($unexpected) {
-            Assert::assertIncluded($this->document, $unexpected);
+            $this->document->assertIncluded($unexpected);
         });
     }
 }
