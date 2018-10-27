@@ -37,7 +37,7 @@ class ExactInDocument extends Constraint
     public function __construct(array $expected, string $pointer, bool $strict = true)
     {
         parent::__construct();
-        $this->expected = Arr::sortRecursive($expected);
+        $this->expected = $expected;
         $this->pointer = $pointer;
         $this->strict = $strict;
     }
@@ -48,15 +48,16 @@ class ExactInDocument extends Constraint
     public function evaluate($other, $description = '', $returnResult = false)
     {
         $actual = Document::cast($other)->get($this->pointer);
+        $expected = Arr::sortRecursive($this->expected);
 
         if (is_array($actual)) {
             $actual = Arr::sortRecursive($actual);
         }
 
         if ($this->strict) {
-            $result = $actual === $this->expected;
+            $result = $actual === $expected;
         } else {
-            $result = $actual == $this->expected;
+            $result = $actual == $expected;
         }
 
         if ($returnResult) {
@@ -65,9 +66,9 @@ class ExactInDocument extends Constraint
 
         if (!$result) {
             $f = new ComparisonFailure(
-                $this->expected,
+                $expected,
                 $actual,
-                \var_export($this->expected, true),
+                \var_export($expected, true),
                 \var_export($actual, true)
             );
 
@@ -80,7 +81,7 @@ class ExactInDocument extends Constraint
      */
     public function toString(): string
     {
-        return json_encode($this->expected, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return Document::cast($this->expected)->toString();
     }
 
     /**
@@ -88,7 +89,7 @@ class ExactInDocument extends Constraint
      */
     protected function failureDescription($document): string
     {
-        return "the member at [{$this->pointer}] matches the object:" . PHP_EOL
+        return "the member at [{$this->pointer}] exactly matches:" . PHP_EOL
             . $this->toString() . PHP_EOL . PHP_EOL
             . "within JSON API document:" . PHP_EOL
             . Document::cast($document);

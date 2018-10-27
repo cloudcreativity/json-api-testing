@@ -5,9 +5,8 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 use CloudCreativity\JsonApi\Testing\Document;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Constraint\Constraint;
-use SebastianBergmann\Comparator\ComparisonFailure;
 
-class SubsetInDocument extends Constraint
+class SubsetInArray extends Constraint
 {
 
     /**
@@ -26,12 +25,12 @@ class SubsetInDocument extends Constraint
     private $strict;
 
     /**
-     * SubsetInDocument constructor.
+     * ArrayContainsSubset constructor.
      *
      * @param array $expected
      *      the expected object
      * @param string $pointer
-     *      the JSON pointer to the object in the JSON API document.
+     *      the JSON pointer to the array in the JSON API document.
      * @param bool $strict
      */
     public function __construct(array $expected, string $pointer, bool $strict = true)
@@ -45,31 +44,13 @@ class SubsetInDocument extends Constraint
     /**
      * @inheritdoc
      */
-    public function evaluate($other, $description = '', $returnResult = false)
+    public function matches($other): bool
     {
         $actual = Document::cast($other)->get($this->pointer);
-        $patched = \array_replace_recursive((array) $actual, $this->expected);
 
-        if ($this->strict) {
-            $result = $actual === $patched;
-        } else {
-            $result = $actual == $patched;
-        }
-
-        if ($returnResult) {
-            return $result;
-        }
-
-        if (!$result) {
-            $f = new ComparisonFailure(
-                $patched,
-                $actual,
-                \var_export($patched, true),
-                \var_export($actual, true)
-            );
-
-            $this->fail($other, $description, $f);
-        }
+        return collect((array) $actual)->contains(function ($item) {
+            return $this->compare($item);
+        });
     }
 
     /**
@@ -85,10 +66,25 @@ class SubsetInDocument extends Constraint
      */
     protected function failureDescription($document): string
     {
-        return "the member at [{$this->pointer}] matches the subset:" . PHP_EOL
+        return "the array at [{$this->pointer}] contains the subset:" . PHP_EOL
             . $this->toString() . PHP_EOL . PHP_EOL
             . "within JSON API document:" . PHP_EOL
             . Document::cast($document);
+    }
+
+    /**
+     * @param $actual
+     * @return bool
+     */
+    private function compare($actual): bool
+    {
+        $patched = \array_replace_recursive((array) $actual, $this->expected);
+
+        if ($this->strict) {
+            return $actual === $patched;
+        }
+
+        return $actual == $patched;
     }
 
 }

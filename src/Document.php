@@ -128,7 +128,7 @@ class Document implements Arrayable, \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return $this->toArray();
+        return Arr::sortRecursive($this->document);
     }
 
     /**
