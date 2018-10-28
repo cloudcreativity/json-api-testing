@@ -2,12 +2,12 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
-use CloudCreativity\JsonApi\Testing\Constraints\ExactInList;
 use CloudCreativity\JsonApi\Testing\Constraints\ExactInDocument;
+use CloudCreativity\JsonApi\Testing\Constraints\ExactInList;
 use CloudCreativity\JsonApi\Testing\Constraints\OnlyExactInList;
 use CloudCreativity\JsonApi\Testing\Constraints\OnlySubsetsInList;
-use CloudCreativity\JsonApi\Testing\Constraints\SubsetInList;
 use CloudCreativity\JsonApi\Testing\Constraints\SubsetInDocument;
+use CloudCreativity\JsonApi\Testing\Constraints\SubsetInList;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
 use PHPUnit\Framework\Constraint\LogicalNot;
 

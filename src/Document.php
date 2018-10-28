@@ -7,6 +7,7 @@ use CloudCreativity\JsonApi\Testing\Concerns\HasDocumentAssertions;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use JsonSerializable;
+use PHPUnit\Framework\Assert as PHPUnitAssert;
 
 class Document implements Arrayable, JsonSerializable, ArrayAccess
 {
@@ -17,6 +18,21 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      * @var array
      */
     private $document;
+
+    /**
+     * Safely create a document.
+     *
+     * @param $content
+     * @return Document|null
+     */
+    public static function create($content): ?self
+    {
+        if (is_string($content)) {
+            return self::fromString($content);
+        }
+
+        return $content ? self::cast($content) : null;
+    }
 
     /**
      * Cast a document to an instance of this document class.
@@ -34,16 +50,35 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
             return self::decode($document);
         }
 
-        return self::fromArray($document);
+        return self::fromIterable($document);
     }
 
     /**
+     * Create a document from an iterable.
+     *
      * @param iterable $input
      * @return Document
      */
-    public static function fromArray(iterable $input): self
+    public static function fromIterable(iterable $input): self
     {
         return new self(collect($input)->all());
+    }
+
+    /**
+     * Create a document from a string.
+     *
+     * @param string $json
+     * @return Document|null
+     */
+    public static function fromString(string $json): ?self
+    {
+        $document = \json_decode($json, true);
+
+        if (JSON_ERROR_NONE !== \json_last_error() || !\is_array($document)) {
+            return null;
+        }
+
+        return new self($document);
     }
 
     /**
@@ -54,13 +89,11 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      */
     public static function decode(string $json): self
     {
-        $document = \json_decode($json, true);
-
-        if (JSON_ERROR_NONE !== json_last_error() || !is_array($document)) {
+        if (!$document = self::fromString($json)) {
             throw new \InvalidArgumentException('Invalid JSON string.');
         }
 
-        return new self($document);
+        return $document;
     }
 
     /**
@@ -166,6 +199,40 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     public function jsonSerialize()
     {
         return Compare::sort($this->document);
+    }
+
+    /**
+     * Assert that all the provided members exist.
+     *
+     * @param string ...$pointers
+     * @return $this
+     */
+    public function assertExists(string ...$pointers): self
+    {
+        $missing = collect($pointers)->reject(function ($pointer) {
+            return $this->has($pointer);
+        })->implode(', ');
+
+        PHPUnitAssert::assertEmpty($missing, "Members [{$missing}] do not exist.");
+
+        return $this;
+    }
+
+    /**
+     * Assert that the provided members do not exist.
+     *
+     * @param string ...$pointers
+     * @return Document
+     */
+    public function assertNotExists(string ...$pointers): self
+    {
+        $unexpected = collect($pointers)->filter(function ($pointer) {
+            return $this->has($pointer);
+        })->implode(', ');
+
+        PHPUnitAssert::assertEmpty($unexpected, "Members [{$unexpected}] exist.");
+
+        return $this;
     }
 
 }
