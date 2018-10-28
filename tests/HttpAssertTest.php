@@ -7,14 +7,14 @@ class HttpAssertTest extends TestCase
 
     public function testStatus(): void
     {
-        HttpAssert::assertStatus('200', 200);
+        HttpAssert::assertStatusCode('200', 200);
 
         $this->willFail(function () {
-            HttpAssert::assertStatus('200', 400);
+            HttpAssert::assertStatusCode('200', 400);
         });
 
         $this->willFail(function () {
-            HttpAssert::assertStatus(400, '200', ['data' => null]);
+            HttpAssert::assertStatusCode(400, '200', ['data' => null]);
         });
 
         $errors = <<<JSON_API
@@ -29,12 +29,12 @@ class HttpAssertTest extends TestCase
 JSON_API;
 
         $this->willFail(function () use ($errors) {
-            HttpAssert::assertStatus(400, 200, $errors);
+            HttpAssert::assertStatusCode(400, 200, $errors);
         });
 
         // do not expect an invalid JSON to break the assertion
         $this->willFail(function () {
-           HttpAssert::assertStatus(400, 200, '{"data: null}');
+           HttpAssert::assertStatusCode(400, 200, '{"data: null}');
         });
     }
 

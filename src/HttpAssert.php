@@ -28,7 +28,7 @@ class HttpAssert
      * @param mixed|null $content
      * @return void
      */
-    public static function assertStatus($status, int $expected, $content = null): void
+    public static function assertStatusCode($status, int $expected, $content = null): void
     {
         PHPUnitAssert::assertThat(
             $status,
@@ -64,7 +64,7 @@ class HttpAssert
      */
     public static function assertJson($status, $contentType, $content, int $expected = self::STATUS_OK): Document
     {
-        self::assertStatus($status, $expected);
+        self::assertStatusCode($status, $expected);
 
         return self::assertContent($contentType, $content, self::JSON_MEDIA_TYPE);
     }
@@ -81,7 +81,7 @@ class HttpAssert
      */
     public static function assertJsonApi($status, $contentType, $content, int $expected = self::STATUS_OK): Document
     {
-        self::assertStatus($status, $expected);
+        self::assertStatusCode($status, $expected);
 
         return self::assertContent($contentType, $content);
     }
@@ -283,10 +283,10 @@ class HttpAssert
         $location,
         string $expectedLocation,
         array $expected,
-        bool $strict
+        bool $strict = true
     ): Document
     {
-        self::assertStatus($status, self::STATUS_CREATED);
+        self::assertStatusCode($status, self::STATUS_CREATED);
         $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict);
         $id = $document->get('/data/id');
 
@@ -323,7 +323,7 @@ class HttpAssert
             throw new \InvalidArgumentException('Expected resource hash must have an id.');
         }
 
-        self::assertStatus($status, self::STATUS_CREATED);
+        self::assertStatusCode($status, self::STATUS_CREATED);
         PHPUnitAssert::assertSame($expectedLocation, $location, 'Unexpected Location header.');
 
         return self::assertContent($contentType, $content)
@@ -340,7 +340,7 @@ class HttpAssert
      */
     public static function assertCreatedNoContent($status, $location, $expectedLocation): void
     {
-        self::assertStatus($status, self::STATUS_NO_CONTENT);
+        self::assertStatusCode($status, self::STATUS_NO_CONTENT);
         PHPUnitAssert::assertSame($expectedLocation, $location, 'Unexpected Location header.');
     }
 
@@ -366,7 +366,7 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        self::assertStatus($status, self::STATUS_ACCEPTED);
+        self::assertStatusCode($status, self::STATUS_ACCEPTED);
         $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict);
         $id = $document->get('/data/id');
 
@@ -385,7 +385,7 @@ class HttpAssert
      */
     public static function assertNoContent($status): void
     {
-        self::assertStatus($status, self::STATUS_NO_CONTENT);
+        self::assertStatusCode($status, self::STATUS_NO_CONTENT);
     }
 
     /**
@@ -472,6 +472,10 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
+        if (empty($error)) {
+            $error = compact('status');
+        }
+
         return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
             ->assertError($error, $strict);
     }
