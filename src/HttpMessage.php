@@ -32,17 +32,27 @@ class HttpMessage implements ArrayAccess
     protected $content;
 
     /**
+     * @var array
+     */
+    protected $headers;
+
+    /**
      * HttpMessage constructor.
      *
      * @param int $status
      * @param string|null $contentType
      * @param string|null $content
      */
-    public function __construct(int $status, string $contentType = null, string $content = null)
-    {
+    public function __construct(
+        int $status,
+        string $contentType = null,
+        string $content = null,
+        array $headers = []
+    ) {
         $this->status = $status;
         $this->contentType = $contentType;
         $this->content = $content;
+        $this->headers = $headers;
     }
 
     /**
@@ -111,6 +121,22 @@ class HttpMessage implements ArrayAccess
     public function getContent(): ?string
     {
         return $this->content;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getContentLocation(): ?string
+    {
+        return $this->headers['Content-Location'] ?? null;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getLocation(): ?string
+    {
+        return $this->headers['Location'] ?? null;
     }
 
 }

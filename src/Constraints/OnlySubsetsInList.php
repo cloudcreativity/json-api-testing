@@ -5,6 +5,7 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
 use PHPUnit\Framework\Constraint\Constraint;
+use SebastianBergmann\Comparator\ComparisonFailure;
 
 class OnlySubsetsInList extends Constraint
 {
@@ -71,6 +72,21 @@ class OnlySubsetsInList extends Constraint
     public function toString(): string
     {
         return Compare::stringify($this->expected);
+    }
+
+    /**
+     * @param mixed $other
+     * @param string $description
+     * @param ComparisonFailure|null $comparisonFailure
+     */
+    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
+    {
+        $comparisonFailure = Compare::failure(
+            $this->expected,
+            Document::cast($other)->get($this->pointer)
+        );
+
+        parent::fail($other, $description, $comparisonFailure);
     }
 
     /**

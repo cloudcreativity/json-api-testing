@@ -6,7 +6,6 @@ use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
 use CloudCreativity\JsonApi\Testing\HttpAssert;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use PHPUnit\Framework\Assert;
 
 trait HasHttpAssertions
 {
@@ -51,7 +50,7 @@ trait HasHttpAssertions
     }
 
     /**
-     * Set the expected resource type.
+     * Set the expected resource type for the data member of the JSON document.
      *
      * @param string $type
      * @return HasHttpAssertions
@@ -178,26 +177,19 @@ trait HasHttpAssertions
      *
      * Prov
      *
-     * @param string|mixed $typeOrId
-     * @param string|null $id
+     * @param UrlRoutable|string|int $id
      * @return $this
      */
-    public function assertFetchedToOne($typeOrId, string $id = null): self
+    public function assertFetchedToOne($id): self
     {
-        if (is_null($id)) {
-            [$type, $id] = $this->identifier($typeOrId);
-        } else if (!is_string($typeOrId)) {
-            throw new \InvalidArgumentException('Type must be a string if id is null.');
-        } else {
-            $type = $typeOrId;
-        }
+        $identifier = $this->identifier($id);
 
         $this->document = HttpAssert::assertFetchedToOne(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $type,
-            $id
+            $identifier['type'],
+            $identifier['id']
         );
 
         return $this;
@@ -246,25 +238,19 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a server generated id.
      *
-     * @param $location
      * @param string $expectedLocation
      *      the expected location without the id.
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertCreatedWithServerId(
-        $location,
-        string $expectedLocation,
-        $expected,
-        bool $strict = true
-    ): self
+    public function assertCreatedWithServerId(string $expectedLocation, $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertCreatedWithServerId(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $location,
+            $this->getLocation(),
             $expectedLocation,
             $this->identifier($expected),
             $strict
@@ -276,24 +262,18 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a client generated id.
      *
-     * @param $location
      * @param string $expectedLocation
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertCreatedWithClientId(
-        $location,
-        string $expectedLocation,
-        $expected,
-        bool $strict = true
-    ): self
+    public function assertCreatedWithClientId(string $expectedLocation, $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertCreatedWithClientId(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $location,
+            $this->getLocation(),
             $expectedLocation,
             $this->identifier($expected),
             $strict
@@ -305,13 +285,16 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a no content response.
      *
-     * @param $location
      * @param $expectedLocation
      * @return $this
      */
-    public function assertCreatedNoContent($location, $expectedLocation): self
+    public function assertCreatedNoContent(string $expectedLocation): self
     {
-        HttpAssert::assertCreatedNoContent($this->getStatusCode(), $location, $expectedLocation);
+        HttpAssert::assertCreatedNoContent(
+            $this->getStatusCode(),
+            $this->getLocation(),
+            $expectedLocation
+        );
 
         return $this;
     }
@@ -368,24 +351,18 @@ trait HasHttpAssertions
     /**
      * Assert that an asynchronous process was accepted with a server id.
      *
-     * @param $contentLocation
      * @param string $expectedLocation
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertAcceptedWithId(
-        $contentLocation,
-        string $expectedLocation,
-        $expected,
-        bool $strict = true
-    ): self
+    public function assertAcceptedWithId(string $expectedLocation, $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertAcceptedWithId(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $contentLocation,
+            $this->getContentLocation(),
             $expectedLocation,
             $this->identifier($expected),
             $strict
@@ -401,8 +378,7 @@ trait HasHttpAssertions
      */
     public function assertNoContent(): self
     {
-        HttpAssert::assertNoContent($this->getStatusCode());
-        Assert::assertEmpty($this->getContent(), 'Expecting HTTP content to be empty.');
+        HttpAssert::assertNoContent($this->getStatusCode(), $this->getContent());
 
         return $this;
     }
@@ -410,17 +386,18 @@ trait HasHttpAssertions
     /**
      * Assert that the expected identifier is included in the document.
      *
-     * @param UrlRoutable|string|int|array $type
-     * @param string|null $id
+     * @param string $type
+     * @param UrlRoutable|string|int|null $id
      * @return $this
      */
-    public function assertIsIncluded($type, string $id = null): self
+    public function assertIsIncluded(string $type, $id): self
     {
-        if (is_null($id)) {
-            [$type, $id] = $this->identifier($type);
-        }
+        $identifier = $this->identifier(compact('type', 'id'));
 
-        $this->getDocument()->assertIncludedContainsIdentifier($type, $id);
+        $this->getDocument()->assertIncludedContainsIdentifier(
+            $identifier['type'],
+            $identifier['id']
+        );
 
         return $this;
     }
@@ -446,11 +423,11 @@ trait HasHttpAssertions
      * This does not assert the order of the included member because there is no significance to
      * the order of resources in the included member.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertIncluded($expected, bool $strict = true): self
+    public function assertIncluded(array $expected, bool $strict = true): self
     {
         $this->getDocument()->assertIncluded(
             $this->identifiers($expected),
@@ -501,15 +478,93 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert that the top-level meta matches the expected values.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return TestResponse
+     */
+    public function assertMeta(array $expected, bool $strict = true): self
+    {
+        $this->getDocument()->assertMeta($expected, $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the top-level meta is exactly the expected meta.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return TestResponse
+     */
+    public function assertExactMeta(array $expected, bool $strict = true): self
+    {
+        $this->getDocument()->assertExactMeta($expected, $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the top-level links match the expected values.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return TestResponse
+     */
+    public function assertLinks(array $expected, bool $strict = true): self
+    {
+        $this->getDocument()->assertLinks($expected, $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the top-level links are exactly the expected links.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return TestResponse
+     */
+    public function assertExactLinks(array $expected, bool $strict = true): self
+    {
+        $this->getDocument()->assertExactLinks($expected, $strict);
+
+        return $this;
+    }
+
+    /**
      * Assert the document contains a single error that matches the supplied error.
      *
+     * @param int $status
      * @param array $error
      * @param bool $strict
      * @return $this
      */
-    public function assertError(array $error, bool $strict = true): self
+    public function assertError(int $status, array $error = [], bool $strict = true): self
     {
         $this->document = HttpAssert::assertError(
+            $this->getStatusCode(),
+            $this->getContentType(),
+            $this->getContent(),
+            $status,
+            $error,
+            $strict
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the document contains a single error that matches the supplied error and has a status member.
+     *
+     * @param array $error
+     * @param bool $strict
+     * @return Document
+     */
+    public function assertErrorStatus(array $error, bool $strict = true): self
+    {
+        $this->document = HttpAssert::assertErrorStatus(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
@@ -568,22 +623,24 @@ trait HasHttpAssertions
      * Ensure the value is an array of identifiers.
      *
      * @param UrlRoutable|string|int|iterable $ids
+     * @param string|null $type
      * @return array
      */
-    protected function identifiers($ids): array
+    protected function identifiers($ids, string $type = null): array
     {
-        return Compare::identifiers($ids, $this->expectedType);
+        return Compare::identifiers($ids, $type ?: $this->getExpectedType());
     }
 
     /**
      * Ensure the value is a resource identifier.
      *
      * @param UrlRoutable|string|int|array $id
+     * @param string|null $type
      * @return array
      */
-    protected function identifier($id): array
+    protected function identifier($id, string $type = null): array
     {
-        return Compare::identifier($id, $this->expectedType);
+        return Compare::identifier($id, $type ?: $this->getExpectedType());
     }
 
     /**

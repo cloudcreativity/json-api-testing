@@ -64,7 +64,7 @@ class HttpAssert
      */
     public static function assertJson($status, $contentType, $content, int $expected = self::STATUS_OK): Document
     {
-        self::assertStatusCode($status, $expected);
+        self::assertStatusCode($status, $expected, $content);
 
         return self::assertContent($contentType, $content, self::JSON_MEDIA_TYPE);
     }
@@ -81,7 +81,7 @@ class HttpAssert
      */
     public static function assertJsonApi($status, $contentType, $content, int $expected = self::STATUS_OK): Document
     {
-        self::assertStatusCode($status, $expected);
+        self::assertStatusCode($status, $expected, $content);
 
         return self::assertContent($contentType, $content);
     }
@@ -286,7 +286,7 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        self::assertStatusCode($status, self::STATUS_CREATED);
+        self::assertStatusCode($status, self::STATUS_CREATED, $content);
         $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict);
         $id = $document->get('/data/id');
 
@@ -319,12 +319,18 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        if (!isset($expected['id'])) {
+        $expectedId = $expected['id'] ?? null;
+
+        if (!$expectedId) {
             throw new \InvalidArgumentException('Expected resource hash must have an id.');
         }
 
-        self::assertStatusCode($status, self::STATUS_CREATED);
-        PHPUnitAssert::assertSame($expectedLocation, $location, 'Unexpected Location header.');
+        self::assertStatusCode($status, self::STATUS_CREATED, $content);
+        PHPUnitAssert::assertSame(
+            "$expectedLocation/{$expectedId}",
+            $location,
+            'Unexpected Location header.'
+        );
 
         return self::assertContent($contentType, $content)
             ->assertHash($expected, '/data', $strict);
@@ -366,7 +372,7 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        self::assertStatusCode($status, self::STATUS_ACCEPTED);
+        self::assertStatusCode($status, self::STATUS_ACCEPTED, $content);
         $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict);
         $id = $document->get('/data/id');
 
@@ -383,9 +389,10 @@ class HttpAssert
      * @param $status
      * @return void
      */
-    public static function assertNoContent($status): void
+    public static function assertNoContent($status, $content = null): void
     {
-        self::assertStatusCode($status, self::STATUS_NO_CONTENT);
+        self::assertStatusCode($status, self::STATUS_NO_CONTENT, $content);
+        PHPUnitAssert::assertEmpty($content, 'Expecting HTTP body content to be empty.');
     }
 
     /**
@@ -440,16 +447,66 @@ class HttpAssert
      * @param $status
      * @param $contentType
      * @param $content
+     * @param int $expectedStatus
      * @param array $error
      * @param bool $strict
      * @return Document
      */
-    public static function assertError($status, $contentType, $content, array $error, bool $strict = true): Document
+    public static function assertError(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $error = [],
+        bool $strict = true
+    ): Document
     {
-        $expectedStatus = $error['status'] ?? self::STATUS_INTERNAL_SERVER_ERROR;
+        $document = self::assertJsonApi($status, $contentType, $content, $expectedStatus)
+            ->assertNotExists('/data');
 
-        return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
-            ->assertError($error, $strict);
+        if ($error) {
+            $document->assertError($error, $strict);
+        } else {
+            $document->assertExists('/error');
+        }
+
+        return $document;
+    }
+
+    /**
+     * Assert the document contains a single error that matches the supplied error and has a status member.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param array $error
+     * @param bool $strict
+     * @return Document
+     */
+    public static function assertErrorStatus(
+        $status,
+        $contentType,
+        $content,
+        array $error = [],
+        bool $strict = true
+    ): Document
+    {
+        $expectedStatus = $error['status'] ?? null;
+
+        if ($expectedStatus) {
+            throw new \InvalidArgumentException('Expecting error to have a status member.');
+        }
+
+        $document = self::assertJsonApi($status, $contentType, $content, (int) $expectedStatus)
+            ->assertNotExists('/data');
+
+        if ($error) {
+            $document->assertError($error, $strict);
+        } else {
+            $document->assertExists('/error');
+        }
+
+        return $document;
     }
 
     /**

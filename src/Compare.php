@@ -119,7 +119,7 @@ class Compare
     public static function failure($expected, $actual, bool $subset = false): ComparisonFailure
     {
         if ($subset && is_array($actual)) {
-            $expected = self::patch($expected, $actual);
+            $expected = self::patch($actual, $expected);
         }
 
         $expected = self::normalize($expected);
@@ -128,8 +128,8 @@ class Compare
         return new ComparisonFailure(
             $expected,
             $actual,
-            \var_export($expected, true),
-            \var_export($actual, true)
+            self::stringify($expected),
+            self::stringify($actual)
         );
     }
 
@@ -163,7 +163,7 @@ class Compare
         }
 
         return collect($ids)->map(function ($id) use ($type) {
-            return $this->identifier($id, $type);
+            return self::identifier($id, $type);
         })->values()->all();
     }
 
@@ -182,11 +182,15 @@ class Compare
         }
 
         if (is_string($id) || is_int($id)) {
-            $id = ['type' => $type, 'id' => (string) $id];
+            return ['type' => $type, 'id' => (string) $id];
         }
 
         if (!Compare::hash($id)) {
             throw new \InvalidArgumentException('Expecting a URL routable, string, integer or array hash.');
+        }
+
+        if (isset($id['id']) && $id['id'] instanceof UrlRoutable) {
+            $id['id'] = (string) $id['id']->getRouteKey();
         }
 
         if ($type && !array_key_exists('type', $id)) {

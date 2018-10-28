@@ -47,7 +47,7 @@ class SubsetInDocument extends Constraint
     public function evaluate($other, $description = '', $returnResult = false)
     {
         $actual = Document::cast($other)->get($this->pointer);
-        $result = Compare::subset($this->expected, $actual);
+        $result = Compare::subset($this->expected, $actual, $this->strict);
 
         if ($returnResult) {
             return $result;

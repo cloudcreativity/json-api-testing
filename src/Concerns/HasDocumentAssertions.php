@@ -303,6 +303,34 @@ trait HasDocumentAssertions
     }
 
     /**
+     * Assert that the top-level links match the expected values.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertLinks(array $expected, bool $strict = true): self
+    {
+        Assert::assertHash($this, $expected, '/links', $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the top-level links are exactly the expected links.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertExactLinks(array $expected, bool $strict = true): self
+    {
+        Assert::assertExact($this, $expected, '/links', $strict);
+
+        return $this;
+    }
+
+    /**
      * Assert the document contains a single error that matches the supplied error.
      *
      * @param array $error
