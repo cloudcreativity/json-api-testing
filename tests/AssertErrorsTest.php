@@ -51,7 +51,7 @@ class AssertErrorsTest extends TestCase
         });
 
         $this->willFail(function () use ($document) {
-            $document->assertErrorsContains(['status' => '422']);
+            $document->assertHasError(['status' => '422']);
         });
     }
 
@@ -66,7 +66,7 @@ class AssertErrorsTest extends TestCase
 
         $this->single->assertErrors([$error]);
 
-        $this->single->assertErrorsContains($error);
+        $this->single->assertHasError($error);
 
         $this->willFail(function () {
             $this->single->assertError([
@@ -90,7 +90,7 @@ class AssertErrorsTest extends TestCase
             $invalid = ['source' => ['pointer' => '/data/attributes/title']],
         ]);
 
-        $this->multiple->assertErrorsContains($invalid);
+        $this->multiple->assertHasError($invalid);
 
         $this->willFail(function () use ($invalid) {
             // the error is present but it is not the only one.
@@ -98,7 +98,7 @@ class AssertErrorsTest extends TestCase
         });
 
         $this->willFail(function () {
-            $this->multiple->assertErrorsContains(['status' => '500']);
+            $this->multiple->assertHasError(['status' => '500']);
         });
 
         $this->willFail(function () {

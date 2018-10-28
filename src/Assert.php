@@ -356,6 +356,19 @@ class Assert
     }
 
     /**
+     * Assert the document contains the supplied error within its errors member.
+     *
+     * @param $document
+     * @param array $error
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertHasError($document, array $error, bool $strict = true): void
+    {
+        self::assertListContainsHash($document, $error, '/errors', $strict);
+    }
+
+    /**
      * Assert the document contains the supplied errors.
      *
      * This does not assert the order of the errors, as the error order does not have any significance.
@@ -368,18 +381,5 @@ class Assert
     public static function assertErrors($document, array $errors, bool $strict = true): void
     {
         self::assertList($document, $errors, '/errors', $strict);
-    }
-
-    /**
-     * Assert the document contains the supplied error within its errors member.
-     *
-     * @param $document
-     * @param array $error
-     * @param bool $strict
-     * @return void
-     */
-    public static function assertErrorsContains($document, array $error, bool $strict = true): void
-    {
-        self::assertListContainsHash($document, $error, '/errors', $strict);
     }
 }

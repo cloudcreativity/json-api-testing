@@ -289,6 +289,20 @@ trait HasDocumentAssertions
     }
 
     /**
+     * Assert the document contains the supplied error within its errors member.
+     *
+     * @param array $error
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertHasError(array $error, bool $strict = true): self
+    {
+        Assert::assertHasError($this, $error, $strict);
+
+        return $this;
+    }
+
+    /**
      * Assert the document contains the supplied errors.
      *
      * This does not assert the order of the errors, as the error order does not have any significance.
@@ -300,20 +314,6 @@ trait HasDocumentAssertions
     public function assertErrors(array $errors, bool $strict = true): self
     {
         Assert::assertErrors($this, $errors, $strict);
-
-        return $this;
-    }
-
-    /**
-     * Assert the document contains the supplied error within its errors member.
-     *
-     * @param array $error
-     * @param bool $strict
-     * @return $this
-     */
-    public function assertErrorsContains(array $error, bool $strict = true): self
-    {
-        Assert::assertErrorsContains($this, $error, $strict);
 
         return $this;
     }

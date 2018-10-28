@@ -8,11 +8,13 @@ use PHPUnit\Framework\Assert as PHPUnitAssert;
 class HttpAssert
 {
 
+    private const JSON_MEDIA_TYPE = 'application/json';
     private const JSON_API_MEDIA_TYPE = 'application/vnd.api+json';
     private const STATUS_OK = 200;
     private const STATUS_CREATED = 201;
     private const STATUS_ACCEPTED = 202;
     private const STATUS_NO_CONTENT = 204;
+    private const STATUS_INTERNAL_SERVER_ERROR = 500;
 
     /**
      * Assert that the HTTP status matches the expected status.
@@ -51,6 +53,40 @@ class HttpAssert
     }
 
     /**
+     * Assert a JSON HTTP message with an expected status.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expected
+     *      the expected HTTP status.
+     * @return Document
+     */
+    public static function assertJson($status, $contentType, $content, int $expected = self::STATUS_OK): Document
+    {
+        self::assertStatus($status, $expected);
+
+        return self::assertContent($contentType, $content, self::JSON_MEDIA_TYPE);
+    }
+
+    /**
+     * Assert a JSON API HTTP message with an expected status.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expected
+     *      the expected HTTP status.
+     * @return Document
+     */
+    public static function assertJsonApi($status, $contentType, $content, int $expected = self::STATUS_OK): Document
+    {
+        self::assertStatus($status, $expected);
+
+        return self::assertContent($contentType, $content);
+    }
+
+    /**
      * Assert that a resource was fetched.
      *
      * @param $status
@@ -68,9 +104,8 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)->assertHash($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content)
+            ->assertHash($expected, '/data', $strict);
     }
 
     /**
@@ -83,9 +118,7 @@ class HttpAssert
      */
     public static function assertFetchedNull($status, $contentType, $content): Document
     {
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)->assertNull();
+        return self::assertJsonApi($status, $contentType, $content)->assertNull();
     }
 
     /**
@@ -106,9 +139,8 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)->assertList($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content)
+            ->assertList($expected, '/data', $strict);
     }
 
     /**
@@ -133,9 +165,7 @@ class HttpAssert
             return self::assertFetchedEmpty($strict, $contentType, $content);
         }
 
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)
+        return self::assertJsonApi($status, $contentType, $content)
             ->assertListInOrder($expected, '/data', $strict);
     }
 
@@ -149,9 +179,7 @@ class HttpAssert
      */
     public static function assertFetchedEmpty($status, $contentType, $content): Document
     {
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)->assertListEmpty();
+        return self::assertJsonApi($status, $contentType, $content)->assertListEmpty();
     }
 
     /**
@@ -179,9 +207,7 @@ class HttpAssert
             return self::assertFetchedNull($status, $contentType, $content);
         }
 
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)
+        return self::assertJsonApi($status, $contentType, $content)
             ->assertExact(compact('type', 'id'));
     }
 
@@ -207,9 +233,7 @@ class HttpAssert
             return self::assertFetchedEmpty($strict, $contentType, $content);
         }
 
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)
+        return self::assertJsonApi($status, $contentType, $content)
             ->assertExactList($expected, '/data', $strict);
     }
 
@@ -235,9 +259,7 @@ class HttpAssert
             return self::assertFetchedEmpty($strict, $contentType, $content);
         }
 
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)
+        return self::assertJsonApi($status, $contentType, $content)
             ->assertExactListInOrder($expected, '/data', $strict);
     }
 
@@ -384,9 +406,7 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)
+        return self::assertJsonApi($status, $contentType, $content)
             ->assertNotExists('/data')
             ->assertHash($expected, '/meta', $strict);
     }
@@ -409,11 +429,75 @@ class HttpAssert
         bool $strict = true
     ): Document
     {
-        self::assertStatus($status, self::STATUS_OK);
-
-        return self::assertContent($contentType, $content)
+        return self::assertJsonApi($status, $contentType, $content)
             ->assertNotExists('/data')
             ->assertExact($expected, '/meta', $strict);
+    }
+
+    /**
+     * Assert the document contains a single error that matches the supplied error.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param array $error
+     * @param bool $strict
+     * @return Document
+     */
+    public static function assertError($status, $contentType, $content, array $error, bool $strict = true): Document
+    {
+        $expectedStatus = $error['status'] ?? self::STATUS_INTERNAL_SERVER_ERROR;
+
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
+            ->assertError($error, $strict);
+    }
+
+    /**
+     * Assert the HTTP message contains the supplied error within its errors member.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $error
+     * @param bool $strict
+     * @return Document
+     */
+    public static function assertHasError(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $error,
+        bool $strict = true
+    ): Document
+    {
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
+            ->assertError($error, $strict);
+    }
+
+    /**
+     * Assert the HTTP status contains the supplied errors.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $errors
+     * @param bool $strict
+     * @return Document
+     */
+    public static function assertErrors(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $errors,
+        bool $strict = true
+    ): Document
+    {
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
+            ->assertErrors($errors, $strict);
     }
 
     /**
