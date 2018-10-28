@@ -131,4 +131,19 @@ class Compare
             \var_export($actual, true)
         );
     }
+
+    /**
+     * Convert a JSON pointer to a dot notation path.
+     *
+     * @param string $pointer
+     * @return string
+     */
+    public static function path(string $pointer): string
+    {
+        if ('/' === $pointer) {
+            return '';
+        }
+
+        return str_replace('/', '.', ltrim($pointer, '/'));
+    }
 }
