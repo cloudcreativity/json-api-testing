@@ -146,7 +146,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      */
     public function toString(): string
     {
-        return json_encode($this, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return Compare::stringify($this->document);
     }
 
     /**
@@ -162,7 +162,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      */
     public function jsonSerialize()
     {
-        return Arr::sortRecursive($this->document);
+        return Compare::sort($this->document);
     }
 
     /**
@@ -184,7 +184,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     }
 
     /**
-     * Assert that the expected array is in the document at the specified path.
+     * Assert that the expected value is in the document at the specified path.
      *
      * @param array|null $expected
      *      the expected resource object.
@@ -194,9 +194,24 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      *      whether strict comparison should be used.
      * @return $this
      */
-    public function assertExact(?array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertExact($expected, string $pointer = '/data', bool $strict = true): self
     {
         Assert::assertExact($this, $expected, $pointer, $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the value at the specified path is not the expected value.
+     *
+     * @param $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertNotExact($expected, string $pointer = '/data', bool $strict = true): self
+    {
+        Assert::assertNotExact($this, $expected, $pointer, $strict);
 
         return $this;
     }
@@ -233,6 +248,32 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Assert that the member contains an empty list.
+     *
+     * @param string $pointer
+     * @return $this
+     */
+    public function assertArrayEmpty(string $pointer = '/data'): self
+    {
+        Assert::assertArrayEmpty($this, $pointer);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the member does not contain an empty list.
+     *
+     * @param string $pointer
+     * @return $this
+     */
+    public function assertArrayNotEmpty(string $pointer = '/data'): self
+    {
+        Assert::assertArrayNotEmpty($this, $pointer);
+
+        return $this;
+    }
+
+    /**
      * Assert that an array in the document only contains the specified subsets.
      *
      * This assertion does not check that the expected and actual arrays are in the same order.
@@ -251,6 +292,24 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     }
 
     /**
+     * Assert that an array in the document only contains the specified values.
+     *
+     * This assertion does not check that the expected and actual arrays are in the same order.
+     * To assert the order, use `assertExactArrayOrder`.
+     *
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertExactArray(array $expected, string $pointer = '/data', bool $strict = true): self
+    {
+        Assert::assertExactArray($this, $expected, $pointer, $strict);
+
+        return $this;
+    }
+
+    /**
      * Assert that an array in the document contains the subsets in the specified order.
      *
      * @param array $expected
@@ -258,9 +317,24 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      * @param bool $strict
      * @return $this
      */
-    public function assertArrayOrder(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertArrayInOrder(array $expected, string $pointer = '/data', bool $strict = true): self
     {
-        Assert::assertArrayOrder($this, $expected, $pointer, $strict);
+        Assert::assertArrayInOrder($this, $expected, $pointer, $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that an array in the document contains the values in the specified order.
+     *
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertExactArrayInOrder(array $expected, string $pointer = '/data', bool $strict = true): self
+    {
+        Assert::assertExactArrayInOrder($this, $expected, $pointer, $strict);
 
         return $this;
     }
@@ -294,6 +368,21 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     public function assertArrayContainsSubset(array $expected, string $pointer = '/data', bool $strict = true): self
     {
         Assert::assertArrayContainsSubset($this, $expected, $pointer, $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that an array in the document at the specified path contains the expected value.
+     *
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertArrayContainsExact(array $expected, string $pointer = '/data', bool $strict = true): self
+    {
+        Assert::assertArrayContainsExact($this, $expected, $pointer, $strict);
 
         return $this;
     }

@@ -2,12 +2,14 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
+use CloudCreativity\JsonApi\Testing\Constraints\ExactInArray;
 use CloudCreativity\JsonApi\Testing\Constraints\ExactInDocument;
-use CloudCreativity\JsonApi\Testing\Constraints\NullInDocument;
-use CloudCreativity\JsonApi\Testing\Constraints\OnlyInArray;
+use CloudCreativity\JsonApi\Testing\Constraints\OnlyExactInArray;
+use CloudCreativity\JsonApi\Testing\Constraints\OnlySubsetsInArray;
 use CloudCreativity\JsonApi\Testing\Constraints\SubsetInArray;
 use CloudCreativity\JsonApi\Testing\Constraints\SubsetInDocument;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
+use PHPUnit\Framework\Constraint\LogicalNot;
 
 class Assert
 {
@@ -37,12 +39,12 @@ class Assert
     }
 
     /**
-     * Assert that the expected array is in the document at the specified path.
+     * Assert that the expected value is in the document at the specified path.
      *
      * @param array|string $document
      *      the JSON API document.
-     * @param array|null $expected
-     *      the expected resource object.
+     * @param mixed $expected
+     *      the expected value.
      * @param string $pointer
      *      the JSON pointer to where the object is expected to exist within the document.
      * @param bool $strict
@@ -51,19 +53,33 @@ class Assert
      */
     public static function assertExact(
         $document,
-        ?array $expected,
+        $expected,
         string $pointer = '/data',
         bool $strict = true
     ): void
     {
-        if (is_null($expected)) {
-            self::assertNull($document, $pointer);
-        } else {
-            PHPUnitAssert::assertThat(
-                $document,
-                new ExactInDocument($expected, $pointer, $strict)
-            );
-        }
+        PHPUnitAssert::assertThat(
+            $document,
+            new ExactInDocument($expected, $pointer, $strict)
+        );
+    }
+
+    /**
+     * Assert that the value at the specified path is not the expected value.
+     *
+     * @param $document
+     * @param $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertNotExact($document, $expected, string $pointer = '/data', bool $strict = true): void
+    {
+        $constraint = new LogicalNot(
+            new ExactInDocument($expected, $pointer, $strict)
+        );
+
+        PHPUnitAssert::assertThat($document, $constraint);
     }
 
     /**
@@ -101,17 +117,38 @@ class Assert
      */
     public static function assertNull($document, string $pointer = '/data'): void
     {
-        PHPUnitAssert::assertThat(
-            $document,
-            new NullInDocument($pointer)
-        );
+        self::assertExact($document, null, $pointer, true);
+    }
+
+    /**
+     * Assert that the member contains an empty list.
+     *
+     * @param $document
+     * @param string $pointer
+     * @return void
+     */
+    public static function assertArrayEmpty($document, string $pointer = '/data'): void
+    {
+        self::assertExact($document, [], $pointer, true);
+    }
+
+    /**
+     * Assert that the member does not contain an empty list.
+     *
+     * @param $document
+     * @param string $pointer
+     * @return void
+     */
+    public static function assertArrayNotEmpty($document, string $pointer = '/data'): void
+    {
+        self::assertNotExact($document, [], $pointer, true);
     }
 
     /**
      * Assert that an array in the document only contains the specified subsets.
      *
      * This assertion does not check that the expected and actual arrays are in the same order.
-     * To assert the order, use `assertArrayOrder`.
+     * To assert the order, use `assertArrayInOrder`.
      *
      * @param $document
      * @param array $expected
@@ -128,7 +165,32 @@ class Assert
     {
         PHPUnitAssert::assertThat(
             $document,
-            new OnlyInArray($expected, $pointer, $strict)
+            new OnlySubsetsInArray($expected, $pointer, $strict)
+        );
+    }
+
+    /**
+     * Assert that an array in the document only contains the specified values.
+     *
+     * This assertion does not check that the expected and actual arrays are in the same order.
+     * To assert the order, use `assertExactArrayInOrder`.
+     *
+     * @param $document
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertExactArray(
+        $document,
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true
+    ): void
+    {
+        PHPUnitAssert::assertThat(
+            $document,
+            new OnlyExactInArray($expected, $pointer, $strict)
         );
     }
 
@@ -141,7 +203,7 @@ class Assert
      * @param bool $strict
      * @return void
      */
-    public static function assertArrayOrder(
+    public static function assertArrayInOrder(
         $document,
         array $expected,
         string $pointer = '/data',
@@ -149,6 +211,25 @@ class Assert
     ): void
     {
         self::assertSubset($document, $expected, $pointer, $strict);
+    }
+
+    /**
+     * Assert that an array in the document contains the values in the specified order.
+     *
+     * @param $document
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertExactArrayInOrder(
+        $document,
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true
+    ): void
+    {
+        self::assertExact($document, $expected, $pointer, $strict);
     }
 
     /**
@@ -187,11 +268,34 @@ class Assert
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true): void
+        bool $strict = true
+    ): void
     {
         PHPUnitAssert::assertThat(
             $document,
             new SubsetInArray($expected, $pointer, $strict)
+        );
+    }
+
+    /**
+     * Assert that an array in the document at the specified path contains the expected value.
+     *
+     * @param $document
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @return void
+     */
+    public static function assertArrayContainsExact(
+        $document,
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true
+    ): void
+    {
+        PHPUnitAssert::assertThat(
+            $document,
+            new ExactInArray($expected, $pointer, $strict)
         );
     }
 

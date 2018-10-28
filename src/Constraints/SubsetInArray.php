@@ -2,8 +2,8 @@
 
 namespace CloudCreativity\JsonApi\Testing\Constraints;
 
+use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
-use Illuminate\Support\Arr;
 use PHPUnit\Framework\Constraint\Constraint;
 
 class SubsetInArray extends Constraint
@@ -12,17 +12,17 @@ class SubsetInArray extends Constraint
     /**
      * @var array
      */
-    private $expected;
+    protected $expected;
 
     /**
      * @var string
      */
-    private $pointer;
+    protected $pointer;
 
     /**
      * @var bool
      */
-    private $strict;
+    protected $strict;
 
     /**
      * ArrayContainsSubset constructor.
@@ -48,7 +48,11 @@ class SubsetInArray extends Constraint
     {
         $actual = Document::cast($other)->get($this->pointer);
 
-        return collect((array) $actual)->contains(function ($item) {
+        if (!is_array($actual)) {
+            return false;
+        }
+
+        return collect($actual)->contains(function ($item) {
             return $this->compare($item);
         });
     }
@@ -58,7 +62,7 @@ class SubsetInArray extends Constraint
      */
     public function toString(): string
     {
-        return Document::cast($this->expected)->toString();
+        return Compare::stringify($this->expected);
     }
 
     /**
@@ -76,15 +80,9 @@ class SubsetInArray extends Constraint
      * @param $actual
      * @return bool
      */
-    private function compare($actual): bool
+    protected function compare($actual): bool
     {
-        $patched = \array_replace_recursive((array) $actual, $this->expected);
-
-        if ($this->strict) {
-            return $actual === $patched;
-        }
-
-        return $actual == $patched;
+        return Compare::subset($this->expected, $actual, $this->strict);
     }
 
 }

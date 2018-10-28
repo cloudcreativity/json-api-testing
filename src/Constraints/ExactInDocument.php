@@ -2,16 +2,15 @@
 
 namespace CloudCreativity\JsonApi\Testing\Constraints;
 
+use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
-use Illuminate\Support\Arr;
 use PHPUnit\Framework\Constraint\Constraint;
-use SebastianBergmann\Comparator\ComparisonFailure;
 
 class ExactInDocument extends Constraint
 {
 
     /**
-     * @var array
+     * @var mixed
      */
     private $expected;
 
@@ -28,13 +27,13 @@ class ExactInDocument extends Constraint
     /**
      * ExactInDocument constructor.
      *
-     * @param array $expected
-     *      the expected object
+     * @param mixed $expected
+     *      the expected value
      * @param string $pointer
      *      the JSON pointer to the object in the JSON API document.
      * @param bool $strict
      */
-    public function __construct(array $expected, string $pointer, bool $strict = true)
+    public function __construct($expected, string $pointer, bool $strict = true)
     {
         parent::__construct();
         $this->expected = $expected;
@@ -48,31 +47,14 @@ class ExactInDocument extends Constraint
     public function evaluate($other, $description = '', $returnResult = false)
     {
         $actual = Document::cast($other)->get($this->pointer);
-        $expected = Arr::sortRecursive($this->expected);
-
-        if (is_array($actual)) {
-            $actual = Arr::sortRecursive($actual);
-        }
-
-        if ($this->strict) {
-            $result = $actual === $expected;
-        } else {
-            $result = $actual == $expected;
-        }
+        $result = Compare::exact($this->expected, $actual, $this->strict);
 
         if ($returnResult) {
             return $result;
         }
 
         if (!$result) {
-            $f = new ComparisonFailure(
-                $expected,
-                $actual,
-                \var_export($expected, true),
-                \var_export($actual, true)
-            );
-
-            $this->fail($other, $description, $f);
+            $this->fail($other, $description, Compare::failure($this->expected, $actual));
         }
     }
 
@@ -81,7 +63,7 @@ class ExactInDocument extends Constraint
      */
     public function toString(): string
     {
-        return Document::cast($this->expected)->toString();
+        return Compare::stringify($this->expected);
     }
 
     /**

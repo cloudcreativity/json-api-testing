@@ -417,7 +417,7 @@ JSON_API;
         ];
 
         $document->assertExact($expected);
-        $document->assertArrayOrder($ids);
+        $document->assertArrayInOrder($ids);
         $document->assertArray($notOrdered);
 
         $document->assertArrayContains('posts', '456');
@@ -434,7 +434,7 @@ JSON_API;
 
         /** Assert data should fail if not in the correct order. */
         $this->willFail(function () use ($document, $notOrdered) {
-            $document->assertArrayOrder($notOrdered);
+            $document->assertArrayInOrder($notOrdered);
         });
 
         /** Assert array only contains should fail if there is an id not in the array */

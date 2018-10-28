@@ -2,10 +2,9 @@
 
 namespace CloudCreativity\JsonApi\Testing\Constraints;
 
+use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
-use Illuminate\Support\Arr;
 use PHPUnit\Framework\Constraint\Constraint;
-use SebastianBergmann\Comparator\ComparisonFailure;
 
 class SubsetInDocument extends Constraint
 {
@@ -48,27 +47,18 @@ class SubsetInDocument extends Constraint
     public function evaluate($other, $description = '', $returnResult = false)
     {
         $actual = Document::cast($other)->get($this->pointer);
-        $patched = \array_replace_recursive((array) $actual, $this->expected);
-
-        if ($this->strict) {
-            $result = $actual === $patched;
-        } else {
-            $result = $actual == $patched;
-        }
+        $result = Compare::subset($this->expected, $actual);
 
         if ($returnResult) {
             return $result;
         }
 
         if (!$result) {
-            $f = new ComparisonFailure(
-                $patched,
-                $actual,
-                \var_export($patched, true),
-                \var_export($actual, true)
+            $this->fail(
+                $other,
+                $description,
+                Compare::failure($this->expected, $actual, true)
             );
-
-            $this->fail($other, $description, $f);
         }
     }
 

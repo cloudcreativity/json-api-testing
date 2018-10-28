@@ -2,26 +2,27 @@
 
 namespace CloudCreativity\JsonApi\Testing\Constraints;
 
+use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
 use PHPUnit\Framework\Constraint\Constraint;
 
-class OnlyInArray extends Constraint
+class OnlySubsetsInArray extends Constraint
 {
 
     /**
      * @var array
      */
-    private $expected;
+    protected $expected;
 
     /**
      * @var string
      */
-    private $pointer;
+    protected $pointer;
 
     /**
      * @var bool
      */
-    private $strict;
+    protected $strict;
 
     /**
      * OnlyInArray constructor.
@@ -47,7 +48,11 @@ class OnlyInArray extends Constraint
     {
         $other = Document::cast($other)->get($this->pointer);
 
-        $allValid = collect((array) $other)->every(function ($item) {
+        if (!is_array($other)) {
+            return false;
+        }
+
+        $allValid = collect($other)->every(function ($item) {
             return $this->expected((array) $item);
         });
 
@@ -65,7 +70,7 @@ class OnlyInArray extends Constraint
      */
     public function toString(): string
     {
-        return Document::cast($this->expected)->toString();
+        return Compare::stringify($this->expected);
     }
 
     /**
@@ -85,7 +90,7 @@ class OnlyInArray extends Constraint
      * @param array $actual
      * @return bool
      */
-    private function expected(array $actual): bool
+    protected function expected(array $actual): bool
     {
         return collect($this->expected)->contains(function ($expected) use ($actual) {
             return $this->compare($expected, $actual);
@@ -99,27 +104,25 @@ class OnlyInArray extends Constraint
      * @param mixed $actual
      * @return bool
      */
-    private function exists(array $expected, $actual): bool
+    protected function exists(array $expected, $actual): bool
     {
-        return collect((array) $actual)->contains(function ($item) use ($expected) {
-            return $this->compare($expected, (array) $item);
+        if (!is_array($actual)) {
+            return false;
+        }
+
+        return collect($actual)->contains(function ($item) use ($expected) {
+            return $this->compare($expected, $item);
         });
     }
 
     /**
      * @param array $expected
-     * @param array $actual
+     * @param mixed $actual
      * @return bool
      */
-    private function compare(array $expected, array $actual): bool
+    protected function compare(array $expected, $actual): bool
     {
-        $patched = \array_replace_recursive($actual, $expected);
-
-        if ($this->strict) {
-            return $actual === $patched;
-        }
-
-        return $actual == $patched;
+        return Compare::subset($expected, $actual, $this->strict);
     }
 
 }
