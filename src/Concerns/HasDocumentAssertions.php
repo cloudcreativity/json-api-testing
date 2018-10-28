@@ -275,6 +275,34 @@ trait HasDocumentAssertions
     }
 
     /**
+     * Assert that the top-level meta matches the expected values.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertMeta(array $expected, bool $strict = true): self
+    {
+        Assert::assertHash($this, $expected, '/meta', $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the top-level meta is exactly the expected meta.
+     *
+     * @param array $expected
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertExactMeta(array $expected, bool $strict = true): self
+    {
+        Assert::assertExact($this, $expected, '/meta', $strict);
+
+        return $this;
+    }
+
+    /**
      * Assert the document contains a single error that matches the supplied error.
      *
      * @param array $error

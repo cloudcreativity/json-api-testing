@@ -2,6 +2,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
@@ -145,5 +146,67 @@ class Compare
         }
 
         return str_replace('/', '.', ltrim($pointer, '/'));
+    }
+
+    /**
+     * Ensure the value is an array of identifiers.
+     *
+     * @param UrlRoutable|string|int|iterable $ids
+     * @param string|null $type
+     *      the type to use if $id does not already have a type.
+     * @return array
+     */
+    public static function identifiers($ids, ?string $type): array
+    {
+        if (self::identifiable($ids)) {
+            return [self::identifier($ids, $type)];
+        }
+
+        return collect($ids)->map(function ($id) use ($type) {
+            return $this->identifier($id, $type);
+        })->values()->all();
+    }
+
+    /**
+     * Ensure the value is a resource identifier.
+     *
+     * @param UrlRoutable|string|int|array $id
+     * @param string|null $type
+     *      the type to use if $id does not already have a type.
+     * @return array
+     */
+    public static function identifier($id, ?string $type): array
+    {
+        if ($id instanceof UrlRoutable) {
+            $id = (string) $id->getRouteKey();
+        }
+
+        if (is_string($id) || is_int($id)) {
+            $id = ['type' => $type, 'id' => (string) $id];
+        }
+
+        if (!Compare::hash($id)) {
+            throw new \InvalidArgumentException('Expecting a URL routable, string, integer or array hash.');
+        }
+
+        if ($type && !array_key_exists('type', $id)) {
+            $id['type'] = $type;
+        }
+
+        return $id;
+    }
+
+    /**
+     * Does the value identify a resource?
+     *
+     * @param $value
+     * @return bool
+     */
+    public static function identifiable($value): bool
+    {
+        return $value instanceof UrlRoutable ||
+            is_string($value) ||
+            is_int($value) ||
+            self::hash($value);
     }
 }

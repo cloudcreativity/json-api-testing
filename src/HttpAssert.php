@@ -162,7 +162,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedEmpty($strict, $contentType, $content);
+            return self::assertFetchedNone($strict, $contentType, $content);
         }
 
         return self::assertJsonApi($status, $contentType, $content)
@@ -177,7 +177,7 @@ class HttpAssert
      * @param $content
      * @return Document
      */
-    public static function assertFetchedEmpty($status, $contentType, $content): Document
+    public static function assertFetchedNone($status, $contentType, $content): Document
     {
         return self::assertJsonApi($status, $contentType, $content)->assertListEmpty();
     }
@@ -230,7 +230,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedEmpty($strict, $contentType, $content);
+            return self::assertFetchedNone($strict, $contentType, $content);
         }
 
         return self::assertJsonApi($status, $contentType, $content)
@@ -256,7 +256,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedEmpty($strict, $contentType, $content);
+            return self::assertFetchedNone($strict, $contentType, $content);
         }
 
         return self::assertJsonApi($status, $contentType, $content)
@@ -276,7 +276,7 @@ class HttpAssert
      * @param bool $strict
      * @return Document
      */
-    public static function assertCreatedWithId(
+    public static function assertCreatedWithServerId(
         $status,
         $contentType,
         $content,
@@ -408,7 +408,7 @@ class HttpAssert
     {
         return self::assertJsonApi($status, $contentType, $content)
             ->assertNotExists('/data')
-            ->assertHash($expected, '/meta', $strict);
+            ->assertMeta($expected, $strict);
     }
 
     /**
@@ -431,7 +431,7 @@ class HttpAssert
     {
         return self::assertJsonApi($status, $contentType, $content)
             ->assertNotExists('/data')
-            ->assertExact($expected, '/meta', $strict);
+            ->assertExactMeta($expected, $strict);
     }
 
     /**
