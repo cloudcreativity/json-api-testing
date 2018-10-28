@@ -35,7 +35,7 @@ class AssertDataTest extends TestCase
         Assert::assertNull($content);
 
         $this->willFail(function () use ($content) {
-            Assert::assertContains($content, 'posts', '123');
+            Assert::assertIdentifier($content, 'posts', '123');
         });
     }
 
@@ -61,7 +61,7 @@ JSON_API;
         ];
 
         $this->willFail(function () use ($content, $expected) {
-            Assert::assertSubset($content, $expected);
+            Assert::assertHash($content, $expected);
         });
     }
 
@@ -79,7 +79,7 @@ JSON_API;
         $expected = ['type' => 'posts', 'id' => '123'];
 
         $this->willFail(function () use ($content, $expected) {
-            Assert::assertSubset($content, $expected);
+            Assert::assertHash($content, $expected);
         });
     }
 
@@ -94,10 +94,10 @@ JSON_API;
 }
 JSON_API;
 
-        Assert::assertSubset($content, ['type' => 'posts']);
+        Assert::assertHash($content, ['type' => 'posts']);
 
         $this->willFail(function () use ($content) {
-            Assert::assertSubset($content, ['type' => 'comments']);
+            Assert::assertHash($content, ['type' => 'comments']);
         });
     }
 
@@ -114,14 +114,14 @@ JSON_API;
 
         $document = Document::decode($content);
 
-        $document->assertContains('posts', '123');
+        $document->assertIdentifier('posts', '123');
 
         $this->willFail(function () use ($document) {
-            $document->assertContains('posts', '999');
+            $document->assertIdentifier('posts', '999');
         });
 
         $this->willFail(function () use ($document) {
-            $document->assertContains('comments', '123');
+            $document->assertIdentifier('comments', '123');
         });
 
         $this->willFail(function () use ($document) {
@@ -143,7 +143,7 @@ JSON_API;
 JSON_API;
 
         $this->willFail(function () use ($content) {
-            Assert::assertContains($content, 'posts', '123');
+            Assert::assertIdentifier($content, 'posts', '123');
         });
     }
 
@@ -161,7 +161,7 @@ JSON_API;
         $document = Document::decode($content);
 
         $this->willFail(function () use ($document) {
-            $document->assertContains('posts', '123');
+            $document->assertIdentifier('posts', '123');
         });
     }
 
@@ -176,10 +176,10 @@ JSON_API;
 }
 JSON_API;
 
-        Assert::assertSubset($content, ['id' => '123']);
+        Assert::assertHash($content, ['id' => '123']);
 
         $this->willFail(function () use ($content) {
-            Assert::assertSubset($content, ['id' => '999']);
+            Assert::assertHash($content, ['id' => '999']);
         });
     }
 
@@ -211,12 +211,12 @@ JSON_API;
             ],
         ];
 
-        Assert::assertSubset($content, $expected);
+        Assert::assertHash($content, $expected);
 
         $expected['attributes']['tags'] = ['news', 'other'];
 
         $this->willFail(function () use ($content, $expected) {
-            Assert::assertSubset($content, $expected);
+            Assert::assertHash($content, $expected);
         });
     }
 
@@ -264,12 +264,12 @@ JSON_API;
 
         $document = Document::decode($content);
 
-        $document->assertSubset($expected);
+        $document->assertHash($expected);
 
         $expected['relationships']['author'] = ['data' => ['id' => '456']];
 
         $this->willFail(function () use ($document, $expected) {
-            $document->assertSubset($expected);
+            $document->assertHash($expected);
         });
     }
 
@@ -337,7 +337,7 @@ JSON_API;
 
         unset($expected['attributes']['content']);
 
-        $document->assertSubset($expected); // subset will pass.
+        $document->assertHash($expected); // subset will pass.
 
         $this->willFail(function () use ($document, $expected) {
             $document->assertExact($expected);
@@ -417,11 +417,11 @@ JSON_API;
         ];
 
         $document->assertExact($expected);
-        $document->assertArrayInOrder($ids);
-        $document->assertArray($notOrdered);
+        $document->assertListInOrder($ids);
+        $document->assertList($notOrdered);
 
-        $document->assertArrayContains('posts', '456');
-        $document->assertArrayContains(
+        $document->assertListContainsIdentifier('posts', '456');
+        $document->assertListContainsIdentifier(
             'comments',
             '101',
             '/data/1/relationships/comments/data'
@@ -434,17 +434,17 @@ JSON_API;
 
         /** Assert data should fail if not in the correct order. */
         $this->willFail(function () use ($document, $notOrdered) {
-            $document->assertArrayInOrder($notOrdered);
+            $document->assertListInOrder($notOrdered);
         });
 
         /** Assert array only contains should fail if there is an id not in the array */
         $this->willFail(function () use ($document, $notOrdered) {
             $notOrdered[] = ['type' => 'posts', 'id' => '999'];
-            $document->assertArray($notOrdered);
+            $document->assertList($notOrdered);
         });
 
         $this->willFail(function () use ($document) {
-            $document->assertArrayContains('comments', '101');
+            $document->assertListContainsIdentifier('comments', '101');
         });
     }
 }

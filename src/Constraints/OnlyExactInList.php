@@ -5,7 +5,7 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
 
-class ExactInArray extends SubsetInArray
+class OnlyExactInList extends OnlySubsetsInList
 {
 
     /**
@@ -13,19 +13,20 @@ class ExactInArray extends SubsetInArray
      */
     protected function failureDescription($document): string
     {
-        return "the array at [{$this->pointer}] contains the values:" . PHP_EOL
+        return "the list at [{$this->pointer}] only contains the values:" . PHP_EOL
             . $this->toString() . PHP_EOL . PHP_EOL
             . "within JSON API document:" . PHP_EOL
             . Document::cast($document);
     }
 
     /**
-     * @param $actual
+     * @param array $expected
+     * @param mixed $actual
      * @return bool
      */
-    protected function compare($actual): bool
+    protected function compare(array $expected, $actual): bool
     {
-        return Compare::exact($this->expected, $actual, $this->strict);
+        return Compare::exact($expected, $actual, $this->strict);
     }
 
 }

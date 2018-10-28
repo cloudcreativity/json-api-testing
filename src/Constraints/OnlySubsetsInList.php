@@ -6,7 +6,7 @@ use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
 use PHPUnit\Framework\Constraint\Constraint;
 
-class OnlySubsetsInArray extends Constraint
+class OnlySubsetsInList extends Constraint
 {
 
     /**
@@ -25,7 +25,7 @@ class OnlySubsetsInArray extends Constraint
     protected $strict;
 
     /**
-     * OnlyInArray constructor.
+     * OnlySubsetsInList constructor.
      *
      * @param array $expected
      *      the expected object

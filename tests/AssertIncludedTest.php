@@ -69,16 +69,16 @@ class AssertIncludedTest extends TestCase
 
     public function testIncludedContains(): void
     {
-        $this->document->assertIncludedContains('comments', '2');
+        $this->document->assertIncludedContainsIdentifier('comments', '2');
 
         $this->willFail(function () {
-            $this->document->assertIncludedContains('comments', '99');
+            $this->document->assertIncludedContainsIdentifier('comments', '99');
         });
     }
 
     public function testIncludedContainsSubset(): void
     {
-        $this->document->assertIncludedContainsSubset([
+        $this->document->assertIncludedContainsHash([
             'type' => 'comments',
             'id' => '1',
             'attributes' => [
@@ -87,7 +87,7 @@ class AssertIncludedTest extends TestCase
         ]);
 
         $this->willFail(function () {
-            $this->document->assertIncludedContainsSubset([
+            $this->document->assertIncludedContainsHash([
                 'type' => 'comments',
                 'id' => '3',
                 'attributes' => [

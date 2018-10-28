@@ -2,11 +2,11 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
-use CloudCreativity\JsonApi\Testing\Constraints\ExactInArray;
+use CloudCreativity\JsonApi\Testing\Constraints\ExactInList;
 use CloudCreativity\JsonApi\Testing\Constraints\ExactInDocument;
-use CloudCreativity\JsonApi\Testing\Constraints\OnlyExactInArray;
-use CloudCreativity\JsonApi\Testing\Constraints\OnlySubsetsInArray;
-use CloudCreativity\JsonApi\Testing\Constraints\SubsetInArray;
+use CloudCreativity\JsonApi\Testing\Constraints\OnlyExactInList;
+use CloudCreativity\JsonApi\Testing\Constraints\OnlySubsetsInList;
+use CloudCreativity\JsonApi\Testing\Constraints\SubsetInList;
 use CloudCreativity\JsonApi\Testing\Constraints\SubsetInDocument;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
 use PHPUnit\Framework\Constraint\LogicalNot;
@@ -15,7 +15,7 @@ class Assert
 {
 
     /**
-     * Assert that the JSON API document has the expected resource object.
+     * Assert that the value at the pointer has the expected JSON API identifier.
      *
      * @param array|string $document
      *      the JSON API document.
@@ -26,16 +26,14 @@ class Assert
      * @param string $pointer
      *      the JSON pointer to where the resource object is expected in the document.
      */
-    public static function assertContains(
+    public static function assertIdentifier(
         $document,
         string $type,
         string $id,
         string $pointer = '/data'
     ): void
     {
-        $expected = compact('type', 'id');
-
-        self::assertSubset($document, $expected, $pointer, true);
+        self::assertHash($document, compact('type', 'id'), $pointer, true);
     }
 
     /**
@@ -83,7 +81,7 @@ class Assert
     }
 
     /**
-     * Assert that the expected array subset is in the document at the specified path.
+     * Assert that the expected hash is in the document at the specified path.
      *
      * @param array|string $document
      *      the JSON API document.
@@ -95,7 +93,7 @@ class Assert
      *      whether strict comparison should be used.
      * @return void
      */
-    public static function assertSubset(
+    public static function assertHash(
         $document,
         array $expected,
         string $pointer = '/data',
@@ -127,9 +125,9 @@ class Assert
      * @param string $pointer
      * @return void
      */
-    public static function assertArrayEmpty($document, string $pointer = '/data'): void
+    public static function assertListEmpty($document, string $pointer = '/data'): void
     {
-        self::assertExact($document, [], $pointer, true);
+        self::assertExactList($document, [], $pointer, true);
     }
 
     /**
@@ -139,16 +137,16 @@ class Assert
      * @param string $pointer
      * @return void
      */
-    public static function assertArrayNotEmpty($document, string $pointer = '/data'): void
+    public static function assertListNotEmpty($document, string $pointer = '/data'): void
     {
         self::assertNotExact($document, [], $pointer, true);
     }
 
     /**
-     * Assert that an array in the document only contains the specified subsets.
+     * Assert that a list in the document only contains the specified hashes.
      *
-     * This assertion does not check that the expected and actual arrays are in the same order.
-     * To assert the order, use `assertArrayInOrder`.
+     * This assertion does not check that the expected and actual lists are in the same order.
+     * To assert the order, use `assertListInOrder`.
      *
      * @param $document
      * @param array $expected
@@ -156,7 +154,7 @@ class Assert
      * @param bool $strict
      * @return void
      */
-    public static function assertArray(
+    public static function assertList(
         $document,
         array $expected,
         string $pointer = '/data',
@@ -165,15 +163,15 @@ class Assert
     {
         PHPUnitAssert::assertThat(
             $document,
-            new OnlySubsetsInArray($expected, $pointer, $strict)
+            new OnlySubsetsInList($expected, $pointer, $strict)
         );
     }
 
     /**
-     * Assert that an array in the document only contains the specified values.
+     * Assert that a list in the document only contains the specified values.
      *
-     * This assertion does not check that the expected and actual arrays are in the same order.
-     * To assert the order, use `assertExactArrayInOrder`.
+     * This assertion does not check that the expected and actual lists are in the same order.
+     * To assert the order, use `assertExactListInOrder`.
      *
      * @param $document
      * @param array $expected
@@ -181,7 +179,7 @@ class Assert
      * @param bool $strict
      * @return void
      */
-    public static function assertExactArray(
+    public static function assertExactList(
         $document,
         array $expected,
         string $pointer = '/data',
@@ -190,12 +188,12 @@ class Assert
     {
         PHPUnitAssert::assertThat(
             $document,
-            new OnlyExactInArray($expected, $pointer, $strict)
+            new OnlyExactInList($expected, $pointer, $strict)
         );
     }
 
     /**
-     * Assert that an array in the document contains the subsets in the specified order.
+     * Assert that a list in the document contains the hashes in the specified order.
      *
      * @param $document
      * @param array $expected
@@ -203,18 +201,21 @@ class Assert
      * @param bool $strict
      * @return void
      */
-    public static function assertArrayInOrder(
+    public static function assertListInOrder(
         $document,
         array $expected,
         string $pointer = '/data',
         bool $strict = true
     ): void
     {
-        self::assertSubset($document, $expected, $pointer, $strict);
+        PHPUnitAssert::assertThat(
+            $document,
+            new SubsetInDocument($expected, $pointer, $strict)
+        );
     }
 
     /**
-     * Assert that an array in the document contains the values in the specified order.
+     * Assert that a list in the document contains the values in the specified order.
      *
      * @param $document
      * @param array $expected
@@ -222,7 +223,7 @@ class Assert
      * @param bool $strict
      * @return void
      */
-    public static function assertExactArrayInOrder(
+    public static function assertExactListInOrder(
         $document,
         array $expected,
         string $pointer = '/data',
@@ -233,7 +234,7 @@ class Assert
     }
 
     /**
-     * Assert that the JSON API document has an array containing the expected resource object.
+     * Assert that the document has a list containing the expected identifier.
      *
      * @param array|string $document
      *      the JSON API document.
@@ -244,7 +245,7 @@ class Assert
      * @param string $pointer
      *      the JSON pointer to where the array is expected in the document.
      */
-    public static function assertArrayContains(
+    public static function assertListContainsIdentifier(
         $document,
         string $type,
         string $id,
@@ -253,18 +254,18 @@ class Assert
     {
         $expected = compact('type', 'id');
 
-        self::assertArrayContainsSubset($document, $expected, $pointer, true);
+        self::assertListContainsHash($document, $expected, $pointer, true);
     }
 
     /**
-     * Assert that an array in the document at the specified path contains the expected subset.
+     * Assert that a list in the document at the specified path contains the expected hash.
      *
      * @param $document
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
      */
-    public static function assertArrayContainsSubset(
+    public static function assertListContainsHash(
         $document,
         array $expected,
         string $pointer = '/data',
@@ -273,12 +274,12 @@ class Assert
     {
         PHPUnitAssert::assertThat(
             $document,
-            new SubsetInArray($expected, $pointer, $strict)
+            new SubsetInList($expected, $pointer, $strict)
         );
     }
 
     /**
-     * Assert that an array in the document at the specified path contains the expected value.
+     * Assert that a list in the document at the specified path contains the expected value.
      *
      * @param $document
      * @param array $expected
@@ -286,7 +287,7 @@ class Assert
      * @param bool $strict
      * @return void
      */
-    public static function assertArrayContainsExact(
+    public static function assertListContainsExact(
         $document,
         array $expected,
         string $pointer = '/data',
@@ -295,7 +296,7 @@ class Assert
     {
         PHPUnitAssert::assertThat(
             $document,
-            new ExactInArray($expected, $pointer, $strict)
+            new ExactInList($expected, $pointer, $strict)
         );
     }
 
@@ -312,33 +313,33 @@ class Assert
      */
     public static function assertIncluded($document, array $expected, bool $strict = true): void
     {
-        self::assertArray($document, $expected, '/included', $strict);
+        self::assertList($document, $expected, '/included', $strict);
     }
 
     /**
-     * Assert that the expected resource object is included in the document.
+     * Assert that the expected identifier is included in the document.
      *
      * @param $document
      * @param string $type
      * @param string $id
      * @return void
      */
-    public static function assertIncludedContains($document, string $type, string $id): void
+    public static function assertIncludedContainsIdentifier($document, string $type, string $id): void
     {
-        self::assertArrayContains($document, $type, $id, '/included');
+        self::assertListContainsIdentifier($document, $type, $id, '/included');
     }
 
     /**
-     * Assert that the included member contains the supplied array subset.
+     * Assert that the included member contains the supplied hash.
      *
      * @param $document
      * @param array $expected
      * @param bool $strict
      * @return void
      */
-    public static function assertIncludedContainsSubset($document, array $expected, bool $strict = true): void
+    public static function assertIncludedContainsHash($document, array $expected, bool $strict = true): void
     {
-        self::assertArrayContainsSubset($document, $expected, '/included', $strict);
+        self::assertListContainsHash($document, $expected, '/included', $strict);
     }
 
     /**
@@ -351,7 +352,7 @@ class Assert
      */
     public static function assertError($document, array $error, bool $strict = true): void
     {
-        self::assertArray($document, [$error], '/errors', $strict);
+        self::assertList($document, [$error], '/errors', $strict);
     }
 
     /**
@@ -366,7 +367,7 @@ class Assert
      */
     public static function assertErrors($document, array $errors, bool $strict = true): void
     {
-        self::assertArray($document, $errors, '/errors', $strict);
+        self::assertList($document, $errors, '/errors', $strict);
     }
 
     /**
@@ -379,6 +380,6 @@ class Assert
      */
     public static function assertErrorsContains($document, array $error, bool $strict = true): void
     {
-        self::assertArrayContainsSubset($document, $error, '/errors', $strict);
+        self::assertListContainsHash($document, $error, '/errors', $strict);
     }
 }
