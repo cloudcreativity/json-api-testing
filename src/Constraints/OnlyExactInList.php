@@ -4,9 +4,23 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use SebastianBergmann\Comparator\ComparisonFailure;
 
 class OnlyExactInList extends OnlySubsetsInList
 {
+
+    /**
+     * @inheritdoc
+     */
+    protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
+    {
+        $comparisonFailure = Compare::failure(
+            $this->expected,
+            Document::cast($other)->get($this->pointer)
+        );
+
+        parent::fail($other, $description, $comparisonFailure);
+    }
 
     /**
      * @inheritdoc

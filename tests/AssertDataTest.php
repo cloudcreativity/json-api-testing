@@ -437,7 +437,7 @@ JSON_API;
             $document->assertListInOrder($notOrdered);
         });
 
-        /** Assert array only contains should fail if there is an id not in the array */
+        /** Assert list should fail if there is an id not in the array */
         $this->willFail(function () use ($document, $notOrdered) {
             $notOrdered[] = ['type' => 'posts', 'id' => '999'];
             $document->assertList($notOrdered);

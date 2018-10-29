@@ -482,7 +482,7 @@ trait HasHttpAssertions
      *
      * @param array $expected
      * @param bool $strict
-     * @return TestResponse
+     * @return $this
      */
     public function assertMeta(array $expected, bool $strict = true): self
     {
@@ -496,7 +496,7 @@ trait HasHttpAssertions
      *
      * @param array $expected
      * @param bool $strict
-     * @return TestResponse
+     * @return $this
      */
     public function assertExactMeta(array $expected, bool $strict = true): self
     {
@@ -510,7 +510,7 @@ trait HasHttpAssertions
      *
      * @param array $expected
      * @param bool $strict
-     * @return TestResponse
+     * @return $this
      */
     public function assertLinks(array $expected, bool $strict = true): self
     {
@@ -524,7 +524,7 @@ trait HasHttpAssertions
      *
      * @param array $expected
      * @param bool $strict
-     * @return TestResponse
+     * @return $this
      */
     public function assertExactLinks(array $expected, bool $strict = true): self
     {
@@ -560,7 +560,7 @@ trait HasHttpAssertions
      *
      * @param array $error
      * @param bool $strict
-     * @return Document
+     * @return $this
      */
     public function assertErrorStatus(array $error, bool $strict = true): self
     {

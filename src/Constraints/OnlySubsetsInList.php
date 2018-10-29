@@ -75,16 +75,17 @@ class OnlySubsetsInList extends Constraint
     }
 
     /**
-     * @param mixed $other
-     * @param string $description
-     * @param ComparisonFailure|null $comparisonFailure
+     * @inheritdoc
      */
     protected function fail($other, $description, ComparisonFailure $comparisonFailure = null): void
     {
-        $comparisonFailure = Compare::failure(
-            $this->expected,
-            Document::cast($other)->get($this->pointer)
-        );
+        if (!$comparisonFailure) {
+            $comparisonFailure = Compare::failure(
+                $this->expected,
+                Document::cast($other)->get($this->pointer),
+                true
+            );
+        }
 
         parent::fail($other, $description, $comparisonFailure);
     }

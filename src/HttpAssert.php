@@ -14,7 +14,6 @@ class HttpAssert
     private const STATUS_CREATED = 201;
     private const STATUS_ACCEPTED = 202;
     private const STATUS_NO_CONTENT = 204;
-    private const STATUS_INTERNAL_SERVER_ERROR = 500;
 
     /**
      * Assert that the HTTP status matches the expected status.
@@ -387,9 +386,10 @@ class HttpAssert
      * Assert a no content response.
      *
      * @param $status
+     * @param string|null
      * @return void
      */
-    public static function assertNoContent($status, $content = null): void
+    public static function assertNoContent($status, string $content = null): void
     {
         self::assertStatusCode($status, self::STATUS_NO_CONTENT, $content);
         PHPUnitAssert::assertEmpty($content, 'Expecting HTTP body content to be empty.');
