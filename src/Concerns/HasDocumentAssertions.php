@@ -29,7 +29,7 @@ trait HasDocumentAssertions
      * Assert that the expected value is in the document at the specified path.
      *
      * @param array|null $expected
-     *      the expected resource object.
+     *      the expected value.
      * @param string $pointer
      *      the JSON pointer to where the object is expected to exist within the document.
      * @param bool $strict

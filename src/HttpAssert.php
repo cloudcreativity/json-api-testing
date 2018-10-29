@@ -92,6 +92,7 @@ class HttpAssert
      * @param $contentType
      * @param $content
      * @param array $expected
+     *      the expected resource, or a subset of the expected resource.
      * @param bool $strict
      * @return Document
      */
@@ -105,6 +106,29 @@ class HttpAssert
     {
         return self::assertJsonApi($status, $contentType, $content)
             ->assertHash($expected, '/data', $strict);
+    }
+
+    /**
+     * Assert that an exact resource or resource collection was fetched.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param array $expected
+     *      the expected content of the document's data member.
+     * @param bool $strict
+     * @return Document
+     */
+    public static function assertFetchedExact(
+        $status,
+        $contentType,
+        $content,
+        array $expected,
+        bool $strict = true
+    ): Document
+    {
+        return self::assertJsonApi($status, $contentType, $content)
+            ->assertExact($expected, '/data', $strict);
     }
 
     /**

@@ -81,12 +81,34 @@ trait HasHttpAssertions
      * Assert that a resource was fetched.
      *
      * @param UrlRoutable|string|int|array $expected
+     *      the expected resource, or a subset of the expected resource.
      * @param bool $strict
      * @return $this
      */
     public function assertFetchedOne($expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertFetchedOne(
+            $this->getStatusCode(),
+            $this->getContentType(),
+            $this->getContent(),
+            $this->identifier($expected),
+            $strict
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that an exact resource was fetched.
+     *
+     * @param UrlRoutable|string|int|array $expected
+     *      the expected resource.
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertFetchedOneExact($expected, bool $strict = true): self
+    {
+        $this->document = HttpAssert::assertFetchedExact(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
@@ -123,6 +145,26 @@ trait HasHttpAssertions
     public function assertFetchedMany($expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertFetchedMany(
+            $this->getStatusCode(),
+            $this->getContentType(),
+            $this->getContent(),
+            $this->identifiers($expected),
+            $strict
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that an exact resource collection was fetched.
+     *
+     * @param UrlRoutable|string|int|array $expected
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertFetchedManyExact($expected, bool $strict = true): self
+    {
+        $this->document = HttpAssert::assertFetchedExact(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
@@ -403,6 +445,8 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert that the included member contains the supplied resource.
+     *
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
