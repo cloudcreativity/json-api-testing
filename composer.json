@@ -23,7 +23,7 @@
     "require": {
         "php": "^7.1",
         "ext-json": "*",
-        "cloudcreativity/utils-object": "^1.0",
+        "illuminate/support": "^5.5",
         "phpunit/phpunit": "^6.0|^7.0"
     },
     "autoload": {

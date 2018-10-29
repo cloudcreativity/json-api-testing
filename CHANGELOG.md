@@ -10,6 +10,15 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Removed
 - Package no longer supports PHPUnit 5.
+- The previous implementation was deleted, removing these classes:
+  - `AbstractTraversableTester`
+  - `DocumentTester`
+  - `ErrorsTester`
+  - `ErrorTester`
+  - `ObjectTester`
+  - `ResourceIdentifierTester`
+  - `ResourceObjectsTester`
+  - `ResourceObjectTester`
 
 ## [0.4.0] - 2018-04-29
 
