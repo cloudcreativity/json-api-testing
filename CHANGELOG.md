@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file. This projec
 - Minimum PHP version is now `7.1`.
 
 ### Removed
-- Package no longer supports PHPUnit 5 and 6.
+- Package no longer supports PHPUnit 5.
 - The previous implementation was deleted, removing these classes:
   - `AbstractTraversableTester`
   - `DocumentTester`
