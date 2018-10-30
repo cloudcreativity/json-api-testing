@@ -517,7 +517,7 @@ class HttpAssert
     {
         $expectedStatus = $error['status'] ?? null;
 
-        if ($expectedStatus) {
+        if (!$expectedStatus) {
             throw new \InvalidArgumentException('Expecting error to have a status member.');
         }
 
