@@ -521,16 +521,7 @@ class HttpAssert
             throw new \InvalidArgumentException('Expecting error to have a status member.');
         }
 
-        $document = self::assertJsonApi($status, $contentType, $content, (int) $expectedStatus)
-            ->assertNotExists('/data');
-
-        if ($error) {
-            $document->assertError($error, $strict);
-        } else {
-            $document->assertExists('/error');
-        }
-
-        return $document;
+        return self::assertError($status, $contentType, $content, (int) $expectedStatus, $error, $strict);
     }
 
     /**
