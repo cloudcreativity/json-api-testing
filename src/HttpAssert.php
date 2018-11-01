@@ -549,7 +549,7 @@ class HttpAssert
         }
 
         return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
-            ->assertError($error, $strict);
+            ->assertHasError($error, $strict);
     }
 
     /**
