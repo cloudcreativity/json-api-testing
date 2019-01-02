@@ -12,17 +12,17 @@ class SubsetInDocument extends Constraint
     /**
      * @var array
      */
-    private $expected;
+    protected $expected;
 
     /**
      * @var string
      */
-    private $pointer;
+    protected $pointer;
 
     /**
      * @var bool
      */
-    private $strict;
+    protected $strict;
 
     /**
      * SubsetInDocument constructor.
@@ -47,7 +47,7 @@ class SubsetInDocument extends Constraint
     public function evaluate($other, $description = '', $returnResult = false)
     {
         $actual = Document::cast($other)->get($this->pointer);
-        $result = Compare::subset($this->expected, $actual, $this->strict);
+        $result = $this->compare($this->expected, $actual, $this->strict);
 
         if ($returnResult) {
             return $result;
@@ -79,6 +79,17 @@ class SubsetInDocument extends Constraint
             . $this->toString() . PHP_EOL . PHP_EOL
             . "within JSON API document:" . PHP_EOL
             . Document::cast($document);
+    }
+
+    /**
+     * @param array $expected
+     * @param $actual
+     * @param bool $strict
+     * @return bool
+     */
+    protected function compare(array $expected, $actual, bool $strict): bool
+    {
+        return Compare::subset($expected, $actual, $strict);
     }
 
 }

@@ -49,6 +49,32 @@ class Compare
     }
 
     /**
+     * Is the supplied value a resource identifier?
+     *
+     * A resource identifier must have a type and id member. It must not have attributes
+     * or relationship members, otherwise it is a resource object.
+     *
+     * - attributes
+     * - relationships
+     *
+     * @param $value
+     * @return bool
+     */
+    public static function resourceIdentifier($value): bool
+    {
+        if (!is_array($value)) {
+            return false;
+        }
+
+        $members = collect($value);
+
+        return $members->has('type') &&
+            $members->has('id') &&
+            !$members->has('attributes') &&
+            !$members->has('relationships');
+    }
+
+    /**
      * Apply a patch to a value.
      *
      * @param array $value

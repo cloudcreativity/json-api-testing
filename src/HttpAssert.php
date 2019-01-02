@@ -272,7 +272,7 @@ class HttpAssert
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
-            ->assertExact(compact('type', 'id'), '/data', true, $message);
+            ->assertIdentifier($type, $id, '/data', $message);
     }
 
     /**
@@ -300,7 +300,7 @@ class HttpAssert
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
-            ->assertExactList($expected, '/data', $strict, $message);
+            ->assertIdentifiersList($expected, '/data', $strict, $message);
     }
 
     /**
@@ -328,7 +328,7 @@ class HttpAssert
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
-            ->assertExactListInOrder($expected, '/data', $strict, $message);
+            ->assertIdentifiersListInOrder($expected, '/data', $strict, $message);
     }
 
     /**

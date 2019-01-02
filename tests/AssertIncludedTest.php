@@ -69,10 +69,10 @@ class AssertIncludedTest extends TestCase
 
     public function testIncludedContains(): void
     {
-        $this->document->assertIncludedContainsIdentifier('comments', '2');
+        $this->document->assertIncludedContainsResource('comments', '2');
 
         $this->willFail(function () {
-            $this->document->assertIncludedContainsIdentifier('comments', '99');
+            $this->document->assertIncludedContainsResource('comments', '99');
         });
     }
 

@@ -5,7 +5,65 @@ namespace CloudCreativity\JsonApi\Testing;
 class AssertIdentifiersTest extends TestCase
 {
 
-    public function testExactArray(): Document
+    public function testIdentifier()
+    {
+        $document = new Document([
+            'data' => [
+                'type' => 'comments',
+                'id' => '1',
+                'meta' => [
+                    'foo' => 'bar',
+                ],
+            ],
+        ]);
+
+        $document->assertIdentifier('comments', '1');
+
+        $this->willFail(function () use ($document) {
+            $document->assertIdentifier('comments', '2');
+        });
+    }
+
+    public function testResourceWithAttributes()
+    {
+        $document = new Document([
+            'data' => [
+                'type' => 'comments',
+                'id' => '1',
+                'attributes' => [
+                    'content' => 'Hello world',
+                ],
+            ],
+        ]);
+
+        $this->willFail(function () use ($document) {
+            $document->assertIdentifier('comments', '1');
+        });
+    }
+
+    public function testResourceWithRelationships()
+    {
+        $document = new Document([
+            'data' => [
+                'type' => 'comments',
+                'id' => '1',
+                'relationships' => [
+                    'post' => [
+                        'data' => [
+                            'type' => 'posts',
+                            'id' => '2',
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->willFail(function () use ($document) {
+            $document->assertIdentifier('comments', '1');
+        });
+    }
+
+    public function testIdentifiersList(): Document
     {
         $document = new Document([
             'data' => [
@@ -16,6 +74,9 @@ class AssertIdentifiersTest extends TestCase
                 [
                     'type' => 'comments',
                     'id' => '2',
+                    'meta' => [
+                        'foo' => 'bar',
+                    ],
                 ],
             ],
         ]);
@@ -23,15 +84,13 @@ class AssertIdentifiersTest extends TestCase
         $expected = $document['data'];
         $unordered = collect($expected)->reverse()->values()->all();
 
-        $document->assertExactList($expected)
-            ->assertExactList($unordered)
-            ->assertList($expected)
-            ->assertList($unordered)
+        $document->assertIdentifiersList($expected)
+            ->assertIdentifiersList($unordered)
             ->assertListNotEmpty();
 
         $this->willFail(function () use ($document, $expected) {
             $expected[] = ['type' => 'comments', 'id' => '3'];
-            $document->assertExactList($expected);
+            $document->assertIdentifiersList($expected);
         }, 'additional identifier');
 
         $this->willFail(function () use ($document, $expected) {
@@ -43,15 +102,14 @@ class AssertIdentifiersTest extends TestCase
 
     /**
      * @param Document $document
-     * @depends testExactArray
+     * @depends testIdentifiersList
      */
-    public function testExactArrayInOrder(Document $document): void
+    public function testIdentifiersListInOrder(Document $document): void
     {
-        $document->assertExactListInOrder($document['data'])
-            ->assertListInOrder($document['data']);
+        $document->assertIdentifiersListInOrder($document['data']);
 
         $this->willFail(function () use ($document) {
-            $document->assertExactListInOrder(
+            $document->assertIdentifiersListInOrder(
                 collect($document['data'])->reverse()->values()->all()
             );
         });
@@ -59,22 +117,18 @@ class AssertIdentifiersTest extends TestCase
 
     /**
      * @param Document $document
-     * @depends testExactArray
+     * @depends testIdentifiersList
      */
-    public function testContainsExact(Document $document): void
+    public function testContainsIdentifier(Document $document): void
     {
-        $document->assertListContainsExact(
-            ['type' => 'comments', 'id' => '2']
-        );
+        $document->assertListContainsIdentifier('comments', '2');
 
         $this->willFail(function () use ($document) {
-            $document->assertListContainsExact(
-                ['type' => 'comments', 'id' => '3']
-            );
+            $document->assertListContainsIdentifier('comments', '3');
         });
     }
 
-    public function testEmpty(): void
+    public function testEmptyList(): void
     {
         $document = new Document(['data' => []]);
 
@@ -123,18 +177,15 @@ class AssertIdentifiersTest extends TestCase
         ];
 
         $this->willFail(function () use ($document, $expected) {
-            $document->assertExactList($expected);
+            $document->assertIdentifiersList($expected);
         }, 'exact array');
 
         $this->willFail(function () use ($document, $expected) {
-            $document->assertExactListInOrder($expected);
+            $document->assertIdentifiersListInOrder($expected);
         }, 'exact array in order');
 
-
         $this->willFail(function () use ($document) {
-            $document->assertListContainsExact(
-                ['type' => 'comments', 'id' => '2']
-            );
-        }, 'contains exact');
+            $document->assertListContainsIdentifier('comments', '2');
+        });
     }
 }

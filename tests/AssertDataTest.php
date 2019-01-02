@@ -35,7 +35,7 @@ class AssertDataTest extends TestCase
         Assert::assertNull($content);
 
         $this->willFail(function () use ($content) {
-            Assert::assertIdentifier($content, 'posts', '123');
+            Assert::assertResource($content, 'posts', '123');
         });
     }
 
@@ -114,14 +114,14 @@ JSON_API;
 
         $document = Document::decode($content);
 
-        $document->assertIdentifier('posts', '123');
+        $document->assertResource('posts', '123');
 
         $this->willFail(function () use ($document) {
-            $document->assertIdentifier('posts', '999');
+            $document->assertResource('posts', '999');
         });
 
         $this->willFail(function () use ($document) {
-            $document->assertIdentifier('comments', '123');
+            $document->assertResource('comments', '123');
         });
 
         $this->willFail(function () use ($document) {
@@ -143,7 +143,7 @@ JSON_API;
 JSON_API;
 
         $this->willFail(function () use ($content) {
-            Assert::assertIdentifier($content, 'posts', '123');
+            Assert::assertResource($content, 'posts', '123');
         });
     }
 
@@ -161,7 +161,7 @@ JSON_API;
         $document = Document::decode($content);
 
         $this->willFail(function () use ($document) {
-            $document->assertIdentifier('posts', '123');
+            $document->assertResource('posts', '123');
         });
     }
 
@@ -420,8 +420,8 @@ JSON_API;
         $document->assertListInOrder($ids);
         $document->assertList($notOrdered);
 
-        $document->assertListContainsIdentifier('posts', '456');
-        $document->assertListContainsIdentifier(
+        $document->assertListContainsResource('posts', '456');
+        $document->assertListContainsResource(
             'comments',
             '101',
             '/data/1/relationships/comments/data'
@@ -444,7 +444,7 @@ JSON_API;
         });
 
         $this->willFail(function () use ($document) {
-            $document->assertListContainsIdentifier('comments', '101');
+            $document->assertListContainsResource('comments', '101');
         });
     }
 }

@@ -8,7 +8,31 @@ trait HasDocumentAssertions
 {
 
     /**
-     * Assert that the value at the pointer has the expected JSON API identifier.
+     * Assert that the value at the pointer has the expected JSON API resource.
+     *
+     * @param string $type
+     *      the expected resource object type.
+     * @param string $id
+     *      the expected resource object id.
+     * @param string $pointer
+     *      the JSON pointer to where the resource object is expected in the document.
+     * @param string $message
+     * @return $this
+     */
+    public function assertResource(
+        string $type,
+        string $id,
+        string $pointer = '/data',
+        string $message = ''
+    ): self
+    {
+        Assert::assertResource($this, $type, $id, $pointer, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the value at the pointer has the expected JSON API resource identifier.
      *
      * @param string $type
      *      the expected resource object type.
@@ -233,7 +257,84 @@ trait HasDocumentAssertions
     }
 
     /**
-     * Assert that the document has a list containing the expected identifier.
+     * Assert that list in the document only contains the specified hashes.
+     *
+     * Asserting that a list contains only identifiers will fail if any of the items in the
+     * list is a resource object. I.e. to pass as an identifier, it must not contain
+     * `attributes` and/or `relationships` members.
+     *
+     * This assertion does not check that the expected and actual lists are in the same order.
+     * To assert the order, use `assertListInOrder`.
+     *
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @param string $message
+     * @return $this
+     */
+    public function assertIdentifiersList(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
+    {
+        Assert::assertIdentifiersList($this, $expected, $pointer, $strict, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert that a list in the document contains the identifiers in the specified order.
+     *
+     * Asserting that a list contains only identifiers will fail if any of the items in the
+     * list is a resource object. I.e. to pass as an identifier, it must not contain
+     * `attributes` and/or `relationships` members.
+     *
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @param string $message
+     * @return $this
+     */
+    public function assertIdentifiersListInOrder(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
+    {
+        Assert::assertIdentifiersListInOrder($this, $expected, $pointer, $strict, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the document has a list containing the expected resource.
+     *
+     * @param string $type
+     *      the expected resource object type.
+     * @param string $id
+     *      the expected resource object id.
+     * @param string $pointer
+     *      the JSON pointer to where the array is expected in the document.
+     * @param string $message
+     * @return $this
+     */
+    public function assertListContainsResource(
+        string $type,
+        string $id,
+        string $pointer = '/data',
+        string $message = ''
+    ): self
+    {
+        Assert::assertListContainsResource($this, $type, $id, $pointer, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the document has a list containing the expected resource identifier.
      *
      * @param string $type
      *      the expected resource object type.
@@ -324,9 +425,9 @@ trait HasDocumentAssertions
      * @param string $message
      * @return $this
      */
-    public function assertIncludedContainsIdentifier(string $type, string $id, string $message = ''): self
+    public function assertIncludedContainsResource(string $type, string $id, string $message = ''): self
     {
-        Assert::assertIncludedContainsIdentifier($this, $type, $id, $message);
+        Assert::assertIncludedContainsResource($this, $type, $id, $message);
 
         return $this;
     }

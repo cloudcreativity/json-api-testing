@@ -435,7 +435,7 @@ trait HasHttpAssertions
     }
 
     /**
-     * Assert that the expected identifier is included in the document.
+     * Assert that the expected resource is included in the document.
      *
      * @param string $type
      * @param UrlRoutable|string|int|null $id
@@ -445,7 +445,7 @@ trait HasHttpAssertions
     {
         $identifier = $this->identifier(compact('type', 'id'));
 
-        $this->getDocument()->assertIncludedContainsIdentifier(
+        $this->getDocument()->assertIncludedContainsResource(
             $identifier['type'],
             $identifier['id']
         );

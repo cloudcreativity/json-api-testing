@@ -4,7 +4,11 @@ namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\JsonApi\Testing\Constraints\ExactInDocument;
 use CloudCreativity\JsonApi\Testing\Constraints\ExactInList;
+use CloudCreativity\JsonApi\Testing\Constraints\IdentifierInDocument;
+use CloudCreativity\JsonApi\Testing\Constraints\IdentifierInList;
+use CloudCreativity\JsonApi\Testing\Constraints\IdentifiersInDocument;
 use CloudCreativity\JsonApi\Testing\Constraints\OnlyExactInList;
+use CloudCreativity\JsonApi\Testing\Constraints\OnlyIdentifiersInList;
 use CloudCreativity\JsonApi\Testing\Constraints\OnlySubsetsInList;
 use CloudCreativity\JsonApi\Testing\Constraints\SubsetInDocument;
 use CloudCreativity\JsonApi\Testing\Constraints\SubsetInList;
@@ -15,7 +19,31 @@ class Assert
 {
 
     /**
-     * Assert that the value at the pointer has the expected JSON API identifier.
+     * Assert that the value at the pointer has the expected JSON API resource.
+     *
+     * @param array|string $document
+     *      the JSON API document.
+     * @param string $type
+     *      the expected resource object type.
+     * @param string $id
+     *      the expected resource object id.
+     * @param string $pointer
+     *      the JSON pointer to where the resource object is expected in the document.
+     * @param string $message
+     */
+    public static function assertResource(
+        $document,
+        string $type,
+        string $id,
+        string $pointer = '/data',
+        string $message = ''
+    ): void
+    {
+        self::assertHash($document, compact('type', 'id'), $pointer, true, $message);
+    }
+
+    /**
+     * Assert that the value at the pointer has the expected JSON API resource identifier.
      *
      * @param array|string $document
      *      the JSON API document.
@@ -35,7 +63,13 @@ class Assert
         string $message = ''
     ): void
     {
-        self::assertHash($document, compact('type', 'id'), $pointer, true, $message);
+        $expected = compact('type', 'id');
+
+        PHPUnitAssert::assertThat(
+            $document,
+            new IdentifierInDocument($expected, $pointer, true),
+            $message
+        );
     }
 
     /**
@@ -263,7 +297,95 @@ class Assert
     }
 
     /**
-     * Assert that the document has a list containing the expected identifier.
+     * Assert that a list in the document only contains the specified identifiers.
+     *
+     * Asserting that a list contains only identifiers will fail if any of the items in the
+     * list is a resource object. I.e. to pass as an identifier, it must not contain
+     * `attributes` and/or `relationships` members.
+     *
+     * This assertion does not check that the expected and actual lists are in the same order.
+     * To assert the order, use `assertIdentifiersListInOrder`.
+     *
+     * @param $document
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @param string $message
+     * @return void
+     */
+    public static function assertIdentifiersList(
+        $document,
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): void
+    {
+        PHPUnitAssert::assertThat(
+            $document,
+            new OnlyIdentifiersInList($expected, $pointer, $strict),
+            $message
+        );
+    }
+
+    /**
+     * Assert that a list in the document contains the identifiers in the specified order.
+     *
+     * Asserting that a list contains only identifiers will fail if any of the items in the
+     * list is a resource object. I.e. to pass as an identifier, it must not contain
+     * `attributes` and/or `relationships` members.
+     *
+     * @param $document
+     * @param array $expected
+     * @param string $pointer
+     * @param bool $strict
+     * @param string $message
+     * @return void
+     */
+    public static function assertIdentifiersListInOrder(
+        $document,
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): void
+    {
+        PHPUnitAssert::assertThat(
+            $document,
+            new IdentifiersInDocument($expected, $pointer, $strict),
+            $message
+        );
+    }
+
+    /**
+     * Assert that the document has a list containing the expected resource.
+     *
+     * @param array|string $document
+     *      the JSON API document.
+     * @param string $type
+     *      the expected resource object type.
+     * @param string $id
+     *      the expected resource object id.
+     * @param string $pointer
+     *      the JSON pointer to where the array is expected in the document.
+     * @param string $message
+     * @return void
+     */
+    public static function assertListContainsResource(
+        $document,
+        string $type,
+        string $id,
+        string $pointer = '/data',
+        string $message = ''
+    ): void
+    {
+        $expected = compact('type', 'id');
+
+        self::assertListContainsHash($document, $expected, $pointer, true, $message);
+    }
+
+    /**
+     * Assert that the document has a list containing the expected resource identifier.
      *
      * @param array|string $document
      *      the JSON API document.
@@ -286,7 +408,11 @@ class Assert
     {
         $expected = compact('type', 'id');
 
-        self::assertListContainsHash($document, $expected, $pointer, true, $message);
+        PHPUnitAssert::assertThat(
+            $document,
+            new IdentifierInList($expected, $pointer, true),
+            $message
+        );
     }
 
     /**
@@ -370,14 +496,14 @@ class Assert
      * @param string $message
      * @return void
      */
-    public static function assertIncludedContainsIdentifier(
+    public static function assertIncludedContainsResource(
         $document,
         string $type,
         string $id,
         string $message = ''
     ): void
     {
-        self::assertListContainsIdentifier($document, $type, $id, '/included', $message);
+        self::assertListContainsResource($document, $type, $id, '/included', $message);
     }
 
     /**
