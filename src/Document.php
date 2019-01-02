@@ -204,16 +204,17 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * Assert that all the provided members exist.
      *
-     * @param string ...$pointers
+     * @param string|string[] $pointers
+     * @param string $message
      * @return $this
      */
-    public function assertExists(string ...$pointers): self
+    public function assertExists($pointers, string $message = ''): self
     {
-        $missing = collect($pointers)->reject(function ($pointer) {
+        $missing = collect((array) $pointers)->reject(function ($pointer) {
             return $this->has($pointer);
         })->implode(', ');
 
-        PHPUnitAssert::assertEmpty($missing, "Members [{$missing}] do not exist.");
+        PHPUnitAssert::assertEmpty($missing, $message ?: "Members [{$missing}] do not exist.");
 
         return $this;
     }
@@ -221,16 +222,17 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * Assert that the provided members do not exist.
      *
-     * @param string ...$pointers
+     * @param string|string[] $pointers
+     * @param string $message
      * @return Document
      */
-    public function assertNotExists(string ...$pointers): self
+    public function assertNotExists($pointers, string $message = ''): self
     {
-        $unexpected = collect($pointers)->filter(function ($pointer) {
+        $unexpected = collect((array) $pointers)->filter(function ($pointer) {
             return $this->has($pointer);
         })->implode(', ');
 
-        PHPUnitAssert::assertEmpty($unexpected, "Members [{$unexpected}] exist.");
+        PHPUnitAssert::assertEmpty($unexpected, $message ?: "Members [{$unexpected}] exist.");
 
         return $this;
     }

@@ -25,15 +25,17 @@ class Assert
      *      the expected resource object id.
      * @param string $pointer
      *      the JSON pointer to where the resource object is expected in the document.
+     * @param string $message
      */
     public static function assertIdentifier(
         $document,
         string $type,
         string $id,
-        string $pointer = '/data'
+        string $pointer = '/data',
+        string $message = ''
     ): void
     {
-        self::assertHash($document, compact('type', 'id'), $pointer, true);
+        self::assertHash($document, compact('type', 'id'), $pointer, true, $message);
     }
 
     /**
@@ -47,18 +49,21 @@ class Assert
      *      the JSON pointer to where the object is expected to exist within the document.
      * @param bool $strict
      *      whether strict comparison should be used.
+     * @param string $message
      * @return void
      */
     public static function assertExact(
         $document,
         $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
         PHPUnitAssert::assertThat(
             $document,
-            new ExactInDocument($expected, $pointer, $strict)
+            new ExactInDocument($expected, $pointer, $strict),
+            $message
         );
     }
 
@@ -69,15 +74,22 @@ class Assert
      * @param $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return void
      */
-    public static function assertNotExact($document, $expected, string $pointer = '/data', bool $strict = true): void
+    public static function assertNotExact(
+        $document,
+        $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): void
     {
         $constraint = new LogicalNot(
             new ExactInDocument($expected, $pointer, $strict)
         );
 
-        PHPUnitAssert::assertThat($document, $constraint);
+        PHPUnitAssert::assertThat($document, $constraint, $message);
     }
 
     /**
@@ -91,18 +103,21 @@ class Assert
      *      the JSON pointer to where the object is expected to exist within the document.
      * @param bool $strict
      *      whether strict comparison should be used.
+     * @param string $message
      * @return void
      */
     public static function assertHash(
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
         PHPUnitAssert::assertThat(
             $document,
-            new SubsetInDocument($expected, $pointer, $strict)
+            new SubsetInDocument($expected, $pointer, $strict),
+            $message
         );
     }
 
@@ -110,12 +125,13 @@ class Assert
      * Assert that the member contains a null value.
      *
      * @param $document
-     * @param string $pointer
+     * @param string $pointer,
+     * @param string $message
      * @return void
      */
-    public static function assertNull($document, string $pointer = '/data'): void
+    public static function assertNull($document, string $pointer = '/data', string $message = ''): void
     {
-        self::assertExact($document, null, $pointer, true);
+        self::assertExact($document, null, $pointer, true, $message);
     }
 
     /**
@@ -123,11 +139,12 @@ class Assert
      *
      * @param $document
      * @param string $pointer
+     * @param string $message
      * @return void
      */
-    public static function assertListEmpty($document, string $pointer = '/data'): void
+    public static function assertListEmpty($document, string $pointer = '/data', string $message = ''): void
     {
-        self::assertExactList($document, [], $pointer, true);
+        self::assertExactList($document, [], $pointer, true, $message);
     }
 
     /**
@@ -135,11 +152,12 @@ class Assert
      *
      * @param $document
      * @param string $pointer
+     * @param string $message
      * @return void
      */
-    public static function assertListNotEmpty($document, string $pointer = '/data'): void
+    public static function assertListNotEmpty($document, string $pointer = '/data', string $message = ''): void
     {
-        self::assertNotExact($document, [], $pointer, true);
+        self::assertNotExact($document, [], $pointer, true, $message);
     }
 
     /**
@@ -152,18 +170,21 @@ class Assert
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return void
      */
     public static function assertList(
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
         PHPUnitAssert::assertThat(
             $document,
-            new OnlySubsetsInList($expected, $pointer, $strict)
+            new OnlySubsetsInList($expected, $pointer, $strict),
+            $message
         );
     }
 
@@ -177,18 +198,21 @@ class Assert
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return void
      */
     public static function assertExactList(
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
         PHPUnitAssert::assertThat(
             $document,
-            new OnlyExactInList($expected, $pointer, $strict)
+            new OnlyExactInList($expected, $pointer, $strict),
+            $message
         );
     }
 
@@ -199,18 +223,21 @@ class Assert
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return void
      */
     public static function assertListInOrder(
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
         PHPUnitAssert::assertThat(
             $document,
-            new SubsetInDocument($expected, $pointer, $strict)
+            new SubsetInDocument($expected, $pointer, $strict),
+            $message
         );
     }
 
@@ -221,16 +248,18 @@ class Assert
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return void
      */
     public static function assertExactListInOrder(
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
-        self::assertExact($document, $expected, $pointer, $strict);
+        self::assertExact($document, $expected, $pointer, $strict, $message);
     }
 
     /**
@@ -244,17 +273,20 @@ class Assert
      *      the expected resource object id.
      * @param string $pointer
      *      the JSON pointer to where the array is expected in the document.
+     * @param string $message
+     * @return void
      */
     public static function assertListContainsIdentifier(
         $document,
         string $type,
         string $id,
-        string $pointer = '/data'
+        string $pointer = '/data',
+        string $message = ''
     ): void
     {
         $expected = compact('type', 'id');
 
-        self::assertListContainsHash($document, $expected, $pointer, true);
+        self::assertListContainsHash($document, $expected, $pointer, true, $message);
     }
 
     /**
@@ -264,17 +296,21 @@ class Assert
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
+     * @return void
      */
     public static function assertListContainsHash(
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
         PHPUnitAssert::assertThat(
             $document,
-            new SubsetInList($expected, $pointer, $strict)
+            new SubsetInList($expected, $pointer, $strict),
+            $message
         );
     }
 
@@ -285,18 +321,21 @@ class Assert
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return void
      */
     public static function assertListContainsExact(
         $document,
         array $expected,
         string $pointer = '/data',
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): void
     {
         PHPUnitAssert::assertThat(
             $document,
-            new ExactInList($expected, $pointer, $strict)
+            new ExactInList($expected, $pointer, $strict),
+            $message
         );
     }
 
@@ -309,11 +348,17 @@ class Assert
      * @param $document
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return void
      */
-    public static function assertIncluded($document, array $expected, bool $strict = true): void
+    public static function assertIncluded(
+        $document,
+        array $expected,
+        bool $strict = true,
+        string $message = ''
+    ): void
     {
-        self::assertList($document, $expected, '/included', $strict);
+        self::assertList($document, $expected, '/included', $strict, $message);
     }
 
     /**
@@ -322,11 +367,17 @@ class Assert
      * @param $document
      * @param string $type
      * @param string $id
+     * @param string $message
      * @return void
      */
-    public static function assertIncludedContainsIdentifier($document, string $type, string $id): void
+    public static function assertIncludedContainsIdentifier(
+        $document,
+        string $type,
+        string $id,
+        string $message = ''
+    ): void
     {
-        self::assertListContainsIdentifier($document, $type, $id, '/included');
+        self::assertListContainsIdentifier($document, $type, $id, '/included', $message);
     }
 
     /**
@@ -335,11 +386,17 @@ class Assert
      * @param $document
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return void
      */
-    public static function assertIncludedContainsHash($document, array $expected, bool $strict = true): void
+    public static function assertIncludedContainsHash(
+        $document,
+        array $expected,
+        bool $strict = true,
+        string $message = ''
+    ): void
     {
-        self::assertListContainsHash($document, $expected, '/included', $strict);
+        self::assertListContainsHash($document, $expected, '/included', $strict, $message);
     }
 
     /**
@@ -348,11 +405,12 @@ class Assert
      * @param $document
      * @param array $error
      * @param bool $strict
+     * @param string $message
      * @return void
      */
-    public static function assertError($document, array $error, bool $strict = true): void
+    public static function assertError($document, array $error, bool $strict = true, string $message = ''): void
     {
-        self::assertList($document, [$error], '/errors', $strict);
+        self::assertList($document, [$error], '/errors', $strict, $message);
     }
 
     /**
@@ -361,11 +419,12 @@ class Assert
      * @param $document
      * @param array $error
      * @param bool $strict
+     * @param string $message
      * @return void
      */
-    public static function assertHasError($document, array $error, bool $strict = true): void
+    public static function assertHasError($document, array $error, bool $strict = true, string $message = ''): void
     {
-        self::assertListContainsHash($document, $error, '/errors', $strict);
+        self::assertListContainsHash($document, $error, '/errors', $strict, $message);
     }
 
     /**
@@ -376,10 +435,11 @@ class Assert
      * @param $document
      * @param array $errors
      * @param bool $strict
+     * @param string $message
      * @return void
      */
-    public static function assertErrors($document, array $errors, bool $strict = true): void
+    public static function assertErrors($document, array $errors, bool $strict = true, string $message = ''): void
     {
-        self::assertList($document, $errors, '/errors', $strict);
+        self::assertList($document, $errors, '/errors', $strict, $message);
     }
 }

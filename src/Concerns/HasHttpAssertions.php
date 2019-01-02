@@ -50,10 +50,19 @@ trait HasHttpAssertions
     }
 
     /**
+     * @param string $type
+     * @return $this
+     */
+    public function willSeeResourceType(string $type): self
+    {
+        return $this->willSeeType($type);
+    }
+
+    /**
      * Set the expected resource type for the data member of the JSON document.
      *
      * @param string $type
-     * @return HasHttpAssertions
+     * @return $this
      */
     public function willSeeType(string $type): self
     {
@@ -68,7 +77,7 @@ trait HasHttpAssertions
 
     /**
      * @param $status
-     * @return HasHttpAssertions
+     * @return $this
      */
     public function assertStatusCode($status): self
     {

@@ -25,13 +25,20 @@ class HttpAssert
      * @param $status
      * @param int $expected
      * @param mixed|null $content
+     * @param string $message
      * @return void
      */
-    public static function assertStatusCode($status, int $expected, $content = null): void
+    public static function assertStatusCode(
+        $status,
+        int $expected,
+        $content = null,
+        string $message = ''
+    ): void
     {
         PHPUnitAssert::assertThat(
             $status,
-            new HttpStatusIs($expected, $content)
+            new HttpStatusIs($expected, $content),
+            $message
         );
     }
 
@@ -41,12 +48,18 @@ class HttpAssert
      * @param $type
      * @param $content
      * @param string $expected
+     * @param string $message
      * @return Document
      */
-    public static function assertContent($type, $content, $expected = self::JSON_API_MEDIA_TYPE): Document
+    public static function assertContent(
+        $type,
+        $content,
+        $expected = self::JSON_API_MEDIA_TYPE,
+        string $message = ''
+    ): Document
     {
-        PHPUnitAssert::assertSame($type, $expected, "Expecting content with media type {$expected}.");
-        PHPUnitAssert::assertNotEmpty($content, 'Expecting HTTP body to have content.');
+        PHPUnitAssert::assertSame($type, $expected, $message ?: "Expecting content with media type {$expected}.");
+        PHPUnitAssert::assertNotEmpty($content, $message ?: 'Expecting HTTP body to have content.');
 
         return Document::cast($content);
     }
@@ -59,13 +72,20 @@ class HttpAssert
      * @param $content
      * @param int $expected
      *      the expected HTTP status.
+     * @param string $message
      * @return Document
      */
-    public static function assertJson($status, $contentType, $content, int $expected = self::STATUS_OK): Document
+    public static function assertJson(
+        $status,
+        $contentType,
+        $content,
+        int $expected = self::STATUS_OK,
+        string $message = ''
+    ): Document
     {
-        self::assertStatusCode($status, $expected, $content);
+        self::assertStatusCode($status, $expected, $content, $message);
 
-        return self::assertContent($contentType, $content, self::JSON_MEDIA_TYPE);
+        return self::assertContent($contentType, $content, self::JSON_MEDIA_TYPE, $message);
     }
 
     /**
@@ -76,13 +96,20 @@ class HttpAssert
      * @param $content
      * @param int $expected
      *      the expected HTTP status.
+     * @param string $message
      * @return Document
      */
-    public static function assertJsonApi($status, $contentType, $content, int $expected = self::STATUS_OK): Document
+    public static function assertJsonApi(
+        $status,
+        $contentType,
+        $content,
+        int $expected = self::STATUS_OK,
+        string $message = ''
+    ): Document
     {
-        self::assertStatusCode($status, $expected, $content);
+        self::assertStatusCode($status, $expected, $content, $message);
 
-        return self::assertContent($contentType, $content);
+        return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message);
     }
 
     /**
@@ -94,6 +121,7 @@ class HttpAssert
      * @param array $expected
      *      the expected resource, or a subset of the expected resource.
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertFetchedOne(
@@ -101,11 +129,12 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertHash($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertHash($expected, '/data', $strict, $message);
     }
 
     /**
@@ -117,6 +146,7 @@ class HttpAssert
      * @param array $expected
      *      the expected content of the document's data member.
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertFetchedExact(
@@ -124,11 +154,12 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertExact($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertExact($expected, '/data', $strict, $message);
     }
 
     /**
@@ -137,11 +168,13 @@ class HttpAssert
      * @param $status
      * @param $contentType
      * @param $content
+     * @param string $message
      * @return Document
      */
-    public static function assertFetchedNull($status, $contentType, $content): Document
+    public static function assertFetchedNull($status, $contentType, $content, string $message = ''): Document
     {
-        return self::assertJsonApi($status, $contentType, $content)->assertNull();
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertNull('/data', $message);
     }
 
     /**
@@ -152,6 +185,7 @@ class HttpAssert
      * @param $content
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertFetchedMany(
@@ -159,11 +193,12 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertList($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertList($expected, '/data', $strict, $message);
     }
 
     /**
@@ -174,6 +209,7 @@ class HttpAssert
      * @param $content
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertFetchedManyInOrder(
@@ -181,15 +217,16 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content);
+            return self::assertFetchedNone($strict, $contentType, $content, $message);
         }
 
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertListInOrder($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertListInOrder($expected, '/data', $strict, $message);
     }
 
     /**
@@ -198,11 +235,13 @@ class HttpAssert
      * @param $status
      * @param $contentType
      * @param $content
+     * @param string $message
      * @return Document
      */
-    public static function assertFetchedNone($status, $contentType, $content): Document
+    public static function assertFetchedNone($status, $contentType, $content, string $message = ''): Document
     {
-        return self::assertJsonApi($status, $contentType, $content)->assertListEmpty();
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertListEmpty('/data', $message);
     }
 
     /**
@@ -216,6 +255,7 @@ class HttpAssert
      * @param $content
      * @param string|null $type
      * @param string|null $id
+     * @param string $message
      * @return Document
      */
     public static function assertFetchedToOne(
@@ -223,15 +263,16 @@ class HttpAssert
         $contentType,
         $content,
         ?string $type,
-        string $id = null
+        string $id = null,
+        string $message = ''
     ): Document
     {
         if (is_null($type) || is_null($id)) {
-            return self::assertFetchedNull($status, $contentType, $content);
+            return self::assertFetchedNull($status, $contentType, $content, $message);
         }
 
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertExact(compact('type', 'id'));
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertExact(compact('type', 'id'), '/data', true, $message);
     }
 
     /**
@@ -242,6 +283,7 @@ class HttpAssert
      * @param $content
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertFetchedToMany(
@@ -249,15 +291,16 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content);
+            return self::assertFetchedNone($strict, $contentType, $content, $message);
         }
 
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertExactList($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertExactList($expected, '/data', $strict, $message);
     }
 
     /**
@@ -268,6 +311,7 @@ class HttpAssert
      * @param $content
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertFetchedToManyInOrder(
@@ -275,15 +319,16 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content);
+            return self::assertFetchedNone($strict, $contentType, $content, $message);
         }
 
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertExactListInOrder($expected, '/data', $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertExactListInOrder($expected, '/data', $strict, $message);
     }
 
     /**
@@ -297,6 +342,7 @@ class HttpAssert
      *      the expected location without the id.
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertCreatedWithServerId(
@@ -306,16 +352,17 @@ class HttpAssert
         $location,
         string $expectedLocation,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        self::assertStatusCode($status, self::STATUS_CREATED, $content);
-        $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict);
+        self::assertStatusCode($status, self::STATUS_CREATED, $content, $message);
+        $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict, $message);
         $id = $document->get('/data/id');
 
-        PHPUnitAssert::assertNotEmpty($id, 'Expecting content to contain a resource id.');
+        PHPUnitAssert::assertNotEmpty($id, $message ?: 'Expecting content to contain a resource id.');
         $expectedLocation = rtrim($expectedLocation, '/') . '/' . $id;
-        PHPUnitAssert::assertSame($expectedLocation, $location, 'Unexpected Location header.');
+        PHPUnitAssert::assertSame($expectedLocation, $location, $message ?: 'Unexpected Location header.');
 
         return $document;
     }
@@ -330,6 +377,7 @@ class HttpAssert
      * @param string $expectedLocation
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertCreatedWithClientId(
@@ -339,7 +387,8 @@ class HttpAssert
         $location,
         string $expectedLocation,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
         $expectedId = $expected['id'] ?? null;
@@ -348,15 +397,15 @@ class HttpAssert
             throw new \InvalidArgumentException('Expected resource hash must have an id.');
         }
 
-        self::assertStatusCode($status, self::STATUS_CREATED, $content);
+        self::assertStatusCode($status, self::STATUS_CREATED, $content, $message);
         PHPUnitAssert::assertSame(
             "$expectedLocation/{$expectedId}",
             $location,
-            'Unexpected Location header.'
+            $message ?: 'Unexpected Location header.'
         );
 
-        return self::assertContent($contentType, $content)
-            ->assertHash($expected, '/data', $strict);
+        return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message)
+            ->assertHash($expected, '/data', $strict, $message);
     }
 
     /**
@@ -365,12 +414,18 @@ class HttpAssert
      * @param $status
      * @param $location
      * @param $expectedLocation
+     * @param string $message = ''
      * @return void
      */
-    public static function assertCreatedNoContent($status, $location, $expectedLocation): void
+    public static function assertCreatedNoContent(
+        $status,
+        $location,
+        $expectedLocation,
+        string $message = ''
+    ): void
     {
-        self::assertStatusCode($status, self::STATUS_NO_CONTENT);
-        PHPUnitAssert::assertSame($expectedLocation, $location, 'Unexpected Location header.');
+        self::assertStatusCode($status, self::STATUS_NO_CONTENT, null, $message);
+        PHPUnitAssert::assertSame($expectedLocation, $location, $message ?: 'Unexpected Location header.');
     }
 
     /**
@@ -383,6 +438,7 @@ class HttpAssert
      * @param string $expectedLocation
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertAcceptedWithId(
@@ -392,16 +448,17 @@ class HttpAssert
         $contentLocation,
         string $expectedLocation,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        self::assertStatusCode($status, self::STATUS_ACCEPTED, $content);
-        $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict);
+        self::assertStatusCode($status, self::STATUS_ACCEPTED, $content, $message);
+        $document = self::assertServerGeneratedId($contentType, $content, $expected, $strict, $message);
         $id = $document->get('/data/id');
 
-        PHPUnitAssert::assertNotEmpty($id, 'Expecting content to contain a resource id.');
+        PHPUnitAssert::assertNotEmpty($id, $message ?: 'Expecting content to contain a resource id.');
         $expectedLocation = rtrim($expectedLocation, '/') . '/' . $id;
-        PHPUnitAssert::assertSame($expectedLocation, $contentLocation, 'Unexpected Location header.');
+        PHPUnitAssert::assertSame($expectedLocation, $contentLocation, $message ?: 'Unexpected Location header.');
 
         return $document;
     }
@@ -411,12 +468,13 @@ class HttpAssert
      *
      * @param $status
      * @param string|null
+     * @param string $message
      * @return void
      */
-    public static function assertNoContent($status, string $content = null): void
+    public static function assertNoContent($status, string $content = null, string $message = ''): void
     {
-        self::assertStatusCode($status, self::STATUS_NO_CONTENT, $content);
-        PHPUnitAssert::assertEmpty($content, 'Expecting HTTP body content to be empty.');
+        self::assertStatusCode($status, self::STATUS_NO_CONTENT, $content, $message);
+        PHPUnitAssert::assertEmpty($content, $message ?: 'Expecting HTTP body content to be empty.');
     }
 
     /**
@@ -427,6 +485,7 @@ class HttpAssert
      * @param $content
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertMetaWithoutData(
@@ -434,12 +493,13 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertNotExists('/data')
-            ->assertMeta($expected, $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertNotExists('/data', $message)
+            ->assertMeta($expected, $strict, $message);
     }
 
     /**
@@ -450,6 +510,7 @@ class HttpAssert
      * @param $content
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertExactMetaWithoutData(
@@ -457,12 +518,13 @@ class HttpAssert
         $contentType,
         $content,
         array $expected,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content)
-            ->assertNotExists('/data')
-            ->assertExactMeta($expected, $strict);
+        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+            ->assertNotExists('/data', $message)
+            ->assertExactMeta($expected, $strict, $message);
     }
 
     /**
@@ -474,6 +536,7 @@ class HttpAssert
      * @param int $expectedStatus
      * @param array $error
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertError(
@@ -482,16 +545,17 @@ class HttpAssert
         $content,
         int $expectedStatus,
         array $error = [],
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        $document = self::assertJsonApi($status, $contentType, $content, $expectedStatus)
-            ->assertNotExists('/data');
+        $document = self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertNotExists('/data', $message);
 
         if ($error) {
-            $document->assertError($error, $strict);
+            $document->assertError($error, $strict, $message);
         } else {
-            $document->assertExists('/error');
+            $document->assertExists('/error', $message);
         }
 
         return $document;
@@ -505,6 +569,7 @@ class HttpAssert
      * @param $content
      * @param array $error
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertErrorStatus(
@@ -512,7 +577,8 @@ class HttpAssert
         $contentType,
         $content,
         array $error = [],
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
         $expectedStatus = $error['status'] ?? null;
@@ -521,7 +587,15 @@ class HttpAssert
             throw new \InvalidArgumentException('Expecting error to have a status member.');
         }
 
-        return self::assertError($status, $contentType, $content, (int) $expectedStatus, $error, $strict);
+        return self::assertError(
+            $status,
+            $contentType,
+            $content,
+            (int) $expectedStatus,
+            $error,
+            $strict,
+            $message
+        );
     }
 
     /**
@@ -533,6 +607,7 @@ class HttpAssert
      * @param int $expectedStatus
      * @param array $error
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertHasError(
@@ -541,15 +616,16 @@ class HttpAssert
         $content,
         int $expectedStatus,
         array $error,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
         if (empty($error)) {
             $error = compact('status');
         }
 
-        return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
-            ->assertHasError($error, $strict);
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertHasError($error, $strict, $message);
     }
 
     /**
@@ -561,6 +637,7 @@ class HttpAssert
      * @param int $expectedStatus
      * @param array $errors
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
     public static function assertErrors(
@@ -569,11 +646,12 @@ class HttpAssert
         $content,
         int $expectedStatus,
         array $errors,
-        bool $strict = true
+        bool $strict = true,
+        string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content, $expectedStatus)
-            ->assertErrors($errors, $strict);
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertErrors($errors, $strict, $message);
     }
 
     /**
@@ -581,16 +659,23 @@ class HttpAssert
      * @param $content
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return Document
      */
-    private static function assertServerGeneratedId($contentType, $content, array $expected, bool $strict): Document
+    private static function assertServerGeneratedId(
+        $contentType,
+        $content,
+        array $expected,
+        bool $strict,
+        string $message = ''
+    ): Document
     {
         if (array_key_exists('id', $expected)) {
             throw new \InvalidArgumentException('Expected resource hash must not have an id.');
         }
 
-        return self::assertContent($contentType, $content)
-            ->assertHash($expected, '/data', $strict)
-            ->assertExists('/data/id');
+        return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message)
+            ->assertHash($expected, '/data', $strict, $message)
+            ->assertExists('/data/id', $message);
     }
 }

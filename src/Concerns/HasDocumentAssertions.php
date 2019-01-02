@@ -16,11 +16,17 @@ trait HasDocumentAssertions
      *      the expected resource object id.
      * @param string $pointer
      *      the JSON pointer to where the resource object is expected in the document.
+     * @param string $message
      * @return $this
      */
-    public function assertIdentifier(string $type, string $id, string $pointer = '/data'): self
+    public function assertIdentifier(
+        string $type,
+        string $id,
+        string $pointer = '/data',
+        string $message = ''
+    ): self
     {
-        Assert::assertIdentifier($this, $type, $id, $pointer);
+        Assert::assertIdentifier($this, $type, $id, $pointer, $message);
 
         return $this;
     }
@@ -34,11 +40,17 @@ trait HasDocumentAssertions
      *      the JSON pointer to where the object is expected to exist within the document.
      * @param bool $strict
      *      whether strict comparison should be used.
+     * @param string $message
      * @return $this
      */
-    public function assertExact($expected, string $pointer = '/data', bool $strict = true): self
+    public function assertExact(
+        $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertExact($this, $expected, $pointer, $strict);
+        Assert::assertExact($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -49,11 +61,17 @@ trait HasDocumentAssertions
      * @param $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertNotExact($expected, string $pointer = '/data', bool $strict = true): self
+    public function assertNotExact(
+        $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertNotExact($this, $expected, $pointer, $strict);
+        Assert::assertNotExact($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -67,11 +85,17 @@ trait HasDocumentAssertions
      *      the JSON pointer to where the object is expected to exist within the document.
      * @param bool $strict
      *      whether strict comparison should be used.
+     * @param string $message
      * @return $this
      */
-    public function assertHash(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertHash(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertHash($this, $expected, $pointer, $strict);
+        Assert::assertHash($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -80,11 +104,12 @@ trait HasDocumentAssertions
      * Assert that the member contains a null value.
      *
      * @param string $pointer
+     * @param string $message
      * @return $this
      */
-    public function assertNull(string $pointer = '/data'): self
+    public function assertNull(string $pointer = '/data', string $message = ''): self
     {
-        Assert::assertNull($this, $pointer);
+        Assert::assertNull($this, $pointer, $message);
 
         return $this;
     }
@@ -93,11 +118,12 @@ trait HasDocumentAssertions
      * Assert that the member contains an empty list.
      *
      * @param string $pointer
+     * @param string $message
      * @return $this
      */
-    public function assertListEmpty(string $pointer = '/data'): self
+    public function assertListEmpty(string $pointer = '/data', string $message = ''): self
     {
-        Assert::assertListEmpty($this, $pointer);
+        Assert::assertListEmpty($this, $pointer, $message);
 
         return $this;
     }
@@ -106,11 +132,12 @@ trait HasDocumentAssertions
      * Assert that the member does not contain an empty list.
      *
      * @param string $pointer
+     * @param string $message
      * @return $this
      */
-    public function assertListNotEmpty(string $pointer = '/data'): self
+    public function assertListNotEmpty(string $pointer = '/data', string $message = ''): self
     {
-        Assert::assertListNotEmpty($this, $pointer);
+        Assert::assertListNotEmpty($this, $pointer, $message);
 
         return $this;
     }
@@ -124,11 +151,17 @@ trait HasDocumentAssertions
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertList(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertList(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertList($this, $expected, $pointer, $strict);
+        Assert::assertList($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -142,11 +175,17 @@ trait HasDocumentAssertions
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertExactList(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertExactList(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertExactList($this, $expected, $pointer, $strict);
+        Assert::assertExactList($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -157,11 +196,17 @@ trait HasDocumentAssertions
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertListInOrder(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertListInOrder(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertListInOrder($this, $expected, $pointer, $strict);
+        Assert::assertListInOrder($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -172,11 +217,17 @@ trait HasDocumentAssertions
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertExactListInOrder(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertExactListInOrder(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertExactListInOrder($this, $expected, $pointer, $strict);
+        Assert::assertExactListInOrder($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -190,11 +241,17 @@ trait HasDocumentAssertions
      *      the expected resource object id.
      * @param string $pointer
      *      the JSON pointer to where the array is expected in the document.
+     * @param string $message
      * @return $this
      */
-    public function assertListContainsIdentifier(string $type, string $id, string $pointer = '/data'): self
+    public function assertListContainsIdentifier(
+        string $type,
+        string $id,
+        string $pointer = '/data',
+        string $message = ''
+    ): self
     {
-        Assert::assertListContainsIdentifier($this, $type, $id, $pointer);
+        Assert::assertListContainsIdentifier($this, $type, $id, $pointer, $message);
 
         return $this;
     }
@@ -205,11 +262,17 @@ trait HasDocumentAssertions
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertListContainsHash(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertListContainsHash(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertListContainsHash($this, $expected, $pointer, $strict);
+        Assert::assertListContainsHash($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -220,11 +283,17 @@ trait HasDocumentAssertions
      * @param array $expected
      * @param string $pointer
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertListContainsExact(array $expected, string $pointer = '/data', bool $strict = true): self
+    public function assertListContainsExact(
+        array $expected,
+        string $pointer = '/data',
+        bool $strict = true,
+        string $message = ''
+    ): self
     {
-        Assert::assertListContainsExact($this, $expected, $pointer, $strict);
+        Assert::assertListContainsExact($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -237,11 +306,12 @@ trait HasDocumentAssertions
      *
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertIncluded(array $expected, bool $strict = true): self
+    public function assertIncluded(array $expected, bool $strict = true, string $message = ''): self
     {
-        Assert::assertIncluded($this, $expected, $strict);
+        Assert::assertIncluded($this, $expected, $strict, $message);
 
         return $this;
     }
@@ -251,11 +321,12 @@ trait HasDocumentAssertions
      *
      * @param string $type
      * @param string $id
+     * @param string $message
      * @return $this
      */
-    public function assertIncludedContainsIdentifier(string $type, string $id): self
+    public function assertIncludedContainsIdentifier(string $type, string $id, string $message = ''): self
     {
-        Assert::assertIncludedContainsIdentifier($this, $type, $id);
+        Assert::assertIncludedContainsIdentifier($this, $type, $id, $message);
 
         return $this;
     }
@@ -265,11 +336,12 @@ trait HasDocumentAssertions
      *
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertIncludedContainsHash(array $expected, bool $strict = true): self
+    public function assertIncludedContainsHash(array $expected, bool $strict = true, string $message = ''): self
     {
-        Assert::assertIncludedContainsHash($this, $expected, $strict);
+        Assert::assertIncludedContainsHash($this, $expected, $strict, $message);
 
         return $this;
     }
@@ -279,11 +351,12 @@ trait HasDocumentAssertions
      *
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertMeta(array $expected, bool $strict = true): self
+    public function assertMeta(array $expected, bool $strict = true, string $message = ''): self
     {
-        Assert::assertHash($this, $expected, '/meta', $strict);
+        Assert::assertHash($this, $expected, '/meta', $strict, $message);
 
         return $this;
     }
@@ -293,11 +366,12 @@ trait HasDocumentAssertions
      *
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertExactMeta(array $expected, bool $strict = true): self
+    public function assertExactMeta(array $expected, bool $strict = true, string $message = ''): self
     {
-        Assert::assertExact($this, $expected, '/meta', $strict);
+        Assert::assertExact($this, $expected, '/meta', $strict, $message);
 
         return $this;
     }
@@ -307,11 +381,12 @@ trait HasDocumentAssertions
      *
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertLinks(array $expected, bool $strict = true): self
+    public function assertLinks(array $expected, bool $strict = true, string $message = ''): self
     {
-        Assert::assertHash($this, $expected, '/links', $strict);
+        Assert::assertHash($this, $expected, '/links', $strict, $message);
 
         return $this;
     }
@@ -321,11 +396,12 @@ trait HasDocumentAssertions
      *
      * @param array $expected
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertExactLinks(array $expected, bool $strict = true): self
+    public function assertExactLinks(array $expected, bool $strict = true, string $message = ''): self
     {
-        Assert::assertExact($this, $expected, '/links', $strict);
+        Assert::assertExact($this, $expected, '/links', $strict, $message);
 
         return $this;
     }
@@ -335,11 +411,12 @@ trait HasDocumentAssertions
      *
      * @param array $error
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertError(array $error, bool $strict = true): self
+    public function assertError(array $error, bool $strict = true, string $message = ''): self
     {
-        Assert::assertError($this, $error, $strict);
+        Assert::assertError($this, $error, $strict, $message);
 
         return $this;
     }
@@ -349,11 +426,12 @@ trait HasDocumentAssertions
      *
      * @param array $error
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertHasError(array $error, bool $strict = true): self
+    public function assertHasError(array $error, bool $strict = true, string $message = ''): self
     {
-        Assert::assertHasError($this, $error, $strict);
+        Assert::assertHasError($this, $error, $strict, $message);
 
         return $this;
     }
@@ -365,11 +443,12 @@ trait HasDocumentAssertions
      *
      * @param array $errors
      * @param bool $strict
+     * @param string $message
      * @return $this
      */
-    public function assertErrors(array $errors, bool $strict = true): self
+    public function assertErrors(array $errors, bool $strict = true, string $message = ''): self
     {
-        Assert::assertErrors($this, $errors, $strict);
+        Assert::assertErrors($this, $errors, $strict, $message);
 
         return $this;
     }
