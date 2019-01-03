@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Copyright 2019 Cloud Creativity Limited
  *
@@ -16,34 +15,37 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Testing;
+namespace CloudCreativity\JsonApi\Testing\Constraints;
 
-use Closure;
-use PHPUnit\Framework\AssertionFailedError;
-use PHPUnit\Framework\TestCase as BaseTestCase;
+use CloudCreativity\JsonApi\Testing\Compare;
+use CloudCreativity\JsonApi\Testing\Document;
 
 /**
- * Class TestCase
+ * Class ExactInList
  *
  * @package CloudCreativity\JsonApi\Testing
  */
-class TestCase extends BaseTestCase
+class ExactInList extends SubsetInList
 {
 
     /**
-     * @param Closure $closure
-     * @param string $message
+     * @inheritdoc
      */
-    protected function willFail(Closure $closure, $message = '')
+    protected function failureDescription($document): string
     {
-        $didFail = false;
-
-        try {
-            $closure();
-        } catch (AssertionFailedError $e) {
-            $didFail = true;
-        }
-
-        $this->assertTrue($didFail, $message ?: 'Expecting test to fail.');
+        return "the list at [{$this->pointer}] contains the values:" . PHP_EOL
+            . $this->toString() . PHP_EOL . PHP_EOL
+            . "within JSON API document:" . PHP_EOL
+            . Document::cast($document);
     }
+
+    /**
+     * @param $actual
+     * @return bool
+     */
+    protected function compare($actual): bool
+    {
+        return Compare::exact($this->expected, $actual, $this->strict);
+    }
+
 }

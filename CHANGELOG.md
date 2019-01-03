@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0-rc.1] - 2019-01-03
+
+### Added
+- New implementation using constraint classes. Assertions are now provided via the `Assert` and `HttpAssert`
+classes, with traits in the `Concerns` namespace for adding these to test classes.
+
+### Changed
+- Minimum PHP version is now `7.1`.
+
+### Removed
+- Package no longer supports PHPUnit 5.
+- The previous implementation was deleted, removing these classes:
+  - `AbstractTraversableTester`
+  - `DocumentTester`
+  - `ErrorsTester`
+  - `ErrorTester`
+  - `ObjectTester`
+  - `ResourceIdentifierTester`
+  - `ResourceObjectsTester`
+  - `ResourceObjectTester`
+
 ## [0.4.0] - 2018-04-29
 
 ### Added
