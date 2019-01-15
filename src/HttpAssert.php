@@ -690,12 +690,17 @@ class HttpAssert
         string $message = ''
     ): Document
     {
-        if (array_key_exists('id', $expected)) {
-            throw new \InvalidArgumentException('Expected resource hash must not have an id.');
+        $id = $expected['id'] ?? null;
+
+        $document = self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message)
+            ->assertHash($expected, '/data', $strict, $message);
+
+        if ($id) {
+            PHPUnitAssert::assertSame($id, $document->get('/data/id'), $message);
+        } else {
+            $document->assertExists('/data/id', $message);
         }
 
-        return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message)
-            ->assertHash($expected, '/data', $strict, $message)
-            ->assertExists('/data/id', $message);
+        return $document;
     }
 }

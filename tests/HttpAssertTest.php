@@ -89,6 +89,57 @@ JSON_API;
         });
     }
 
+    public function testCreatedWithServerId(): void
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123",
+        "attributes": {
+            "title": "Hello World!",
+            "content": "..."
+        }
+    }
+}
+JSON_API;
+
+        $expected = [
+            'type' => 'posts',
+            'attributes' => [
+                'title' => 'Hello World!',
+                'content' => '...',
+            ],
+        ];
+
+        $message = new HttpMessage(201, 'application/vnd.api+json', $content, [
+            'Location' => 'http://localhost/api/v1/posts/123',
+        ]);
+
+        $message->willSeeResourceType('posts');
+
+        $message->assertCreatedWithServerId(
+            'http://localhost/api/v1/posts',
+            $expected
+        );
+
+        $expected['id'] = '123';
+
+        $message->assertCreatedWithServerId(
+            'http://localhost/api/v1/posts',
+            $expected
+        );
+
+        $expected['id'] = '456';
+
+        $this->willFail(function () use ($message, $expected) {
+            $message->assertCreatedWithServerId(
+                'http://localhost/api/v1/posts',
+                $expected
+            );
+        });
+    }
+
     public function testOthers()
     {
         $this->markTestIncomplete('@todo must add tests for other assertions');

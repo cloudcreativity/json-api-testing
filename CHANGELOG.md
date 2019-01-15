@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+- [#5](https://github.com/cloudcreativity/json-api-testing/issues/5)
+Can now assert a server generated id with a known id.
+
 ## [1.0.0-rc.1] - 2019-01-03
 
 ### Added
