@@ -12,6 +12,8 @@ Can now assert a server generated id with a known id.
 ### Fixed
 - [#6](https://github.com/cloudcreativity/json-api-testing/issues/6)
 Fixed asserting that an error exists with only an integer HTTP status code.
+- [#4](https://github.com/cloudcreativity/json-api-testing/issues/4)
+Fixed incorrect diff when asserting a resource identifier on a document that contains a resource object.
 
 ## [1.0.0-rc.1] - 2019-01-03
 

@@ -160,6 +160,7 @@ class Compare
      * @param $expected
      * @param $actual
      * @param bool $subset
+     *      whether the expected is meant to be a subset of the actual.
      * @return ComparisonFailure
      */
     public static function failure($expected, $actual, bool $subset = false): ComparisonFailure
