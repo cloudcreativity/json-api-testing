@@ -635,13 +635,13 @@ class HttpAssert
         $contentType,
         $content,
         int $expectedStatus,
-        array $error,
+        array $error = [],
         bool $strict = true,
         string $message = ''
     ): Document
     {
         if (empty($error)) {
-            $error = compact('status');
+            $error = ['status' => (string) $status];
         }
 
         return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)

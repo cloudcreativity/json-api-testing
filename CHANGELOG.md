@@ -9,6 +9,10 @@ All notable changes to this project will be documented in this file. This projec
 - [#5](https://github.com/cloudcreativity/json-api-testing/issues/5)
 Can now assert a server generated id with a known id.
 
+### Fixed
+- [#6](https://github.com/cloudcreativity/json-api-testing/issues/6)
+Fixed asserting that an error exists with only an integer HTTP status code.
+
 ## [1.0.0-rc.1] - 2019-01-03
 
 ### Added

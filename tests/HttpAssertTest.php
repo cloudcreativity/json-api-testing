@@ -59,6 +59,43 @@ JSON_API;
 {
     "errors": [
         {
+            "status": "422",
+            "detail": "The selected bar is invalid.",
+            "source": {
+                "pointer": "/data/attributes/bar"
+            }
+        }
+    ]
+}
+JSON_API;
+
+        $message = new HttpMessage(422, 'application/vnd.api+json', $content);
+
+        $message->assertHasError(422);
+
+        $message->assertHasError(422, [
+            'status' => '422',
+            'source' => ['pointer' => '/data/attributes/bar'],
+        ]);
+
+        $this->willFail(function () use ($message) {
+            $message->assertHasError(400);
+        });
+
+        $this->willFail(function () use ($message) {
+            $message->assertHasError(422, [
+                'status' => '422',
+                'source' => ['pointer' => '/data/attributes/baz']
+            ]);
+        });
+    }
+
+    public function testHasErrorWithMultipleErrors(): void
+    {
+        $content = <<<JSON_API
+{
+    "errors": [
+        {
             "status": "404",
             "detail": "The related resource does not exist.",
             "source": {
