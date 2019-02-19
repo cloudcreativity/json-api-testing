@@ -6,6 +6,8 @@ All notable changes to this project will be documented in this file. This projec
 ## Unreleased
 
 ### Added
+- [#3](https://github.com/cloudcreativity/json-api-testing/issues/3)
+Can now assert exact errors on a document and HTTP message.
 - [#5](https://github.com/cloudcreativity/json-api-testing/issues/5)
 Can now assert a server generated id with a known id.
 

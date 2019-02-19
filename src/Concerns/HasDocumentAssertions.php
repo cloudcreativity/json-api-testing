@@ -543,6 +543,21 @@ trait HasDocumentAssertions
     }
 
     /**
+     * Assert the document contains a single error that exactly matches the supplied error.
+     *
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return $this
+     */
+    public function assertExactError(array $error, bool $strict = true, string $message = ''): self
+    {
+        Assert::assertExactError($this, $error, $strict, $message);
+
+        return $this;
+    }
+
+    /**
      * Assert the document contains the supplied error within its errors member.
      *
      * @param array $error
@@ -553,6 +568,21 @@ trait HasDocumentAssertions
     public function assertHasError(array $error, bool $strict = true, string $message = ''): self
     {
         Assert::assertHasError($this, $error, $strict, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert the document contains the exact supplied error within its errors member.
+     *
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return $this
+     */
+    public function assertHasExactError(array $error, bool $strict = true, string $message = ''): self
+    {
+        Assert::assertHasExactError($this, $error, $strict, $message);
 
         return $this;
     }
@@ -570,6 +600,23 @@ trait HasDocumentAssertions
     public function assertErrors(array $errors, bool $strict = true, string $message = ''): self
     {
         Assert::assertErrors($this, $errors, $strict, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert the document contains the exact supplied errors.
+     *
+     * This does not assert the order of the errors, as the error order does not have any significance.
+     *
+     * @param array $errors
+     * @param bool $strict
+     * @param string $message
+     * @return $this
+     */
+    public function assertExactErrors(array $errors, bool $strict = true, string $message = ''): self
+    {
+        Assert::assertExactErrors($this, $errors, $strict, $message);
 
         return $this;
     }

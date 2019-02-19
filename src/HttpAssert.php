@@ -582,6 +582,35 @@ class HttpAssert
     }
 
     /**
+     * Assert the document contains an exact single error that matches the supplied error.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertExactError(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $error,
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        $document = self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertNotExists('/data', $message)
+            ->assertExactError($error, $strict, $message);
+
+        return $document;
+    }
+
+    /**
      * Assert the document contains a single error that matches the supplied error and has a status member.
      *
      * @param $status
@@ -608,6 +637,43 @@ class HttpAssert
         }
 
         return self::assertError(
+            $status,
+            $contentType,
+            $content,
+            (int) $expectedStatus,
+            $error,
+            $strict,
+            $message
+        );
+    }
+
+    /**
+     * Assert the document contains an exact single error that matches the supplied error and has a status member.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertExactErrorStatus(
+        $status,
+        $contentType,
+        $content,
+        array $error,
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        $expectedStatus = $error['status'] ?? null;
+
+        if (!$expectedStatus) {
+            throw new \InvalidArgumentException('Expecting error to have a status member.');
+        }
+
+        return self::assertExactError(
             $status,
             $contentType,
             $content,
@@ -649,6 +715,36 @@ class HttpAssert
     }
 
     /**
+     * Assert the HTTP message contains the supplied error within its errors member.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertHasExactError(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $error,
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        if (empty($error)) {
+            $error = ['status' => (string) $status];
+        }
+
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertHasExactError($error, $strict, $message);
+    }
+
+    /**
      * Assert the HTTP status contains the supplied errors.
      *
      * @param $status
@@ -672,6 +768,32 @@ class HttpAssert
     {
         return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
             ->assertErrors($errors, $strict, $message);
+    }
+
+    /**
+     * Assert the HTTP status contains the exact supplied errors.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $errors
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertExactErrors(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $errors,
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertExactErrors($errors, $strict, $message);
     }
 
     /**

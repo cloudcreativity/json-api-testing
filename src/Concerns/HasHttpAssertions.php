@@ -629,6 +629,28 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert the document contains a single  error that exactly matches the supplied error.
+     *
+     * @param int $status
+     * @param array $error
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertExactError(int $status, array $error, bool $strict = true): self
+    {
+        $this->document = HttpAssert::assertExactError(
+            $this->getStatusCode(),
+            $this->getContentType(),
+            $this->getContent(),
+            $status,
+            $error,
+            $strict
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert the document contains a single error that matches the supplied error and has a status member.
      *
      * @param array $error
@@ -638,6 +660,26 @@ trait HasHttpAssertions
     public function assertErrorStatus(array $error, bool $strict = true): self
     {
         $this->document = HttpAssert::assertErrorStatus(
+            $this->getStatusCode(),
+            $this->getContentType(),
+            $this->getContent(),
+            $error,
+            $strict
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the document contains a single error that exactly matches the supplied error and has a status member.
+     *
+     * @param array $error
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertExactErrorStatus(array $error, bool $strict = true): self
+    {
+        $this->document = HttpAssert::assertExactErrorStatus(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
@@ -671,6 +713,28 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert the HTTP message contains the exact supplied error within its errors member.
+     *
+     * @param int $status
+     * @param array $error
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertHasExactError(int $status, array $error, bool $strict = true): self
+    {
+        $this->document = HttpAssert::assertHasExactError(
+            $this->getStatusCode(),
+            $this->getContentType(),
+            $this->getContent(),
+            $status,
+            $error,
+            $strict
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert the HTTP status contains the supplied errors.
      *
      * @param int $status
@@ -681,6 +745,28 @@ trait HasHttpAssertions
     public function assertErrors(int $status, array $errors, bool $strict = true): self
     {
         $this->document = HttpAssert::assertErrors(
+            $this->getStatusCode(),
+            $this->getContentType(),
+            $this->getContent(),
+            $status,
+            $errors,
+            $strict
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the HTTP status contains the supplied exact errors.
+     *
+     * @param int $status
+     * @param array $errors
+     * @param bool $strict
+     * @return $this
+     */
+    public function assertExactErrors(int $status, array $errors, bool $strict = true): self
+    {
+        $this->document = HttpAssert::assertExactErrors(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),

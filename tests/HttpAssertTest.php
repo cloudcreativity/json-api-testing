@@ -71,12 +71,17 @@ JSON_API;
 
         $message = new HttpMessage(422, 'application/vnd.api+json', $content);
 
-        $message->assertHasError(422);
-
-        $message->assertHasError(422, [
+        $subset = [
             'status' => '422',
             'source' => ['pointer' => '/data/attributes/bar'],
-        ]);
+        ];
+
+        $exact = $subset;
+        $exact['detail'] = 'The selected bar is invalid.';
+
+        $message->assertHasError(422);
+        $message->assertHasError(422, $subset);
+        $message->assertHasExactError(422, $exact);
 
         $this->willFail(function () use ($message) {
             $message->assertHasError(400);
@@ -87,6 +92,10 @@ JSON_API;
                 'status' => '422',
                 'source' => ['pointer' => '/data/attributes/baz']
             ]);
+        });
+
+        $this->willFail(function () use ($message, $subset) {
+            $message->assertHasExactError(422, $subset);
         });
     }
 

@@ -26,6 +26,16 @@ class AssertErrorsTest extends TestCase
     private $single;
 
     /**
+     * @var array
+     */
+    private $error422;
+
+    /**
+     * @var array
+     */
+    private $error400;
+
+    /**
      * @var Document
      */
     private $multiple;
@@ -38,7 +48,7 @@ class AssertErrorsTest extends TestCase
         parent::setUp();
         $this->single = new Document($document = [
             'errors' => [
-                [
+                $this->error422 = [
                     'title' => 'Invalid',
                     'detail' => 'The title attribute must be a string.',
                     'status' => '422',
@@ -49,7 +59,7 @@ class AssertErrorsTest extends TestCase
             ],
         ]);
 
-        $document['errors'][] = ['title' => 'Bad Request', 'status' => '400'];
+        $document['errors'][] = $this->error400 = ['title' => 'Bad Request', 'status' => '400'];
         $this->multiple = new Document($document);
     }
 
@@ -62,64 +72,124 @@ class AssertErrorsTest extends TestCase
         });
 
         $this->willFail(function () use ($document) {
+            $document->assertExactError($this->error422);
+        });
+
+        $this->willFail(function () use ($document) {
             $document->assertErrors([['status' => '422']]);
+        });
+
+        $this->willFail(function () use ($document) {
+            $document->assertExactErrors([$this->error422]);
         });
 
         $this->willFail(function () use ($document) {
             $document->assertHasError(['status' => '422']);
         });
+
+        $this->willFail(function () use ($document) {
+            $document->assertHasExactError($this->error422);
+        });
     }
 
     public function testOneError(): void
     {
-        $this->single->assertError($error = [
+        $this->single->assertError($subset = [
             'status' => '422',
             'source' => [
                 'pointer' => '/data/attributes/title',
             ],
         ]);
 
-        $this->single->assertErrors([$error]);
+        $incorrect = ['status' => '400'];
 
-        $this->single->assertHasError($error);
+        $this->single->assertError($subset);
+        $this->single->assertExactError($this->error422);
 
-        $this->willFail(function () {
-            $this->single->assertError([
-                'status' => '400',
-            ]);
+        $this->single->assertErrors([$subset]);
+        $this->single->assertExactErrors([$this->error422]);
+
+        $this->single->assertHasError($subset);
+        $this->single->assertHasExactError($this->error422);
+
+        $this->willFail(function () use ($incorrect) {
+            $this->single->assertError($incorrect);
         });
 
-        $this->willFail(function () use ($error) {
-            $this->single->assertErrors([
-                $error,
-                ['status' => '400']
-            ]);
+        $this->willFail(function () use ($subset) {
+            $this->single->assertExactError($subset);
+        });
+
+        $this->willFail(function () use ($subset, $incorrect) {
+            $this->single->assertErrors([$subset, $incorrect]);
+        });
+
+        $this->willFail(function () use ($subset) {
+            $this->single->assertExactErrors([$subset]);
+        });
+
+        $this->willFail(function () use ($incorrect) {
+            $this->single->assertHasError($incorrect);
+        });
+
+        $this->willFail(function () use ($subset) {
+            $this->single->assertHasExactError($subset);
         });
     }
 
     public function testMultipleErrors(): void
     {
+        $other = ['status' => '500'];
+
+        /** Multiple Errors */
         $this->multiple->assertErrors([
             // order is not significant
-            ['status' => '400'],
-            $invalid = ['source' => ['pointer' => '/data/attributes/title']],
+            $subset400 = ['status' => '400'],
+            $subset422 = ['source' => ['pointer' => '/data/attributes/title']],
         ]);
 
-        $this->multiple->assertHasError($invalid);
+        $this->multiple->assertExactErrors([
+            // order is not significant
+            $this->error400,
+            $this->error422
+        ]);
 
-        $this->willFail(function () use ($invalid) {
+        $this->willFail(function () use ($other, $subset400, $subset422) {
+            $this->multiple->assertErrors([
+                $subset400,
+                $subset422,
+                $other,
+            ]);
+        });
+
+        $this->willFail(function () use ($other) {
+            $this->multiple->assertExactErrors([
+                $this->error400,
+                $this->error422,
+                $other
+            ]);
+        });
+
+        /** Has Error */
+        $this->multiple->assertHasError($subset422);
+        $this->multiple->assertHasExactError($this->error400);
+
+        $this->willFail(function () use ($other) {
+            $this->multiple->assertHasError($other);
+        });
+
+        $this->willFail(function () use ($subset422) {
+            $this->multiple->assertHasExactError($subset422);
+        });
+
+        /** Single Error */
+        $this->willFail(function () use ($subset422) {
             // the error is present but it is not the only one.
-            $this->multiple->assertError($invalid);
+            $this->multiple->assertError($subset422);
         });
 
         $this->willFail(function () {
-            $this->multiple->assertHasError(['status' => '500']);
-        });
-
-        $this->willFail(function () {
-            $expected = $this->single['errors'];
-            $expected[2] = ['status' => '500'];
-            $this->multiple->assertErrors($expected);
+            $this->multiple->assertExactError($this->error422);
         });
     }
 }
