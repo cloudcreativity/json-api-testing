@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
-## Unreleased
+## [1.0.0] - 2019-02-27
 
 ### Added
 - [#3](https://github.com/cloudcreativity/json-api-testing/issues/3)
