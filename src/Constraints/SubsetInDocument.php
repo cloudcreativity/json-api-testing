@@ -20,6 +20,7 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
 use PHPUnit\Framework\Constraint\Constraint;
+use SebastianBergmann\Comparator\ComparisonFailure;
 
 /**
  * Class SubsetInDocument
@@ -77,7 +78,7 @@ class SubsetInDocument extends Constraint
             $this->fail(
                 $other,
                 $description,
-                Compare::failure($this->expected, $actual, true)
+                $this->failure($actual)
             );
         }
     }
@@ -110,6 +111,15 @@ class SubsetInDocument extends Constraint
     protected function compare(array $expected, $actual, bool $strict): bool
     {
         return Compare::subset($expected, $actual, $strict);
+    }
+
+    /**
+     * @param $actual
+     * @return ComparisonFailure
+     */
+    protected function failure($actual): ComparisonFailure
+    {
+        return Compare::failure($this->expected, $actual, true);
     }
 
 }

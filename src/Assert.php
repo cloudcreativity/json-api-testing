@@ -560,6 +560,20 @@ class Assert
     }
 
     /**
+     * Assert the document contains a single error that exactly matches the supplied error.
+     *
+     * @param $document
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return void
+     */
+    public static function assertExactError($document, array $error, bool $strict = true, string $message = ''): void
+    {
+        self::assertExactList($document, [$error], '/errors', $strict, $message);
+    }
+
+    /**
      * Assert the document contains the supplied error within its errors member.
      *
      * @param $document
@@ -571,6 +585,25 @@ class Assert
     public static function assertHasError($document, array $error, bool $strict = true, string $message = ''): void
     {
         self::assertListContainsHash($document, $error, '/errors', $strict, $message);
+    }
+
+    /**
+     * Assert the document contains the exact supplied error within its errors member.
+     *
+     * @param $document
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return void
+     */
+    public static function assertHasExactError(
+        $document,
+        array $error,
+        bool $strict = true,
+        string $message = ''
+    ): void
+    {
+        self::assertListContainsExact($document, $error, '/errors', $strict, $message);
     }
 
     /**
@@ -587,5 +620,21 @@ class Assert
     public static function assertErrors($document, array $errors, bool $strict = true, string $message = ''): void
     {
         self::assertList($document, $errors, '/errors', $strict, $message);
+    }
+
+    /**
+     * Assert the document contains the supplied errors.
+     *
+     * This does not assert the order of the errors, as the error order does not have any significance.
+     *
+     * @param $document
+     * @param array $errors
+     * @param bool $strict
+     * @param string $message
+     * @return void
+     */
+    public static function assertExactErrors($document, array $errors, bool $strict = true, string $message = ''): void
+    {
+        self::assertExactList($document, $errors, '/errors', $strict, $message);
     }
 }

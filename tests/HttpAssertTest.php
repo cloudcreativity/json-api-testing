@@ -59,6 +59,52 @@ JSON_API;
 {
     "errors": [
         {
+            "status": "422",
+            "detail": "The selected bar is invalid.",
+            "source": {
+                "pointer": "/data/attributes/bar"
+            }
+        }
+    ]
+}
+JSON_API;
+
+        $message = new HttpMessage(422, 'application/vnd.api+json', $content);
+
+        $subset = [
+            'status' => '422',
+            'source' => ['pointer' => '/data/attributes/bar'],
+        ];
+
+        $exact = $subset;
+        $exact['detail'] = 'The selected bar is invalid.';
+
+        $message->assertHasError(422);
+        $message->assertHasError(422, $subset);
+        $message->assertHasExactError(422, $exact);
+
+        $this->willFail(function () use ($message) {
+            $message->assertHasError(400);
+        });
+
+        $this->willFail(function () use ($message) {
+            $message->assertHasError(422, [
+                'status' => '422',
+                'source' => ['pointer' => '/data/attributes/baz']
+            ]);
+        });
+
+        $this->willFail(function () use ($message, $subset) {
+            $message->assertHasExactError(422, $subset);
+        });
+    }
+
+    public function testHasErrorWithMultipleErrors(): void
+    {
+        $content = <<<JSON_API
+{
+    "errors": [
+        {
             "status": "404",
             "detail": "The related resource does not exist.",
             "source": {
@@ -86,6 +132,57 @@ JSON_API;
                 'status' => '422',
                 'source' => ['pointer' => '/data/attributes/baz']
             ]);
+        });
+    }
+
+    public function testCreatedWithServerId(): void
+    {
+        $content = <<<JSON_API
+{
+    "data": {
+        "type": "posts",
+        "id": "123",
+        "attributes": {
+            "title": "Hello World!",
+            "content": "..."
+        }
+    }
+}
+JSON_API;
+
+        $expected = [
+            'type' => 'posts',
+            'attributes' => [
+                'title' => 'Hello World!',
+                'content' => '...',
+            ],
+        ];
+
+        $message = new HttpMessage(201, 'application/vnd.api+json', $content, [
+            'Location' => 'http://localhost/api/v1/posts/123',
+        ]);
+
+        $message->willSeeResourceType('posts');
+
+        $message->assertCreatedWithServerId(
+            'http://localhost/api/v1/posts',
+            $expected
+        );
+
+        $expected['id'] = '123';
+
+        $message->assertCreatedWithServerId(
+            'http://localhost/api/v1/posts',
+            $expected
+        );
+
+        $expected['id'] = '456';
+
+        $this->willFail(function () use ($message, $expected) {
+            $message->assertCreatedWithServerId(
+                'http://localhost/api/v1/posts',
+                $expected
+            );
         });
     }
 

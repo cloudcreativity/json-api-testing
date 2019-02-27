@@ -582,6 +582,35 @@ class HttpAssert
     }
 
     /**
+     * Assert the document contains an exact single error that matches the supplied error.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertExactError(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $error,
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        $document = self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertNotExists('/data', $message)
+            ->assertExactError($error, $strict, $message);
+
+        return $document;
+    }
+
+    /**
      * Assert the document contains a single error that matches the supplied error and has a status member.
      *
      * @param $status
@@ -619,6 +648,43 @@ class HttpAssert
     }
 
     /**
+     * Assert the document contains an exact single error that matches the supplied error and has a status member.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertExactErrorStatus(
+        $status,
+        $contentType,
+        $content,
+        array $error,
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        $expectedStatus = $error['status'] ?? null;
+
+        if (!$expectedStatus) {
+            throw new \InvalidArgumentException('Expecting error to have a status member.');
+        }
+
+        return self::assertExactError(
+            $status,
+            $contentType,
+            $content,
+            (int) $expectedStatus,
+            $error,
+            $strict,
+            $message
+        );
+    }
+
+    /**
      * Assert the HTTP message contains the supplied error within its errors member.
      *
      * @param $status
@@ -635,17 +701,47 @@ class HttpAssert
         $contentType,
         $content,
         int $expectedStatus,
+        array $error = [],
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        if (empty($error)) {
+            $error = ['status' => (string) $status];
+        }
+
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertHasError($error, $strict, $message);
+    }
+
+    /**
+     * Assert the HTTP message contains the supplied error within its errors member.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $error
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertHasExactError(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
         array $error,
         bool $strict = true,
         string $message = ''
     ): Document
     {
         if (empty($error)) {
-            $error = compact('status');
+            $error = ['status' => (string) $status];
         }
 
         return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
-            ->assertHasError($error, $strict, $message);
+            ->assertHasExactError($error, $strict, $message);
     }
 
     /**
@@ -675,6 +771,32 @@ class HttpAssert
     }
 
     /**
+     * Assert the HTTP status contains the exact supplied errors.
+     *
+     * @param $status
+     * @param $contentType
+     * @param $content
+     * @param int $expectedStatus
+     * @param array $errors
+     * @param bool $strict
+     * @param string $message
+     * @return Document
+     */
+    public static function assertExactErrors(
+        $status,
+        $contentType,
+        $content,
+        int $expectedStatus,
+        array $errors,
+        bool $strict = true,
+        string $message = ''
+    ): Document
+    {
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+            ->assertExactErrors($errors, $strict, $message);
+    }
+
+    /**
      * @param $contentType
      * @param $content
      * @param array $expected
@@ -690,12 +812,17 @@ class HttpAssert
         string $message = ''
     ): Document
     {
-        if (array_key_exists('id', $expected)) {
-            throw new \InvalidArgumentException('Expected resource hash must not have an id.');
+        $id = $expected['id'] ?? null;
+
+        $document = self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message)
+            ->assertHash($expected, '/data', $strict, $message);
+
+        if ($id) {
+            PHPUnitAssert::assertSame($id, $document->get('/data/id'), $message);
+        } else {
+            $document->assertExists('/data/id', $message);
         }
 
-        return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message)
-            ->assertHash($expected, '/data', $strict, $message)
-            ->assertExists('/data/id', $message);
+        return $document;
     }
 }

@@ -19,6 +19,7 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use SebastianBergmann\Comparator\ComparisonFailure;
 
 /**
  * Class IdentifierInDocument
@@ -52,5 +53,14 @@ class IdentifierInDocument extends SubsetInDocument
         }
 
         return Compare::resourceIdentifier($actual);
+    }
+
+    /**
+     * @param $actual
+     * @return ComparisonFailure
+     */
+    protected function failure($actual): ComparisonFailure
+    {
+        return Compare::failure($this->expected, $actual, false);
     }
 }
