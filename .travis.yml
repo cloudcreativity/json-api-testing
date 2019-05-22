@@ -22,20 +22,20 @@ matrix:
     - PHPUNIT_VERSION=^6.5
   - php: 7.2
     env:
-    - LARAVEL_VERSION=5.6.*
-    - PHPUNIT_VERSION=^7.0
-  - php: 7.2
-    env:
-    - LARAVEL_VERSION=5.7.*
+    - LARAVEL_VERSION=5.8.*
     - PHPUNIT_VERSION=^7.0
   - php: 7.3
     env:
     - LARAVEL_VERSION=5.8.*
     - PHPUNIT_VERSION=^7.0
+  - php: 7.3
+    env:
+      - LARAVEL_VERSION=5.8.*
+      - PHPUNIT_VERSION=^8.0
 
 install:
 - composer require "illuminate/support:${LARAVEL_VERSION}" --no-update -n
-- composer require "phpunit/phpunit:${PHPUNIT_VERSION}" --dev --no-update -n
+- composer require "phpunit/phpunit:${PHPUNIT_VERSION}" --no-update -n
 - travis_retry composer install --no-suggest --prefer-dist -n -o
 
 script:

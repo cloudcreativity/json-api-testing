@@ -55,7 +55,6 @@ class ExactInDocument extends Constraint
      */
     public function __construct($expected, string $pointer, bool $strict = true)
     {
-        parent::__construct();
         $this->expected = $expected;
         $this->pointer = $pointer;
         $this->strict = $strict;

@@ -46,7 +46,6 @@ class HttpStatusIs extends Constraint
      */
     public function __construct(int $expected, $content = null)
     {
-        parent::__construct();
         $this->expected = $expected;
         $this->content = $content;
     }
