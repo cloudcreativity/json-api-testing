@@ -56,7 +56,6 @@ class SubsetInDocument extends Constraint
      */
     public function __construct(array $expected, string $pointer, bool $strict = true)
     {
-        parent::__construct();
         $this->expected = $expected;
         $this->pointer = $pointer;
         $this->strict = $strict;
