@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Changed
+- Minimum `illuminate/support` version is now `5.8` (previously `5.5`).
+- Minimum PHPUnit version is now `7.5` (previously `6.0`).
+
 ### Removed
 - Removed the `assertNoContent()` method from the `Concerns\HasHttpAssertions` trait. Unlike other
 assertion methods in that trait, this method refers to a HTTP status description which means it is

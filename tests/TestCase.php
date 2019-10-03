@@ -33,8 +33,9 @@ class TestCase extends BaseTestCase
     /**
      * @param Closure $closure
      * @param string $message
+     * @return void
      */
-    protected function willFail(Closure $closure, $message = '')
+    protected function willFail(Closure $closure, string $message = ''): void
     {
         $didFail = false;
 
