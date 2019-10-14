@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.0.0] - 2019-10-14
+
+### Changed
+- Minimum `illuminate/support` version is now `5.8` (previously `5.5`).
+- Minimum PHPUnit version is now `7.5` (previously `6.0`).
+
+### Removed
+- Removed the `assertNoContent()` method from the `Concerns\HasHttpAssertions` trait. Unlike other
+assertion methods in that trait, this method refers to a HTTP status description which means it is
+likely to collide with assertions provided by frameworks. For example, Laravel `6.1.0` introduced
+an `assertNoContent()` method to its test response which is not compatible with the implementation
+provided by this package.
+
 ## [1.2.0] - 2019-09-04
 
 ### Added

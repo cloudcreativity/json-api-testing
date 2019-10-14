@@ -389,10 +389,12 @@ trait HasHttpAssertions
     public function assertUpdated(array $expected = null, bool $strict = true): self
     {
         if (is_null($expected)) {
-            return $this->assertNoContent();
+            HttpAssert::assertNoContent($this->getStatusCode(), $this->getContent());
+        } else {
+            $this->assertFetchedOne($expected, $strict);
         }
 
-        return $this->assertFetchedOne($expected, $strict);
+        return $this;
     }
 
     /**
@@ -413,10 +415,12 @@ trait HasHttpAssertions
     public function assertDeleted(array $expected = null, bool $strict = true): self
     {
         if (is_null($expected)) {
-            return $this->assertNoContent();
+            HttpAssert::assertNoContent($this->getStatusCode(), $this->getContent());
+        } else {
+            $this->assertMetaWithoutData($expected, $strict);
         }
 
-        return $this->assertMetaWithoutData($expected, $strict);
+        return $this;
     }
 
     /**
@@ -438,18 +442,6 @@ trait HasHttpAssertions
             $this->identifier($expected),
             $strict
         );
-
-        return $this;
-    }
-
-    /**
-     * Assert a no content response.
-     *
-     * @return $this
-     */
-    public function assertNoContent(): self
-    {
-        HttpAssert::assertNoContent($this->getStatusCode(), $this->getContent());
 
         return $this;
     }
