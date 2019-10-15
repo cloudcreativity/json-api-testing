@@ -78,7 +78,7 @@ class HttpAssert
         string $message = ''
     ): Document
     {
-        PHPUnitAssert::assertSame($type, $expected, $message ?: "Expecting content with media type {$expected}.");
+        PHPUnitAssert::assertSame($expected, $type, $message ?: "Expecting content with media type {$expected}.");
         PHPUnitAssert::assertNotEmpty($content, $message ?: 'Expecting HTTP body to have content.');
 
         return Document::cast($content);
