@@ -419,6 +419,8 @@ JSON_API;
         $document->assertExact($expected);
         $document->assertListInOrder($ids);
         $document->assertList($notOrdered);
+        $document->assertListNotEmpty();
+        $document->assertListNotEmptyOrMissing();
 
         $document->assertListContainsResource('posts', '456');
         $document->assertListContainsResource(
@@ -445,6 +447,14 @@ JSON_API;
 
         $this->willFail(function () use ($document) {
             $document->assertListContainsResource('comments', '101');
+        });
+
+        $this->willFail(function () use ($document) {
+            $document->assertListEmpty();
+        });
+
+        $this->willFail(function () use ($document) {
+            $document->assertListEmptyOrMissing();
         });
     }
 }

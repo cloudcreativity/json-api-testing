@@ -110,4 +110,43 @@ class AssertIncludedTest extends TestCase
             $this->document->assertIncluded($unexpected);
         });
     }
+
+    public function testNoneIncluded(): void
+    {
+        $this->willFail(function () {
+            $this->document->assertNoneIncluded();
+        });
+
+
+        $document = new Document([
+            'data' => [
+                'type' => 'posts',
+                'id' => '123',
+                'relationships' => [
+                    'comments' => [
+                        ['type' => 'comments', 'id' => '1'],
+                        ['type' => 'comments', 'id' => '2'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $document->assertNoneIncluded();
+
+        $document = new Document([
+            'data' => [
+                'type' => 'posts',
+                'id' => '123',
+                'relationships' => [
+                    'comments' => [
+                        ['type' => 'comments', 'id' => '1'],
+                        ['type' => 'comments', 'id' => '2'],
+                    ],
+                ],
+            ],
+            'included' => [],
+        ]);
+
+        $document->assertNoneIncluded();
+    }
 }

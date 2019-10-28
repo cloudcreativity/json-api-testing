@@ -17,6 +17,7 @@
 
 namespace CloudCreativity\JsonApi\Testing;
 
+use CloudCreativity\JsonApi\Testing\Constraints\EmptyOrMissingList;
 use CloudCreativity\JsonApi\Testing\Constraints\ExactInDocument;
 use CloudCreativity\JsonApi\Testing\Constraints\ExactInList;
 use CloudCreativity\JsonApi\Testing\Constraints\IdentifierInDocument;
@@ -198,7 +199,11 @@ class Assert
      */
     public static function assertListEmpty($document, string $pointer = '/data', string $message = ''): void
     {
-        self::assertExactList($document, [], $pointer, true, $message);
+        PHPUnitAssert::assertThat(
+            $document,
+            new EmptyOrMissingList($pointer, false),
+            $message
+        );
     }
 
     /**
@@ -211,7 +216,51 @@ class Assert
      */
     public static function assertListNotEmpty($document, string $pointer = '/data', string $message = ''): void
     {
-        self::assertNotExact($document, [], $pointer, true, $message);
+        $constraint = new LogicalNot(
+            new EmptyOrMissingList($pointer, false)
+        );
+
+        PHPUnitAssert::assertThat($document, $constraint, $message);
+    }
+
+    /**
+     * Assert that the member contains an empty list, or the member does not exist.
+     *
+     * @param $document
+     * @param string $pointer
+     * @param string $message
+     */
+    public static function assertListEmptyOrMissing(
+        $document,
+        string $pointer = '/data',
+        string $message = ''
+    ): void
+    {
+        PHPUnitAssert::assertThat(
+            $document,
+            new EmptyOrMissingList($pointer, true),
+            $message
+        );
+    }
+
+    /**
+     * Assert that the member contains an empty list, or the member does not exist.
+     *
+     * @param $document
+     * @param string $pointer
+     * @param string $message
+     */
+    public static function assertListNotEmptyOrMissing(
+        $document,
+        string $pointer = '/data',
+        string $message = ''
+    ): void
+    {
+        $constraint = new LogicalNot(
+            new EmptyOrMissingList($pointer, true)
+        );
+
+        PHPUnitAssert::assertThat($document, $constraint, $message);
     }
 
     /**
@@ -543,6 +592,18 @@ class Assert
     ): void
     {
         self::assertListContainsHash($document, $expected, '/included', $strict, $message);
+    }
+
+    /**
+     * Assert that the included member does not exist or is empty.
+     *
+     * @param $document
+     * @param string $message
+     * @return void
+     */
+    public static function assertNoneIncluded($document, string $message = ''): void
+    {
+        self::assertListEmptyOrMissing($document, '/included', $message);
     }
 
     /**
