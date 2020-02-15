@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 ## Unreleased
 
 ### Added
+- Package now supports Laravel 7.
 - [#9](https://github.com/cloudcreativity/json-api-testing/issues/9)
 Can now assert that there are no resources included - i.e. that the `included` member is not present
 or is an empty list.
