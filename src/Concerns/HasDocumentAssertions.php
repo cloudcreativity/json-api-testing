@@ -187,6 +187,34 @@ trait HasDocumentAssertions
     }
 
     /**
+     * Assert that the member is an empty list or does not exist (is missing).
+     *
+     * @param string $pointer
+     * @param string $message
+     * @return $this
+     */
+    public function assertListEmptyOrMissing(string $pointer = '/data', string $message = ''): self
+    {
+        Assert::assertListEmptyOrMissing($this, $pointer, $message);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the member exists and is not an empty list.
+     *
+     * @param string $pointer
+     * @param string $message
+     * @return $this
+     */
+    public function assertListNotEmptyOrMissing(string $pointer = '/data', string $message = ''): self
+    {
+        Assert::assertListNotEmptyOrMissing($this, $pointer, $message);
+
+        return $this;
+    }
+
+    /**
      * Assert that list in the document only contains the specified hashes.
      *
      * This assertion does not check that the expected and actual lists are in the same order.
@@ -463,6 +491,17 @@ trait HasDocumentAssertions
     public function assertIncludedContainsHash(array $expected, bool $strict = true, string $message = ''): self
     {
         Assert::assertIncludedContainsHash($this, $expected, $strict, $message);
+
+        return $this;
+    }
+
+    /**
+     * @param string $message
+     * @return $this
+     */
+    public function assertNoneIncluded(string $message = ''): self
+    {
+        Assert::assertNoneIncluded($this, $message);
 
         return $this;
     }

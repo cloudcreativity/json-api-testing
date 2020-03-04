@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [2.1.0] - 2020-03-04
+
+### Added
+- Package now supports Laravel 7.
+- [#9](https://github.com/cloudcreativity/json-api-testing/issues/9)
+Can now assert that there are no resources included - i.e. that the `included` member is not present
+or is an empty list.
+
+### Fixed
+- [#10](https://github.com/cloudcreativity/json-api-testing/pull/10)
+Pass expected and actual values to PHPUnit's assertion in correct order.
+
 ## [2.0.0] - 2019-10-14
 
 ### Changed

@@ -10,19 +10,19 @@ matrix:
         - PHPUNIT_VERSION=^7.5
     - php: "7.2"
       env:
-        - LARAVEL_VERSION=5.8.*
-        - PHPUNIT_VERSION=^7.5
+        - LARAVEL_VERSION=^6.0
+        - PHPUNIT_VERSION=^8.0
     - php: "7.2"
+      env:
+        - LARAVEL_VERSION=^7.0
+        - PHPUNIT_VERSION=^8.0
+    - php: "7.3"
       env:
         - LARAVEL_VERSION=^6.0
         - PHPUNIT_VERSION=^8.0
     - php: "7.3"
       env:
-        - LARAVEL_VERSION=5.8.*
-        - PHPUNIT_VERSION=^7.5
-    - php: "7.3"
-      env:
-        - LARAVEL_VERSION=^6.0
+        - LARAVEL_VERSION=^7.0
         - PHPUNIT_VERSION=^8.0
 
 install:

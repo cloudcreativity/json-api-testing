@@ -23,7 +23,7 @@
     "require": {
         "php": "^7.1",
         "ext-json": "*",
-        "illuminate/support": "^5.8|^6.0",
+        "illuminate/support": "^5.8|^6.0|^7.0",
         "phpunit/phpunit": "^7.5|^8.0"
     },
     "autoload": {
