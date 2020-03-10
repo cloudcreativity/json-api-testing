@@ -7,7 +7,7 @@ matrix:
     - php: "7.2"
       env:
         - LARAVEL_VERSION=5.8.*
-        - PHPUNIT_VERSION=^7.5
+        - PHPUNIT_VERSION=^8.0
     - php: "7.2"
       env:
         - LARAVEL_VERSION=^6.0
