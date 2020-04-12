@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [3.0.0] - 2020-04-12
+
+### Added
+- Package now supports PHP Unit 9.
+
+### Changed
+- Dropped support for PHP Unit 7.
+- Dropped support for Laravel 5.
+
 ## [2.1.0] - 2020-03-04
 
 ### Added
