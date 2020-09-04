@@ -23,7 +23,7 @@
     "require": {
         "php": "^7.2",
         "ext-json": "*",
-        "illuminate/support": "^6.0|^7.0",
+        "illuminate/support": "^6.0|^7.0|^8.0",
         "phpunit/phpunit": "^8.0|^9.0"
     },
     "autoload": {
@@ -41,7 +41,7 @@
             "dev-develop": "3.x-dev"
         }
     },
-    "minimum-stability": "stable",
+    "minimum-stability": "dev",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
