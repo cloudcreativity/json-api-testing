@@ -1,5 +1,4 @@
 language: php
-dist: trusty
 sudo: false
 
 matrix:
@@ -21,6 +20,10 @@ matrix:
         - LARAVEL_VERSION=^8.0
         - PHPUNIT_VERSION=^9.0
     - php: "7.4"
+      env:
+        - LARAVEL_VERSION=^8.0
+        - PHPUNIT_VERSION=^9.0
+    - php: "8.0snapshot"
       env:
         - LARAVEL_VERSION=^8.0
         - PHPUNIT_VERSION=^9.0
