@@ -3,9 +3,17 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Changed
+
+- Minimum PHP version is now `7.4`.
+- Minimum Laravel version is now `8.0`.
+- Minimum PHPUnit version is now `9.0`.
+
 ## [3.2.0] - 2020-11-25
 
-###
+### Added
 - Package now supports PHP 8.
 
 ## [3.1.0] - 2020-09-09
