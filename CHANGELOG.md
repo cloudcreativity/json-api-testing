@@ -3,9 +3,29 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [3.3.0] - 2021-07-31
+
+### Changed
+
+- Minimum PHP version is now `7.4`.
+- Minimum Laravel version is now `8.0`.
+- Minimum PHPUnit version is now `9.0`.
+
+### Fixed
+
+- [#19](https://github.com/cloudcreativity/json-api-testing/issues/19) The expected location for the
+  `assertCreatedWithServerId()` and `assertCreatedWithClientId()` can now be `null`, indicating that the `Location`
+  header is not expected.
+
+### Deprecated
+
+- The following methods are deprecated and will be removed in `4.0`:
+  - `assertDeleted()` - use `assertNoContent()` or `assertMetaWithoutData()` depending on your expected response.
+  - `assertUpdated()` - use `assertNoContent()` or `assertFetchedOne()` depending on your expected response.
+
 ## [3.2.0] - 2020-11-25
 
-###
+### Added
 - Package now supports PHP 8.
 
 ## [3.1.0] - 2020-09-09

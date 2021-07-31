@@ -1,18 +1,18 @@
 <?php
-/**
- * Copyright 2019 Cloud Creativity Limited
+/*
+ * Copyright 2021 Cloud Creativity Limited
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ *  Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  */
 
 namespace CloudCreativity\JsonApi\Testing\Concerns;
@@ -309,13 +309,13 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a server generated id.
      *
-     * @param string $expectedLocation
-     *      the expected location without the id.
+     * @param string|null $expectedLocation
+     *      the expected location without the id, or null if no location header is expected.
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertCreatedWithServerId(string $expectedLocation, $expected, bool $strict = true): self
+    public function assertCreatedWithServerId(?string $expectedLocation, $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertCreatedWithServerId(
             $this->getStatusCode(),
@@ -333,12 +333,13 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a client generated id.
      *
-     * @param string $expectedLocation
+     * @param string|null $expectedLocation
+     *      the expected location without the id, or null if no location header is expected.
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertCreatedWithClientId(string $expectedLocation, $expected, bool $strict = true): self
+    public function assertCreatedWithClientId(?string $expectedLocation, $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertCreatedWithClientId(
             $this->getStatusCode(),
@@ -385,6 +386,7 @@ trait HasHttpAssertions
      *      array representation of the expected resource, or null for a no-content response
      * @param bool $strict
      * @return $this
+     * @deprecated 4.0 use not recommended: use `assertNoContent()` or `assertFetchedOne()` instead.
      */
     public function assertUpdated(array $expected = null, bool $strict = true): self
     {
@@ -411,6 +413,7 @@ trait HasHttpAssertions
      *      the expected top-level meta, or null for no content response.
      * @param bool $strict
      * @return $this
+     * @deprecated 4.0 use not recommended: use `assertNoContent() or `assertMetaWithoutData()` instead.
      */
     public function assertDeleted(array $expected = null, bool $strict = true): self
     {
