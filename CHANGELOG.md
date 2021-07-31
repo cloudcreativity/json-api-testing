@@ -17,6 +17,12 @@ All notable changes to this project will be documented in this file. This projec
   `assertCreatedWithServerId()` and `assertCreatedWithClientId()` can now be `null`, indicating that the `Location`
   header is not expected.
 
+### Deprecated
+
+- The following methods are deprecated and will be removed in `4.0`:
+  - `assertDeleted()` - use `assertNoContent()` or `assertMetaWithoutData()` depending on your expected response.
+  - `assertUpdated()` - use `assertNoContent()` or `assertFetchedOne()` depending on your expected response.
+
 ## [3.2.0] - 2020-11-25
 
 ### Added

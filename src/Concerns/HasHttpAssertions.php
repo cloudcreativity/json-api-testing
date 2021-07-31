@@ -386,6 +386,7 @@ trait HasHttpAssertions
      *      array representation of the expected resource, or null for a no-content response
      * @param bool $strict
      * @return $this
+     * @deprecated 4.0 use not recommended: use `assertNoContent()` or `assertFetchedOne()` instead.
      */
     public function assertUpdated(array $expected = null, bool $strict = true): self
     {
@@ -412,6 +413,7 @@ trait HasHttpAssertions
      *      the expected top-level meta, or null for no content response.
      * @param bool $strict
      * @return $this
+     * @deprecated 4.0 use not recommended: use `assertNoContent() or `assertMetaWithoutData()` instead.
      */
     public function assertDeleted(array $expected = null, bool $strict = true): self
     {
