@@ -11,6 +11,12 @@ All notable changes to this project will be documented in this file. This projec
 - Minimum Laravel version is now `8.0`.
 - Minimum PHPUnit version is now `9.0`.
 
+### Fixed
+
+- [#19](https://github.com/cloudcreativity/json-api-testing/issues/19) The expected location for the
+  `assertCreatedWithServerId()` and `assertCreatedWithClientId()` can now be `null`, indicating that the `Location`
+  header is not expected.
+
 ## [3.2.0] - 2020-11-25
 
 ### Added

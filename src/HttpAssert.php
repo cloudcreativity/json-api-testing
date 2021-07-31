@@ -358,8 +358,8 @@ class HttpAssert
      * @param $contentType
      * @param $content
      * @param $location
-     * @param string $expectedLocation
-     *      the expected location without the id.
+     * @param string|null $expectedLocation
+     *      the expected location without the id, or null if none is expected.
      * @param array $expected
      * @param bool $strict
      * @param string $message
@@ -370,7 +370,7 @@ class HttpAssert
         $contentType,
         $content,
         $location,
-        string $expectedLocation,
+        ?string $expectedLocation,
         array $expected,
         bool $strict = true,
         string $message = ''
@@ -381,8 +381,13 @@ class HttpAssert
         $id = $document->get('/data/id');
 
         PHPUnitAssert::assertNotEmpty($id, $message ?: 'Expecting content to contain a resource id.');
-        $expectedLocation = rtrim($expectedLocation, '/') . '/' . $id;
-        PHPUnitAssert::assertSame($expectedLocation, $location, $message ?: 'Unexpected Location header.');
+
+        if (null === $expectedLocation) {
+            PHPUnitAssert::assertNull($location, 'Expecting no location header.');
+        } else {
+            $expectedLocation = rtrim($expectedLocation, '/') . '/' . $id;
+            PHPUnitAssert::assertSame($expectedLocation, $location, $message ?: 'Unexpected Location header.');
+        }
 
         return $document;
     }
@@ -394,7 +399,8 @@ class HttpAssert
      * @param $contentType
      * @param $content
      * @param $location
-     * @param string $expectedLocation
+     * @param string|null $expectedLocation
+     *      the expected location without the id, or null if none is expected.
      * @param array $expected
      * @param bool $strict
      * @param string $message
@@ -405,7 +411,7 @@ class HttpAssert
         $contentType,
         $content,
         $location,
-        string $expectedLocation,
+        ?string $expectedLocation,
         array $expected,
         bool $strict = true,
         string $message = ''
@@ -418,11 +424,16 @@ class HttpAssert
         }
 
         self::assertStatusCode($status, self::STATUS_CREATED, $content, $message);
-        PHPUnitAssert::assertSame(
-            "$expectedLocation/{$expectedId}",
-            $location,
-            $message ?: 'Unexpected Location header.'
-        );
+
+        if (null === $expectedLocation) {
+            PHPUnitAssert::assertNull($location, 'Expecting no location header.');
+        } else {
+            PHPUnitAssert::assertSame(
+                "$expectedLocation/{$expectedId}",
+                $location,
+                $message ?: 'Unexpected Location header.'
+            );
+        }
 
         return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message)
             ->assertHash($expected, '/data', $strict, $message);

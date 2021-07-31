@@ -309,13 +309,13 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a server generated id.
      *
-     * @param string $expectedLocation
-     *      the expected location without the id.
+     * @param string|null $expectedLocation
+     *      the expected location without the id, or null if no location header is expected.
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertCreatedWithServerId(string $expectedLocation, $expected, bool $strict = true): self
+    public function assertCreatedWithServerId(?string $expectedLocation, $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertCreatedWithServerId(
             $this->getStatusCode(),
@@ -333,12 +333,13 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a client generated id.
      *
-     * @param string $expectedLocation
+     * @param string|null $expectedLocation
+     *      the expected location without the id, or null if no location header is expected.
      * @param UrlRoutable|string|int|array $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertCreatedWithClientId(string $expectedLocation, $expected, bool $strict = true): self
+    public function assertCreatedWithClientId(?string $expectedLocation, $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertCreatedWithClientId(
             $this->getStatusCode(),
