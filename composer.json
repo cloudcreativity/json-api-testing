@@ -24,7 +24,7 @@
         "php": "^7.4|^8.0",
         "ext-json": "*",
         "illuminate/support": "^8.0",
-        "phpunit/phpunit": "^9.0"
+        "phpunit/phpunit": "^9.5.10"
     },
     "autoload": {
         "psr-4": {

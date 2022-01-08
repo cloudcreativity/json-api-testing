@@ -21,6 +21,7 @@ use ArrayAccess;
 use CloudCreativity\JsonApi\Testing\Concerns\HasDocumentAssertions;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use JsonSerializable;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
 
@@ -129,7 +130,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toString();
     }
@@ -137,23 +138,24 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
-        return collect($this->document)->offsetExists($offset);
+        return Collection::make($this->document)->offsetExists($offset);
     }
 
     /**
      * @inheritDoc
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
-        return collect($this->document)->offsetGet($offset);
+        return Collection::make($this->document)->offsetGet($offset);
     }
 
     /**
      * @inheritDoc
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         throw new \LogicException('Not implemented.');
     }
@@ -161,7 +163,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         throw new \LogicException('Not implemented.');
     }
@@ -216,7 +218,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * @inheritDoc
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return Compare::sort($this->document);
     }
