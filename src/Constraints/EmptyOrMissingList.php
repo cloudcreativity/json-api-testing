@@ -26,12 +26,12 @@ class EmptyOrMissingList extends Constraint
     /**
      * @var string
      */
-    private $pointer;
+    private string $pointer;
 
     /**
      * @var bool
      */
-    private $missing;
+    private bool $missing;
 
     /**
      * ListEmptyOrMissing constructor.

@@ -15,6 +15,8 @@
  *  limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\JsonApi\Testing\Constraints\EmptyOrMissingList;

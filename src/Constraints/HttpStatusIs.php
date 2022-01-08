@@ -31,10 +31,10 @@ class HttpStatusIs extends Constraint
     /**
      * @var int
      */
-    private $expected;
+    private int $expected;
 
     /**
-     * @var string|null
+     * @var mixed
      */
     private $content;
 
@@ -42,7 +42,7 @@ class HttpStatusIs extends Constraint
      * HttpStatusIs constructor.
      *
      * @param int $expected
-     * @param string|null $content
+     * @param mixed $content
      */
     public function __construct(int $expected, $content = null)
     {

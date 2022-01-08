@@ -15,6 +15,8 @@
  *  limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
@@ -32,17 +34,17 @@ class SubsetInList extends Constraint
     /**
      * @var array
      */
-    protected $expected;
+    protected array $expected;
 
     /**
      * @var string
      */
-    protected $pointer;
+    protected string $pointer;
 
     /**
      * @var bool
      */
-    protected $strict;
+    protected bool $strict;
 
     /**
      * SubsetInList constructor.

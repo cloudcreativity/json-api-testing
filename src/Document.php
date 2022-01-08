@@ -15,6 +15,8 @@
  *  limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace CloudCreativity\JsonApi\Testing;
 
 use ArrayAccess;
@@ -32,13 +34,12 @@ use PHPUnit\Framework\Assert as PHPUnitAssert;
  */
 class Document implements Arrayable, JsonSerializable, ArrayAccess
 {
-
     use HasDocumentAssertions;
 
     /**
      * @var array
      */
-    private $document;
+    private array $document;
 
     /**
      * Safely create a document.

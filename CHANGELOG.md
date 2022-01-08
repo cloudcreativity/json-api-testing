@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changed
 
 - **BREAKING**: added return types to internal methods to remove deprecation messages in PHP 8.1.
+- **BREAKING**: added class property type hints to all classes.
 
 ## [3.3.0] - 2021-07-31
 

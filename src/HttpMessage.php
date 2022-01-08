@@ -15,6 +15,8 @@
  *  limitations under the License.
  */
 
+declare(strict_types=1);
+
 namespace CloudCreativity\JsonApi\Testing;
 
 use ArrayAccess;
@@ -33,22 +35,22 @@ class HttpMessage implements ArrayAccess
     /**
      * @var int
      */
-    protected $status;
+    protected int $status;
 
     /**
      * @var string|null
      */
-    protected $contentType;
+    protected ?string $contentType;
 
     /**
      * @var string|null
      */
-    protected $content;
+    protected ?string $content;
 
     /**
      * @var array
      */
-    protected $headers;
+    protected array $headers;
 
     /**
      * HttpMessage constructor.

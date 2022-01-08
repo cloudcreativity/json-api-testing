@@ -37,12 +37,12 @@ class ExactInDocument extends Constraint
     /**
      * @var string
      */
-    private $pointer;
+    private string $pointer;
 
     /**
      * @var bool
      */
-    private $strict;
+    private bool $strict;
 
     /**
      * ExactInDocument constructor.
