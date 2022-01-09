@@ -17,9 +17,11 @@
 
 declare(strict_types=1);
 
-namespace CloudCreativity\JsonApi\Testing;
+namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
 use Closure;
+use CloudCreativity\JsonApi\Testing\HttpMessage;
+use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use Illuminate\Contracts\Routing\UrlRoutable;
 
 class FetchedOneTest extends TestCase

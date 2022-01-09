@@ -16,7 +16,9 @@
  *  limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Testing;
+namespace CloudCreativity\JsonApi\Testing\Tests;
+
+use CloudCreativity\JsonApi\Testing\Document;
 
 /**
  * Class AssertIncludedTest

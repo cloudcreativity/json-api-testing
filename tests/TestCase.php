@@ -16,7 +16,7 @@
  *  limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Testing;
+namespace CloudCreativity\JsonApi\Testing\Tests;
 
 use Closure;
 use PHPUnit\Framework\AssertionFailedError;

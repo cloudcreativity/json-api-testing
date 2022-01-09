@@ -17,7 +17,10 @@
 
 declare(strict_types=1);
 
-namespace CloudCreativity\JsonApi\Testing;
+namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
+
+use CloudCreativity\JsonApi\Testing\HttpMessage;
+use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 
 class StatusCodeTest extends TestCase
 {

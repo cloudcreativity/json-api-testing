@@ -15,7 +15,10 @@
  *  limitations under the License.
  */
 
-namespace CloudCreativity\JsonApi\Testing;
+namespace CloudCreativity\JsonApi\Testing\Tests;
+
+use CloudCreativity\JsonApi\Testing\HttpAssert;
+use CloudCreativity\JsonApi\Testing\HttpMessage;
 
 class HttpAssertTest extends TestCase
 {
