@@ -124,6 +124,20 @@ class HttpMessage implements ArrayAccess
     }
 
     /**
+     * Return a new instance with a new status code.
+     *
+     * @param int $status
+     * @return HttpMessage
+     */
+    public function withStatusCode(int $status): self
+    {
+        $copy = clone $this;
+        $copy->status = $status;
+
+        return $copy;
+    }
+
+    /**
      * @return string|null
      */
     public function getContentType(): ?string
@@ -132,11 +146,39 @@ class HttpMessage implements ArrayAccess
     }
 
     /**
+     * Return a new instance with the supplied content type.
+     *
+     * @param string|null $contentType
+     * @return HttpMessage
+     */
+    public function withContentType(?string $contentType): self
+    {
+        $copy = clone $this;
+        $copy->contentType = $contentType;
+
+        return $copy;
+    }
+
+    /**
      * @return string|null
      */
     public function getContent(): ?string
     {
         return $this->content;
+    }
+
+    /**
+     * Return a new instance with the supplied content.
+     *
+     * @param string|null $content
+     * @return $this
+     */
+    public function withContent(?string $content): self
+    {
+        $copy = clone $this;
+        $copy->content = $content;
+
+        return $copy;
     }
 
     /**

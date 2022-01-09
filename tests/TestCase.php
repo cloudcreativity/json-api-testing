@@ -34,6 +34,7 @@ class TestCase extends BaseTestCase
      * @param Closure $closure
      * @param string $message
      * @return void
+     * @deprecated use `assertThatItFails`
      */
     protected function willFail(Closure $closure, string $message = ''): void
     {
@@ -46,5 +47,25 @@ class TestCase extends BaseTestCase
         }
 
         $this->assertTrue($didFail, $message ?: 'Expecting test to fail.');
+    }
+
+    /**
+     * @param string $expected
+     * @param Closure $closure
+     * @param string $message
+     * @return void
+     */
+    protected function assertThatItFails(string $expected, Closure $closure, string $message = ''): void
+    {
+        $actual = null;
+
+        try {
+            $closure();
+        } catch (AssertionFailedError $e) {
+            $actual = $e;
+        }
+
+        $this->assertNotNull($actual, $message ?: 'Expecting test to fail.');
+        $this->assertStringContainsString($expected, $actual->getMessage());
     }
 }
