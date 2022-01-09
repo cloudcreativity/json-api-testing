@@ -197,4 +197,26 @@ class HttpMessage implements ArrayAccess
         return $this->headers['Location'] ?? null;
     }
 
+    /**
+     * @return array
+     */
+    public function getHeaders(): array
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Return a new instance with the provided headers.
+     *
+     * @param array $headers
+     * @return $this
+     */
+    public function withHeaders(array $headers): self
+    {
+        $copy = clone $this;
+        $copy->headers = $headers;
+
+        return $copy;
+    }
+
 }

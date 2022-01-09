@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- The `assertCreatedWithServerId`, `assertCreatedWithClientId` and `assertCreatedNoContent` methods will now fail with a
+  better assertion message if the Location header is missing.
+
+### Fixed
+
+- The `assertFetchedManyInOrder` assertion did not work if the expected `data` was an empty array.
+
 ## [3.3.0] - 2021-07-31
 
 ### Changed
