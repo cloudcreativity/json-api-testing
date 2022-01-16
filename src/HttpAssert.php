@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -242,7 +242,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content, $message);
+            return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
@@ -316,7 +316,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content, $message);
+            return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
@@ -344,7 +344,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content, $message);
+            return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
@@ -383,8 +383,9 @@ class HttpAssert
         PHPUnitAssert::assertNotEmpty($id, $message ?: 'Expecting content to contain a resource id.');
 
         if (null === $expectedLocation) {
-            PHPUnitAssert::assertNull($location, 'Expecting no location header.');
+            PHPUnitAssert::assertNull($location, 'Expecting no Location header.');
         } else {
+            PHPUnitAssert::assertNotNull($location, 'Missing Location header.');
             $expectedLocation = rtrim($expectedLocation, '/') . '/' . $id;
             PHPUnitAssert::assertSame($expectedLocation, $location, $message ?: 'Unexpected Location header.');
         }
@@ -426,8 +427,9 @@ class HttpAssert
         self::assertStatusCode($status, self::STATUS_CREATED, $content, $message);
 
         if (null === $expectedLocation) {
-            PHPUnitAssert::assertNull($location, 'Expecting no location header.');
+            PHPUnitAssert::assertNull($location, 'Expecting no Location header.');
         } else {
+            PHPUnitAssert::assertNotNull($location, 'Missing Location header.');
             PHPUnitAssert::assertSame(
                 "$expectedLocation/{$expectedId}",
                 $location,
@@ -456,7 +458,13 @@ class HttpAssert
     ): void
     {
         self::assertStatusCode($status, self::STATUS_NO_CONTENT, null, $message);
-        PHPUnitAssert::assertSame($expectedLocation, $location, $message ?: 'Unexpected Location header.');
+
+        if (null === $expectedLocation) {
+            PHPUnitAssert::assertNull($location, 'Expecting no Location header.');
+        } else {
+            PHPUnitAssert::assertNotNull($location, 'Missing Location header.');
+            PHPUnitAssert::assertSame($expectedLocation, $location, $message ?: 'Unexpected Location header.');
+        }
     }
 
     /**
@@ -529,7 +537,7 @@ class HttpAssert
     ): Document
     {
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
-            ->assertNotExists('/data', $message)
+            ->assertNotExists('/data', $message ?: 'Data member exists.')
             ->assertMeta($expected, $strict, $message);
     }
 
@@ -554,7 +562,7 @@ class HttpAssert
     ): Document
     {
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
-            ->assertNotExists('/data', $message)
+            ->assertNotExists('/data', $message ?: 'Data member exists.')
             ->assertExactMeta($expected, $strict, $message);
     }
 
