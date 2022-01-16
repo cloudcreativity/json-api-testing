@@ -537,7 +537,7 @@ class HttpAssert
     ): Document
     {
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
-            ->assertNotExists('/data', $message)
+            ->assertNotExists('/data', $message ?: 'Data member exists.')
             ->assertMeta($expected, $strict, $message);
     }
 
@@ -562,7 +562,7 @@ class HttpAssert
     ): Document
     {
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
-            ->assertNotExists('/data', $message)
+            ->assertNotExists('/data', $message ?: 'Data member exists.')
             ->assertExactMeta($expected, $strict, $message);
     }
 
