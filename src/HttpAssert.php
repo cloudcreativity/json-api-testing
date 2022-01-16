@@ -316,7 +316,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content, $message);
+            return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
@@ -344,7 +344,7 @@ class HttpAssert
     ): Document
     {
         if (empty($expected)) {
-            return self::assertFetchedNone($strict, $contentType, $content, $message);
+            return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)

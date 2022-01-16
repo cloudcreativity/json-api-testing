@@ -188,9 +188,4 @@ JSON_API;
             );
         });
     }
-
-    public function testOthers()
-    {
-        $this->markTestIncomplete('@todo must add tests for other assertions');
-    }
 }

@@ -76,7 +76,7 @@ class FetchedOneTest extends TestCase
         $this->http->willSeeType($this->resource['type']);
     }
 
-    public function testFetchOneWithUrlRoutable(): void
+    public function testFetchedOneWithUrlRoutable(): void
     {
         $model = $this->createMock(UrlRoutable::class);
         $model->method('getRouteKey')->willReturn((int) $this->resource['id']);
@@ -104,7 +104,7 @@ class FetchedOneTest extends TestCase
         );
     }
 
-    public function testFetchOneWithIntegerAndString(): void
+    public function testFetchedOneWithIntegerAndString(): void
     {
         $this->http->assertFetchedOne($this->resource['id']);
         $this->http->assertFetchedOne((int) $this->resource['id']);

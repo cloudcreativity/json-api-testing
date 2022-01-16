@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file. This projec
 ### Fixed
 
 - The `assertFetchedManyInOrder` assertion did not work if the expected `data` was an empty array.
+- The `assertFetchedToMany` and `assertFetchedToManyInOrder` assertions did not work if the expected `data` was an empty
+  array.
 
 ## [3.3.0] - 2021-07-31
 

@@ -861,4 +861,70 @@ class FetchedManyTest extends TestCase
             );
         }
     }
+
+    public function testFetchedNone(): void
+    {
+        $empty = $this->http->withContent('{"data": []}');
+
+        $empty->assertFetchedNone();
+
+        $this->assertThatItFails(
+            'document has an empty list at [/data]',
+            fn() => $this->http->assertFetchedNone()
+        );
+    }
+
+    public function testInvalidStatusCode(): void
+    {
+        $http = $this->http->withStatusCode(201);
+        $empty = $http->withContent('{"data": []}');
+        $expected = [$this->post1, $this->post2, $this->post3];
+
+        $this->assertThatItFails(
+            'status 201 is 200',
+            fn() => $http->assertFetchedMany($expected)
+        );
+
+        $this->assertThatItFails(
+            'status 201 is 200',
+            fn() => $http->assertFetchedManyExact($expected)
+        );
+
+        $this->assertThatItFails(
+            'status 201 is 200',
+            fn() => $http->assertFetchedManyInOrder($expected)
+        );
+
+        $this->assertThatItFails(
+            'status 201 is 200',
+            fn() => $empty->assertFetchedNone()
+        );
+    }
+
+    public function testInvalidContentType(): void
+    {
+        $http = $this->http->withContentType('application/json');
+        $empty = $http->withContent('{"data": []}');
+        $expected = [$this->post1, $this->post2, $this->post3];
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $http->assertFetchedMany($expected)
+        );
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $http->assertFetchedManyExact($expected)
+        );
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $http->assertFetchedManyInOrder($expected)
+        );
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $empty->assertFetchedNone()
+        );
+    }
 }

@@ -246,9 +246,7 @@ trait HasHttpAssertions
      * If either type or id are null, then it will be asserted that the data member of the content
      * is null.
      *
-     * Prov
-     *
-     * @param UrlRoutable|string|int $id
+     * @param UrlRoutable|array|string|int $id
      * @return $this
      */
     public function assertFetchedToOne($id): self
