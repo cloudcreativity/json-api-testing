@@ -324,4 +324,15 @@ class IncludedTest extends TestCase
             ])
         );
     }
+
+    public function testDoesntHaveIncluded(): void
+    {
+        $none = $this->http->withContent(json_encode(['data' => $this->post]));
+        $none->assertDoesntHaveIncluded();
+
+        $this->assertThatItFails(
+            'Document has included resources',
+            fn() => $this->http->assertDoesntHaveIncluded()
+        );
+    }
 }

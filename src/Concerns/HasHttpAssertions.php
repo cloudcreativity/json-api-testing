@@ -47,14 +47,14 @@ trait HasHttpAssertions
      */
     public function getDocument(): Document
     {
-        if (!$this->document) {
-            $this->document = HttpAssert::assertContent(
-                $this->getContentType(),
-                $this->getContent()
-            );
+        if ($this->document) {
+            return $this->document;
         }
 
-        return $this->document;
+        return $this->document = HttpAssert::assertContent(
+            $this->getContentType(),
+            $this->getContent()
+        );
     }
 
     /**
@@ -499,6 +499,18 @@ trait HasHttpAssertions
             $this->identifiers($expected),
             $strict
         );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the document does not have the top-level included member.
+     *
+     * @return $this
+     */
+    public function assertDoesntHaveIncluded(): self
+    {
+        $this->getDocument()->assertNotExists('included', 'Document has included resources.');
 
         return $this;
     }
