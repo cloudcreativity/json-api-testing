@@ -624,6 +624,18 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert that the document does not have the top-level links member.
+     *
+     * @return $this
+     */
+    public function assertDoesntHaveLinks(): self
+    {
+        $this->getDocument()->assertNotExists('links', 'Document has top-level links.');
+
+        return $this;
+    }
+
+    /**
      * Assert the document contains a single error that matches the supplied error.
      *
      * @param int $status
