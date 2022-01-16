@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,14 +49,14 @@ trait HasHttpAssertions
      */
     public function getDocument(): Document
     {
-        if (!$this->document) {
-            $this->document = HttpAssert::assertContent(
-                $this->getContentType(),
-                $this->getContent()
-            );
+        if ($this->document) {
+            return $this->document;
         }
 
-        return $this->document;
+        return $this->document = HttpAssert::assertContent(
+            $this->getContentType(),
+            $this->getContent()
+        );
     }
 
     /**
@@ -98,10 +98,10 @@ trait HasHttpAssertions
     }
 
     /**
-     * @param $status
+     * @param int $status
      * @return $this
      */
-    public function assertStatusCode($status): self
+    public function assertStatusCode(int $status): self
     {
         HttpAssert::assertStatusCode($this->getStatusCode(), $status, $this->getContent());
 
@@ -248,9 +248,7 @@ trait HasHttpAssertions
      * If either type or id are null, then it will be asserted that the data member of the content
      * is null.
      *
-     * Prov
-     *
-     * @param UrlRoutable|string|int $id
+     * @param UrlRoutable|array|string|int $id
      * @return $this
      */
     public function assertFetchedToOne($id): self
@@ -508,6 +506,18 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert that the document does not have the top-level included member.
+     *
+     * @return $this
+     */
+    public function assertDoesntHaveIncluded(): self
+    {
+        $this->getDocument()->assertNotExists('included', 'Document has included resources.');
+
+        return $this;
+    }
+
+    /**
      * Assert a top-level meta response without data.
      *
      * @param array $expected
@@ -576,6 +586,18 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert that the document does not have the top-level meta member.
+     *
+     * @return $this
+     */
+    public function assertDoesntHaveMeta(): self
+    {
+        $this->getDocument()->assertNotExists('meta', 'Document has top-level meta.');
+
+        return $this;
+    }
+
+    /**
      * Assert that the top-level links match the expected values.
      *
      * @param array $expected
@@ -599,6 +621,18 @@ trait HasHttpAssertions
     public function assertExactLinks(array $expected, bool $strict = true): self
     {
         $this->getDocument()->assertExactLinks($expected, $strict);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the document does not have the top-level links member.
+     *
+     * @return $this
+     */
+    public function assertDoesntHaveLinks(): self
+    {
+        $this->getDocument()->assertNotExists('links', 'Document has top-level links.');
 
         return $this;
     }

@@ -33,7 +33,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "CloudCreativity\\JsonApi\\Testing\\": "tests/"
+            "CloudCreativity\\JsonApi\\Testing\\Tests\\": "tests/"
         }
     },
     "extra": {

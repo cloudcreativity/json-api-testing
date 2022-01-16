@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2021 Cloud Creativity Limited
+ * Copyright 2022 Cloud Creativity Limited
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ namespace CloudCreativity\JsonApi\Testing;
 
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
 /**
@@ -88,12 +89,13 @@ class Compare
             return false;
         }
 
-        $members = collect($value);
+        $members = Collection::make($value);
 
         return $members->has('type') &&
             $members->has('id') &&
             !$members->has('attributes') &&
-            !$members->has('relationships');
+            !$members->has('relationships') &&
+            !$members->has('links');
     }
 
     /**
@@ -211,7 +213,7 @@ class Compare
             return [self::identifier($ids, $type)];
         }
 
-        return collect($ids)->map(function ($id) use ($type) {
+        return Collection::make($ids)->map(function ($id) use ($type) {
             return self::identifier($id, $type);
         })->values()->all();
     }
@@ -240,6 +242,10 @@ class Compare
 
         if (isset($id['id']) && $id['id'] instanceof UrlRoutable) {
             $id['id'] = (string) $id['id']->getRouteKey();
+        }
+
+        if (isset($id['id']) && is_int($id['id'])) {
+            $id['id'] = (string) $id['id'];
         }
 
         if ($type && !array_key_exists('type', $id)) {
