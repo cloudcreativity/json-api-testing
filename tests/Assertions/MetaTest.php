@@ -178,4 +178,16 @@ class MetaTest extends TestCase
             fn() => $this->http->assertExactMeta($invalid)
         );
     }
+
+    public function testDoesntHaveMeta(): void
+    {
+        $none = $this->http->withContent(json_encode(['data' => $this->post]));
+
+        $none->assertDoesntHaveMeta();
+
+        $this->assertThatItFails(
+            'Document has top-level meta.',
+            fn() => $this->http->assertDoesntHaveMeta()
+        );
+    }
 }

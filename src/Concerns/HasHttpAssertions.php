@@ -584,6 +584,18 @@ trait HasHttpAssertions
     }
 
     /**
+     * Assert that the document does not have the top-level meta member.
+     *
+     * @return $this
+     */
+    public function assertDoesntHaveMeta(): self
+    {
+        $this->getDocument()->assertNotExists('meta', 'Document has top-level meta.');
+
+        return $this;
+    }
+
+    /**
      * Assert that the top-level links match the expected values.
      *
      * @param array $expected

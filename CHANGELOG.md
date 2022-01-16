@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file. This projec
 - The `assertCreatedWithServerId`, `assertCreatedWithClientId` and `assertCreatedNoContent` methods will now fail with a
   better assertion message if the Location header is missing.
 - New `assertDoesntHaveIncluded` assertion to assert that the JSON:API document does not have the top-level `included` member.
+- New `assertDoesntHaveMeta` assertion to assert the JSON:API document does not have the top-level `meta` member.
 
 ### Fixed
 
