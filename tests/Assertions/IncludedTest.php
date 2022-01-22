@@ -22,6 +22,7 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Collection;
 
 class IncludedTest extends TestCase
 {
@@ -237,11 +238,13 @@ class IncludedTest extends TestCase
         $invalid->method('getRouteKey')->willReturn(99);
 
         // order is not significant.
-        $this->http->assertIncluded([
+        $this->http->assertIncluded($values = [
             ['type' => 'tags', 'id' => $tag2],
             ['type' => 'users', 'id' => $author],
             ['type' => 'tags', 'id' => $tag1],
         ]);
+
+        $this->http->assertIncluded(Collection::make($values));
 
         $this->assertThatItFails(
             'array at [/included] only contains the subsets',
@@ -269,11 +272,13 @@ class IncludedTest extends TestCase
         $invalid = 99;
 
         // order is not significant.
-        $this->http->assertIncluded([
+        $this->http->assertIncluded($values = [
             ['type' => 'tags', 'id' => $tag2],
             ['type' => 'users', 'id' => $author],
             ['type' => 'tags', 'id' => $tag1],
         ]);
+
+        $this->http->assertIncluded(Collection::make($values));
 
         $this->assertThatItFails(
             'array at [/included] only contains the subsets',
@@ -301,11 +306,13 @@ class IncludedTest extends TestCase
         $invalid = '99';
 
         // order is not significant.
-        $this->http->assertIncluded([
+        $this->http->assertIncluded($values = [
             ['type' => 'tags', 'id' => $tag2],
             ['type' => 'users', 'id' => $author],
             ['type' => 'tags', 'id' => $tag1],
         ]);
+
+        $this->http->assertIncluded(Collection::make($values));
 
         $this->assertThatItFails(
             'array at [/included] only contains the subsets',

@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING**: added class property type hints to all classes.
 - **BREAKING**: the `assertStatusCode` method now expects the status code to be an integer. Previously it allowed
   strings.
+- **BREAKING**: the `assertIncluded` method type-hint for the expected value has changed from `array` to `iterable`.
 
 ### Removed
 

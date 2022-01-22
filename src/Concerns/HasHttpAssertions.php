@@ -436,11 +436,11 @@ trait HasHttpAssertions
      * This does not assert the order of the included member because there is no significance to
      * the order of resources in the included member.
      *
-     * @param array $expected
+     * @param iterable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertIncluded(array $expected, bool $strict = true): self
+    public function assertIncluded(iterable $expected, bool $strict = true): self
     {
         $this->getDocument()->assertIncluded(
             $this->identifiers($expected),
