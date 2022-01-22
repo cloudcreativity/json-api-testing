@@ -19,6 +19,7 @@ namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\JsonApi\Testing\Constraints\HttpStatusIs;
 use CloudCreativity\JsonApi\Testing\Constraints\HttpStatusIsSuccessful;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
 
 /**
@@ -471,8 +472,11 @@ class HttpAssert
             PHPUnitAssert::assertNull($location, 'Expecting no Location header.');
         } else {
             PHPUnitAssert::assertNotNull($location, 'Missing Location header.');
+            $expectedLocationWithId = Str::endsWith($expectedLocation, '/' . $expectedId) ?
+                $expectedLocation :
+                "$expectedLocation/{$expectedId}";
             PHPUnitAssert::assertSame(
-                "$expectedLocation/{$expectedId}",
+                $expectedLocationWithId,
                 $location,
                 $message ?: 'Unexpected Location header.'
             );

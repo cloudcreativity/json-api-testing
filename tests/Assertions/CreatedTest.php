@@ -140,10 +140,20 @@ class CreatedTest extends TestCase
         );
     }
 
+    /**
+     * Expecting the location to work either with or without the client id in it.
+     *
+     * @see https://github.com/cloudcreativity/json-api-testing/issues/14
+     */
     public function testWithClientId(): void
     {
         $this->http->assertCreatedWithClientId(
             'http://localhost/api/v1/posts',
+            $this->resource
+        );
+
+        $this->http->assertCreatedWithClientId(
+            'http://localhost/api/v1/posts/' . $this->resource['id'],
             $this->resource
         );
     }
