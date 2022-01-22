@@ -17,6 +17,12 @@ All notable changes to this project will be documented in this file. This projec
 - **BREAKING**: the `assertStatusCode` method now expects the status code to be an integer. Previously it allowed
   strings.
 
+### Removed
+
+- Removed the following deprecated methods:
+  - `assertDeleted()` - use `assertNoContent()` or `assertMetaWithoutData()` depending on your expected response.
+  - `assertUpdated()` - use `assertNoContent()` or `assertFetchedOne()` depending on your expected response.
+
 ## [3.4.0] - 2022-01-16
 
 ### Added

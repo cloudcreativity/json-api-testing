@@ -372,61 +372,6 @@ trait HasHttpAssertions
     }
 
     /**
-     * Assert response is a JSON API resource updated response.
-     *
-     * For a resource update, we typically expect either:
-     *
-     * - 200 OK with resource content; or
-     * - 204 No Content
-     *
-     * Alternatively a top-level meta only response is acceptable. If this is expected,
-     * it can be asserted using `assertMetaWithoutData`.
-     *
-     * @param array $expected
-     *      array representation of the expected resource, or null for a no-content response
-     * @param bool $strict
-     * @return $this
-     * @deprecated 4.0 use not recommended: use `assertNoContent()` or `assertFetchedOne()` instead.
-     */
-    public function assertUpdated(array $expected = null, bool $strict = true): self
-    {
-        if (is_null($expected)) {
-            HttpAssert::assertNoContent($this->getStatusCode(), $this->getContent());
-        } else {
-            $this->assertFetchedOne($expected, $strict);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Assert response is a JSON API resource deleted response.
-     *
-     * The JSON API spec says that:
-     *
-     * - A server MUST return a 204 No Content status code if a deletion request is successful
-     * and no content is returned.
-     * - A server MUST return a 200 OK status code if a deletion request is successful and the server responds
-     * with only top-level meta data.
-     *
-     * @param array|null $expected
-     *      the expected top-level meta, or null for no content response.
-     * @param bool $strict
-     * @return $this
-     * @deprecated 4.0 use not recommended: use `assertNoContent() or `assertMetaWithoutData()` instead.
-     */
-    public function assertDeleted(array $expected = null, bool $strict = true): self
-    {
-        if (is_null($expected)) {
-            HttpAssert::assertNoContent($this->getStatusCode(), $this->getContent());
-        } else {
-            $this->assertMetaWithoutData($expected, $strict);
-        }
-
-        return $this;
-    }
-
-    /**
      * Assert that an asynchronous process was accepted with a server id.
      *
      * @param string $expectedLocation
