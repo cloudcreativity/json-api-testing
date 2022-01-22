@@ -35,12 +35,12 @@ trait HasHttpAssertions
     /**
      * @var Document|null
      */
-    protected $document;
+    protected ?Document $document = null;
 
     /**
      * @var string|null
      */
-    private $expectedType;
+    private ?string $expectedType = null;
 
     /**
      * Get the JSON API document.
