@@ -69,15 +69,35 @@ class MetaTest extends TestCase
         );
     }
 
-    public function testMetaWithoutData(): void
+    /**
+     * @return array
+     */
+    public function statusCodeProvider(): array
     {
+        return [
+            '200' => [200],
+            '201' => [201],
+            '202' => [202],
+            '299' => [299],
+        ];
+    }
+
+    /**
+     * @param int $status
+     * @return void
+     * @dataProvider statusCodeProvider
+     */
+    public function testMetaWithoutData(int $status): void
+    {
+        $http = $this->http->withStatusCode($status);
+
         $partial = $this->meta;
         unset($partial['baz']);
 
-        $this->http->assertMetaWithoutData($this->meta);
-        $this->http->assertMetaWithoutData($partial);
+        $http->assertMetaWithoutData($this->meta);
+        $http->assertMetaWithoutData($partial);
 
-        $data = $this->http->withContent(json_encode([
+        $data = $http->withContent(json_encode([
             'data' => $this->post,
             'meta' => $this->meta,
         ]));
@@ -88,19 +108,26 @@ class MetaTest extends TestCase
         );
     }
 
-    public function testExactMetaWithoutData(): void
+    /**
+     * @param int $status
+     * @return void
+     * @dataProvider statusCodeProvider
+     */
+    public function testExactMetaWithoutData(int $status): void
     {
+        $http = $this->http->withStatusCode($status);
+
         $partial = $this->meta;
         unset($partial['baz']);
 
-        $this->http->assertExactMetaWithoutData($this->meta);
+        $http->assertExactMetaWithoutData($this->meta);
 
         $this->assertThatItFails(
             'member at [/meta] exactly matches',
-            fn() => $this->http->assertExactMetaWithoutData($partial),
+            fn() => $http->assertExactMetaWithoutData($partial),
         );
 
-        $data = $this->http->withContent(json_encode([
+        $data = $http->withContent(json_encode([
             'data' => $this->post,
             'meta' => $this->meta,
         ]));
@@ -111,17 +138,44 @@ class MetaTest extends TestCase
         );
     }
 
-    public function testInvalidStatusCode(): void
+    /**
+     * @return array
+     */
+    public function invalidStatusCodeProvider(): array
     {
-        $http = $this->http->withStatusCode(201);
+        return [
+            '100' => [100],
+            '199' => [199],
+            // 204 is invalid as the response has content.
+            '204' => [204, 'HTTP status 204 No Content is invalid as there is content'],
+            '300' => [300],
+            '399' => [399],
+            '400' => [400],
+            '499' => [499],
+            '500' => [500],
+            '599' => [599],
+        ];
+    }
+
+    /**
+     * @param int $status
+     * @param string $expected
+     * @return void
+     * @dataProvider invalidStatusCodeProvider
+     */
+    public function testInvalidStatusCode(int $status, string $expected = ''): void
+    {
+        $expected = $expected ?: "HTTP status {$status} is successful";
+
+        $http = $this->http->withStatusCode($status);
 
         $this->assertThatItFails(
-            'status 201 is 200',
+            $expected,
             fn() => $http->assertMetaWithoutData($this->meta)
         );
 
         $this->assertThatItFails(
-            'status 201 is 200',
+            $expected,
             fn() => $http->assertExactMetaWithoutData($this->meta)
         );
     }

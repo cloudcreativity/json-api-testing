@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Added
+
+- [#18](https://github.com/cloudcreativity/json-api-testing/issues/18) The `assertMetaWithoutData` and
+  `assertExactMetaWithoutData` assertions now assert a successful HTTP status code. Previously they were expecting
+  `200 OK` though this is too restrictive for a meta-only response. However, the assertions will continue to fail for
+  `204 No Content` responses because they are expecting the response to have content.
+
 ## [3.4.0] - 2022-01-16
 
 ### Added

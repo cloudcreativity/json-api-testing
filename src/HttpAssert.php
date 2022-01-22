@@ -18,6 +18,7 @@
 namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\JsonApi\Testing\Constraints\HttpStatusIs;
+use CloudCreativity\JsonApi\Testing\Constraints\HttpStatusIsSuccessful;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
 
 /**
@@ -58,6 +59,25 @@ class HttpAssert
         PHPUnitAssert::assertThat(
             $status,
             new HttpStatusIs($expected, $content),
+            $message
+        );
+    }
+
+    /**
+     * Assert that the provided HTTP status is successful.
+     *
+     * The HTTP content must be provided for this assertion, because a 204 No Content status
+     * would not be valid if there is content.
+     *
+     * @param int $status
+     * @param string|null $content
+     * @param string $message
+     */
+    public static function assertStatusIsSuccessful(int $status, ?string $content, string $message = ''): void
+    {
+        PHPUnitAssert::assertThat(
+            $status,
+            new HttpStatusIsSuccessful($content),
             $message
         );
     }
@@ -128,6 +148,27 @@ class HttpAssert
     ): Document
     {
         self::assertStatusCode($status, $expected, $content, $message);
+
+        return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message);
+    }
+
+    /**
+     * Assert a JSON API HTTP message with a successful status.
+     *
+     * @param int $status
+     * @param string $contentType
+     * @param string|null $content
+     * @param string $message
+     * @return Document
+     */
+    public static function assertJsonApiIsSuccessful(
+        int $status,
+        string $contentType,
+        ?string $content,
+        string $message = ''
+    ): Document
+    {
+        self::assertStatusIsSuccessful($status, $content, $message);
 
         return self::assertContent($contentType, $content, self::JSON_API_MEDIA_TYPE, $message);
     }
@@ -536,7 +577,7 @@ class HttpAssert
         string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+        return self::assertJsonApiIsSuccessful($status, $contentType, $content, $message)
             ->assertNotExists('/data', $message ?: 'Data member exists.')
             ->assertMeta($expected, $strict, $message);
     }
@@ -561,7 +602,7 @@ class HttpAssert
         string $message = ''
     ): Document
     {
-        return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
+        return self::assertJsonApiIsSuccessful($status, $contentType, $content, $message)
             ->assertNotExists('/data', $message ?: 'Data member exists.')
             ->assertExactMeta($expected, $strict, $message);
     }
