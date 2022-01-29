@@ -29,26 +29,6 @@ use PHPUnit\Framework\TestCase as BaseTestCase;
  */
 class TestCase extends BaseTestCase
 {
-
-    /**
-     * @param Closure $closure
-     * @param string $message
-     * @return void
-     * @deprecated use `assertThatItFails`
-     */
-    protected function willFail(Closure $closure, string $message = ''): void
-    {
-        $didFail = false;
-
-        try {
-            $closure();
-        } catch (AssertionFailedError $e) {
-            $didFail = true;
-        }
-
-        $this->assertTrue($didFail, $message ?: 'Expecting test to fail.');
-    }
-
     /**
      * @param string $expected
      * @param Closure $closure
