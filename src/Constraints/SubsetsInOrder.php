@@ -21,17 +21,16 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
-use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
-use Illuminate\Support\Collection;
-use JsonSerializable;
+use CloudCreativity\JsonApi\Testing\Utils\JsonStack;
 use PHPUnit\Framework\Constraint\Constraint;
+use SebastianBergmann\Comparator\ComparisonFailure;
 
 /**
- * Class SubsetInList
+ * Class SubsetsInOrder
  *
  * @package CloudCreativity\JsonApi\Testing
  */
-class SubsetInList extends Constraint
+class SubsetsInOrder extends Constraint
 {
 
     /**
@@ -50,17 +49,17 @@ class SubsetInList extends Constraint
     protected bool $strict;
 
     /**
-     * SubsetInList constructor.
+     * SubsetsInOrder constructor.
      *
-     * @param array|JsonSerializable $expected
+     * @param iterable $expected
      *      the expected object
      * @param string $pointer
-     *      the JSON pointer to the array in the JSON API document.
+     *      the JSON pointer to the object in the JSON API document.
      * @param bool $strict
      */
-    public function __construct($expected, string $pointer, bool $strict = true)
+    public function __construct(iterable $expected, string $pointer, bool $strict = true)
     {
-        $this->expected = JsonObject::cast($expected)->toArray();
+        $this->expected = JsonStack::cast($expected)->toArray();
         $this->pointer = $pointer;
         $this->strict = $strict;
     }
@@ -68,17 +67,24 @@ class SubsetInList extends Constraint
     /**
      * @inheritdoc
      */
-    public function matches($other): bool
+    public function evaluate($other, string $description = '', bool $returnResult = false): ?bool
     {
         $actual = Document::cast($other)->get($this->pointer);
+        $result = $this->compare($this->expected, $actual, $this->strict);
 
-        if (!is_array($actual)) {
-            return false;
+        if ($returnResult) {
+            return $result;
         }
 
-        return Collection::make($actual)->contains(function ($item) {
-            return $this->compare($item);
-        });
+        if (!$result) {
+            $this->fail(
+                $other,
+                $description,
+                $this->failure($actual)
+            );
+        }
+
+        return null;
     }
 
     /**
@@ -94,19 +100,30 @@ class SubsetInList extends Constraint
      */
     protected function failureDescription($document): string
     {
-        return "the array at [{$this->pointer}] contains the subset:" . PHP_EOL
+        return "the array at [{$this->pointer}] contains the subsets in order:" . PHP_EOL
             . $this->toString() . PHP_EOL . PHP_EOL
             . "within JSON API document:" . PHP_EOL
             . Document::cast($document);
     }
 
     /**
-     * @param $actual
+     * @param array $expected
+     * @param mixed $actual
+     * @param bool $strict
      * @return bool
      */
-    protected function compare($actual): bool
+    protected function compare(array $expected, $actual, bool $strict): bool
     {
-        return Compare::subset($this->expected, $actual, $this->strict);
+        return Compare::subset($expected, $actual, $strict);
+    }
+
+    /**
+     * @param mixed $actual
+     * @return ComparisonFailure
+     */
+    protected function failure($actual): ComparisonFailure
+    {
+        return Compare::failure($this->expected, $actual, true);
     }
 
 }

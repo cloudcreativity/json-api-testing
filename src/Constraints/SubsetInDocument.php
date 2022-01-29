@@ -21,6 +21,8 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
+use JsonSerializable;
 use PHPUnit\Framework\Constraint\Constraint;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
@@ -50,15 +52,15 @@ class SubsetInDocument extends Constraint
     /**
      * SubsetInDocument constructor.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      *      the expected object
      * @param string $pointer
      *      the JSON pointer to the object in the JSON API document.
      * @param bool $strict
      */
-    public function __construct(array $expected, string $pointer, bool $strict = true)
+    public function __construct($expected, string $pointer, bool $strict = true)
     {
-        $this->expected = $expected;
+        $this->expected = JsonObject::cast($expected)->toArray();
         $this->pointer = $pointer;
         $this->strict = $strict;
     }
@@ -91,7 +93,7 @@ class SubsetInDocument extends Constraint
      */
     public function toString(): string
     {
-        return Document::cast($this->expected)->toString();
+        return Compare::stringify($this->expected);
     }
 
     /**
@@ -107,7 +109,7 @@ class SubsetInDocument extends Constraint
 
     /**
      * @param array $expected
-     * @param $actual
+     * @param mixed $actual
      * @param bool $strict
      * @return bool
      */
@@ -117,7 +119,7 @@ class SubsetInDocument extends Constraint
     }
 
     /**
-     * @param $actual
+     * @param mixed $actual
      * @return ComparisonFailure
      */
     protected function failure($actual): ComparisonFailure

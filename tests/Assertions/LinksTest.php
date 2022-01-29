@@ -20,7 +20,9 @@ declare(strict_types=1);
 namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
 use CloudCreativity\JsonApi\Testing\HttpMessage;
+use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestObject;
 
 class LinksTest extends TestCase
 {
@@ -73,6 +75,7 @@ class LinksTest extends TestCase
         $invalid['related'] = '/api/foo/bar';
 
         $this->http->assertLinks($this->links);
+        $this->http->assertLinks(new TestObject($this->links));
         $this->http->assertLinks($partial);
 
         $this->assertThatItFails(
@@ -90,6 +93,7 @@ class LinksTest extends TestCase
         $invalid['related'] = '/api/foo/bar';
 
         $this->http->assertExactLinks($this->links);
+        $this->http->assertExactLinks(new JsonObject($this->links));
 
         $this->assertThatItFails(
             'member at [/links] exactly matches',

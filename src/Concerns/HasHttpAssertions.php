@@ -19,10 +19,12 @@ declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Concerns;
 
-use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
 use CloudCreativity\JsonApi\Testing\HttpAssert;
+use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
+use CloudCreativity\JsonApi\Testing\Utils\JsonStack;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use JsonSerializable;
 
 /**
  * Trait HasHttpAssertions
@@ -31,16 +33,15 @@ use Illuminate\Contracts\Routing\UrlRoutable;
  */
 trait HasHttpAssertions
 {
-
     /**
      * @var Document|null
      */
     protected ?Document $document = null;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $expectedType = null;
+    private string $expectedType = '';
 
     /**
      * Get the JSON API document.
@@ -64,10 +65,6 @@ trait HasHttpAssertions
      */
     public function getExpectedType(): string
     {
-        if (!$this->expectedType) {
-            throw new \LogicException('An expected resource type must be set.');
-        }
-
         return $this->expectedType;
     }
 
@@ -111,7 +108,7 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was fetched.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param array|JsonSerializable|UrlRoutable|string|int $expected
      *      the expected resource, or a subset of the expected resource.
      * @param bool $strict
      * @return $this
@@ -122,7 +119,7 @@ trait HasHttpAssertions
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $this->identifier($expected),
+            JsonObject::cast($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -132,7 +129,7 @@ trait HasHttpAssertions
     /**
      * Assert that an exact resource was fetched.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param array|JsonSerializable|UrlRoutable|string|int $expected
      *      the expected resource.
      * @param bool $strict
      * @return $this
@@ -143,7 +140,7 @@ trait HasHttpAssertions
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $this->identifier($expected),
+            JsonObject::cast($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -169,17 +166,17 @@ trait HasHttpAssertions
     /**
      * Assert that a resource collection was fetched.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param iterable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertFetchedMany($expected, bool $strict = true): self
+    public function assertFetchedMany(iterable $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertFetchedMany(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $this->identifiers($expected),
+            new JsonStack($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -189,17 +186,17 @@ trait HasHttpAssertions
     /**
      * Assert that an exact resource collection was fetched.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param iterable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertFetchedManyExact($expected, bool $strict = true): self
+    public function assertFetchedManyExact(iterable $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertFetchedExact(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $this->identifiers($expected),
+            new JsonStack($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -209,17 +206,17 @@ trait HasHttpAssertions
     /**
      * Assert that a resource collection was fetched in the expected order.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param iterable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertFetchedManyInOrder($expected, bool $strict = true): self
+    public function assertFetchedManyInOrder(iterable $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertFetchedManyInOrder(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $this->identifiers($expected),
+            new JsonStack($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -245,15 +242,15 @@ trait HasHttpAssertions
     /**
      * Assert that a to-one relationship was fetched.
      *
-     * If either type or id are null, then it will be asserted that the data member of the content
-     * is null.
-     *
-     * @param UrlRoutable|array|string|int $id
+     * @param array|JsonSerializable|UrlRoutable|string|int $expected
      * @return $this
      */
-    public function assertFetchedToOne($id): self
+    public function assertFetchedToOne($expected): self
     {
-        $identifier = $this->identifier($id);
+        $identifier = JsonObject::cast(
+            $expected,
+            $this->getExpectedType()
+        )->toArray();
 
         $this->document = HttpAssert::assertFetchedToOne(
             $this->getStatusCode(),
@@ -269,17 +266,17 @@ trait HasHttpAssertions
     /**
      * Assert that a to-many relationship was fetched.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param iterable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertFetchedToMany($expected, bool $strict = true): self
+    public function assertFetchedToMany(iterable $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertFetchedToMany(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $this->identifiers($expected),
+            new JsonStack($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -289,17 +286,17 @@ trait HasHttpAssertions
     /**
      * Assert that a to-many relationship was fetched in the expected order.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param iterable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertFetchedToManyInOrder($expected, bool $strict = true): self
+    public function assertFetchedToManyInOrder(iterable $expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertFetchedToManyInOrder(
             $this->getStatusCode(),
             $this->getContentType(),
             $this->getContent(),
-            $this->identifiers($expected),
+            new JsonStack($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -311,7 +308,7 @@ trait HasHttpAssertions
      *
      * @param string|null $expectedLocation
      *      the expected location without the id, or null if no location header is expected.
-     * @param UrlRoutable|string|int|array $expected
+     * @param array|JsonSerializable|UrlRoutable|string|int $expected
      * @param bool $strict
      * @return $this
      */
@@ -323,7 +320,7 @@ trait HasHttpAssertions
             $this->getContent(),
             $this->getLocation(),
             $expectedLocation,
-            $this->identifier($expected),
+            JsonObject::cast($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -335,7 +332,7 @@ trait HasHttpAssertions
      *
      * @param string|null $expectedLocation
      *      the expected location without the id, or null if no location header is expected.
-     * @param UrlRoutable|string|int|array $expected
+     * @param array|JsonSerializable|UrlRoutable|string|int $expected
      * @param bool $strict
      * @return $this
      */
@@ -347,7 +344,7 @@ trait HasHttpAssertions
             $this->getContent(),
             $this->getLocation(),
             $expectedLocation,
-            $this->identifier($expected),
+            JsonObject::cast($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -357,7 +354,7 @@ trait HasHttpAssertions
     /**
      * Assert that a resource was created with a no content response.
      *
-     * @param $expectedLocation
+     * @param string $expectedLocation
      * @return $this
      */
     public function assertCreatedNoContent(string $expectedLocation): self
@@ -375,7 +372,7 @@ trait HasHttpAssertions
      * Assert that an asynchronous process was accepted with a server id.
      *
      * @param string $expectedLocation
-     * @param UrlRoutable|string|int|array $expected
+     * @param array|JsonSerializable|UrlRoutable|string|int $expected
      * @param bool $strict
      * @return $this
      */
@@ -387,7 +384,7 @@ trait HasHttpAssertions
             $this->getContent(),
             $this->getContentLocation(),
             $expectedLocation,
-            $this->identifier($expected),
+            JsonObject::cast($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -398,16 +395,14 @@ trait HasHttpAssertions
      * Assert that the expected resource is included in the document.
      *
      * @param string $type
-     * @param UrlRoutable|string|int|null $id
+     * @param UrlRoutable|string|int $id
      * @return $this
      */
     public function assertIsIncluded(string $type, $id): self
     {
-        $identifier = $this->identifier(compact('type', 'id'));
-
         $this->getDocument()->assertIncludedContainsResource(
-            $identifier['type'],
-            $identifier['id']
+            $type,
+            $id,
         );
 
         return $this;
@@ -416,14 +411,14 @@ trait HasHttpAssertions
     /**
      * Assert that the included member contains the supplied resource.
      *
-     * @param UrlRoutable|string|int|array $expected
+     * @param array|JsonSerializable|UrlRoutable|string|int $expected
      * @param bool $strict
      * @return $this
      */
     public function assertIncludes($expected, bool $strict = true): self
     {
         $this->getDocument()->assertIncludedContainsHash(
-            $this->identifier($expected),
+            JsonObject::cast($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -443,7 +438,7 @@ trait HasHttpAssertions
     public function assertIncluded(iterable $expected, bool $strict = true): self
     {
         $this->getDocument()->assertIncluded(
-            $this->identifiers($expected),
+            new JsonStack($expected, $this->getExpectedType()),
             $strict
         );
 
@@ -465,11 +460,11 @@ trait HasHttpAssertions
     /**
      * Assert a top-level meta response without data.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertMetaWithoutData(array $expected, bool $strict = true): self
+    public function assertMetaWithoutData($expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertMetaWithoutData(
             $this->getStatusCode(),
@@ -485,11 +480,11 @@ trait HasHttpAssertions
     /**
      * Assert an exact top-level meta response without data.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertExactMetaWithoutData(array $expected, bool $strict = true): self
+    public function assertExactMetaWithoutData($expected, bool $strict = true): self
     {
         $this->document = HttpAssert::assertExactMetaWithoutData(
             $this->getStatusCode(),
@@ -505,11 +500,11 @@ trait HasHttpAssertions
     /**
      * Assert that the top-level meta matches the expected values.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertMeta(array $expected, bool $strict = true): self
+    public function assertMeta($expected, bool $strict = true): self
     {
         $this->getDocument()->assertMeta($expected, $strict);
 
@@ -519,11 +514,11 @@ trait HasHttpAssertions
     /**
      * Assert that the top-level meta is exactly the expected meta.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertExactMeta(array $expected, bool $strict = true): self
+    public function assertExactMeta($expected, bool $strict = true): self
     {
         $this->getDocument()->assertExactMeta($expected, $strict);
 
@@ -545,11 +540,11 @@ trait HasHttpAssertions
     /**
      * Assert that the top-level links match the expected values.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertLinks(array $expected, bool $strict = true): self
+    public function assertLinks($expected, bool $strict = true): self
     {
         $this->getDocument()->assertLinks($expected, $strict);
 
@@ -559,11 +554,11 @@ trait HasHttpAssertions
     /**
      * Assert that the top-level links are exactly the expected links.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @return $this
      */
-    public function assertExactLinks(array $expected, bool $strict = true): self
+    public function assertExactLinks($expected, bool $strict = true): self
     {
         $this->getDocument()->assertExactLinks($expected, $strict);
 
@@ -586,11 +581,11 @@ trait HasHttpAssertions
      * Assert the document contains a single error that matches the supplied error.
      *
      * @param int $status
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @return $this
      */
-    public function assertError(int $status, array $error = [], bool $strict = true): self
+    public function assertError(int $status, $error = [], bool $strict = true): self
     {
         $this->document = HttpAssert::assertError(
             $this->getStatusCode(),
@@ -608,11 +603,11 @@ trait HasHttpAssertions
      * Assert the document contains a single  error that exactly matches the supplied error.
      *
      * @param int $status
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @return $this
      */
-    public function assertExactError(int $status, array $error, bool $strict = true): self
+    public function assertExactError(int $status, $error, bool $strict = true): self
     {
         $this->document = HttpAssert::assertExactError(
             $this->getStatusCode(),
@@ -629,11 +624,11 @@ trait HasHttpAssertions
     /**
      * Assert the document contains a single error that matches the supplied error and has a status member.
      *
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @return $this
      */
-    public function assertErrorStatus(array $error, bool $strict = true): self
+    public function assertErrorStatus($error, bool $strict = true): self
     {
         $this->document = HttpAssert::assertErrorStatus(
             $this->getStatusCode(),
@@ -649,11 +644,11 @@ trait HasHttpAssertions
     /**
      * Assert the document contains a single error that exactly matches the supplied error and has a status member.
      *
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @return $this
      */
-    public function assertExactErrorStatus(array $error, bool $strict = true): self
+    public function assertExactErrorStatus($error, bool $strict = true): self
     {
         $this->document = HttpAssert::assertExactErrorStatus(
             $this->getStatusCode(),
@@ -670,11 +665,11 @@ trait HasHttpAssertions
      * Assert the HTTP message contains the supplied error within its errors member.
      *
      * @param int $status
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @return $this
      */
-    public function assertHasError(int $status, array $error = [], bool $strict = true): self
+    public function assertHasError(int $status, $error = [], bool $strict = true): self
     {
         $this->document = HttpAssert::assertHasError(
             $this->getStatusCode(),
@@ -692,11 +687,11 @@ trait HasHttpAssertions
      * Assert the HTTP message contains the exact supplied error within its errors member.
      *
      * @param int $status
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @return $this
      */
-    public function assertHasExactError(int $status, array $error, bool $strict = true): self
+    public function assertHasExactError(int $status, $error, bool $strict = true): self
     {
         $this->document = HttpAssert::assertHasExactError(
             $this->getStatusCode(),
@@ -714,11 +709,11 @@ trait HasHttpAssertions
      * Assert the HTTP status contains the supplied errors.
      *
      * @param int $status
-     * @param array $errors
+     * @param iterable $errors
      * @param bool $strict
      * @return $this
      */
-    public function assertErrors(int $status, array $errors, bool $strict = true): self
+    public function assertErrors(int $status, iterable $errors, bool $strict = true): self
     {
         $this->document = HttpAssert::assertErrors(
             $this->getStatusCode(),
@@ -736,11 +731,11 @@ trait HasHttpAssertions
      * Assert the HTTP status contains the supplied exact errors.
      *
      * @param int $status
-     * @param array $errors
+     * @param iterable $errors
      * @param bool $strict
      * @return $this
      */
-    public function assertExactErrors(int $status, array $errors, bool $strict = true): self
+    public function assertExactErrors(int $status, iterable $errors, bool $strict = true): self
     {
         $this->document = HttpAssert::assertExactErrors(
             $this->getStatusCode(),
@@ -752,40 +747,5 @@ trait HasHttpAssertions
         );
 
         return $this;
-    }
-
-    /**
-     * Ensure the value is an array of identifiers.
-     *
-     * @param UrlRoutable|string|int|iterable $ids
-     * @param string|null $type
-     * @return array
-     */
-    protected function identifiers($ids, string $type = null): array
-    {
-        return Compare::identifiers($ids, $type ?: $this->getExpectedType());
-    }
-
-    /**
-     * Ensure the value is a resource identifier.
-     *
-     * @param UrlRoutable|string|int|array $id
-     * @param string|null $type
-     * @return array
-     */
-    protected function identifier($id, string $type = null): array
-    {
-        return Compare::identifier($id, $type ?: $this->getExpectedType());
-    }
-
-    /**
-     * Does the value identify a resource?
-     *
-     * @param $id
-     * @return bool
-     */
-    protected function identifiable($id): bool
-    {
-        return Compare::identifiable($id);
     }
 }

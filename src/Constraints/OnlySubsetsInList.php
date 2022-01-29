@@ -21,6 +21,8 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use CloudCreativity\JsonApi\Testing\Utils\JsonStack;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Constraint\Constraint;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
@@ -50,15 +52,15 @@ class OnlySubsetsInList extends Constraint
     /**
      * OnlySubsetsInList constructor.
      *
-     * @param array $expected
+     * @param iterable $expected
      *      the expected object
      * @param string $pointer
      *      the JSON pointer to the array in the JSON API document.
      * @param bool $strict
      */
-    public function __construct(array $expected, string $pointer, bool $strict = true)
+    public function __construct(iterable $expected, string $pointer, bool $strict = true)
     {
-        $this->expected = $expected;
+        $this->expected = JsonStack::cast($expected)->toArray();
         $this->pointer = $pointer;
         $this->strict = $strict;
     }
@@ -74,15 +76,15 @@ class OnlySubsetsInList extends Constraint
             return false;
         }
 
-        $allValid = collect($other)->every(function ($item) {
+        $allValid = Collection::make($other)->every(function ($item) {
             return $this->expected((array) $item);
         });
 
         if (!$allValid) {
-            return $allValid;
+            return false;
         }
 
-        return collect($this->expected)->every(function ($expected) use ($other) {
+        return Collection::make($this->expected)->every(function ($expected) use ($other) {
             return $this->exists($expected, $other);
         });
     }
@@ -130,7 +132,7 @@ class OnlySubsetsInList extends Constraint
      */
     protected function expected(array $actual): bool
     {
-        return collect($this->expected)->contains(function ($expected) use ($actual) {
+        return Collection::make($this->expected)->contains(function ($expected) use ($actual) {
             return $this->compare($expected, $actual);
         });
     }
@@ -148,7 +150,7 @@ class OnlySubsetsInList extends Constraint
             return false;
         }
 
-        return collect($actual)->contains(function ($item) use ($expected) {
+        return Collection::make($actual)->contains(function ($item) use ($expected) {
             return $this->compare($expected, $item);
         });
     }

@@ -2,17 +2,17 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 declare(strict_types=1);
@@ -22,7 +22,9 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 use Closure;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestObject;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Support\Collection;
 
 class FetchedToOneTest extends TestCase
 {
@@ -55,12 +57,12 @@ class FetchedToOneTest extends TestCase
             json_encode(['data' => $this->identifier]),
             ['Content-Type' => 'application/vnd.api+json', 'Accept' => 'application/vnd.api+json'],
         );
-
-        $this->http->willSeeType($this->identifier['type']);
     }
 
     public function testFetchedToOneWithUrlRoutable(): void
     {
+        $this->http->willSeeType($this->identifier['type']);
+
         $model = $this->createMock(UrlRoutable::class);
         $model->method('getRouteKey')->willReturn((int) $this->identifier['id']);
 
@@ -89,6 +91,8 @@ class FetchedToOneTest extends TestCase
 
     public function testFetchedToOneWithIntegerAndString(): void
     {
+        $this->http->willSeeType($this->identifier['type']);
+
         $this->http->assertFetchedToOne($this->identifier['id']);
         $this->http->assertFetchedToOne((int) $this->identifier['id']);
 
@@ -148,6 +152,32 @@ class FetchedToOneTest extends TestCase
             $this->assertThatItFails(
                 'member at [/data] matches',
                 fn() => $this->http->assertFetchedToOne($value)
+            );
+        }
+    }
+
+    /**
+     * @param bool $expected
+     * @param Closure $provider
+     * @return void
+     * @dataProvider fetchedToOneArrayProvider
+     */
+    public function testFetchedOneWithObject(bool $expected, Closure $provider): void
+    {
+        $value = $provider($this->identifier);
+
+        if ($expected) {
+            $this->http->assertFetchedToOne(new TestObject($value));
+            $this->http->assertFetchedToOne(new Collection($value));
+        } else {
+            $this->assertThatItFails(
+                'member at [/data] matches',
+                fn() => $this->http->assertFetchedToOne(new TestObject($value))
+            );
+
+            $this->assertThatItFails(
+                'member at [/data] matches',
+                fn() => $this->http->assertFetchedToOne(new Collection($value))
             );
         }
     }

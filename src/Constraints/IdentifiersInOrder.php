@@ -21,13 +21,14 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use Illuminate\Support\Collection;
 
 /**
- * Class IdentifiersInDocument
+ * Class IdentifiersInOrder
  *
  * @package CloudCreativity\JsonApi\Testing
  */
-class IdentifiersInDocument extends SubsetInDocument
+class IdentifiersInOrder extends SubsetsInOrder
 {
 
     /**
@@ -35,7 +36,7 @@ class IdentifiersInDocument extends SubsetInDocument
      */
     protected function failureDescription($document): string
     {
-        return "the member at [{$this->pointer}] matches the resource identifiers:" . PHP_EOL
+        return "the array at [{$this->pointer}] contains the resource identifiers in order:" . PHP_EOL
             . $this->toString() . PHP_EOL . PHP_EOL
             . "within JSON API document:" . PHP_EOL
             . Document::cast($document);
@@ -53,7 +54,7 @@ class IdentifiersInDocument extends SubsetInDocument
             return false;
         }
 
-        return collect($actual)->every(function (array $identifier) {
+        return Collection::make($actual)->every(function (array $identifier) {
             return Compare::resourceIdentifier($identifier);
         });
     }

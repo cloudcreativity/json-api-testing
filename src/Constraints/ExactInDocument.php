@@ -21,6 +21,8 @@ namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
+use JsonSerializable;
 use PHPUnit\Framework\Constraint\Constraint;
 
 /**
@@ -32,9 +34,9 @@ class ExactInDocument extends Constraint
 {
 
     /**
-     * @var mixed
+     * @var array|null
      */
-    private $expected;
+    private ?array $expected;
 
     /**
      * @var string
@@ -49,7 +51,7 @@ class ExactInDocument extends Constraint
     /**
      * ExactInDocument constructor.
      *
-     * @param mixed $expected
+     * @param JsonSerializable|array|null $expected
      *      the expected value
      * @param string $pointer
      *      the JSON pointer to the object in the JSON API document.
@@ -57,7 +59,8 @@ class ExactInDocument extends Constraint
      */
     public function __construct($expected, string $pointer, bool $strict = true)
     {
-        $this->expected = $expected;
+        $expected = JsonObject::nullable($expected);
+        $this->expected = $expected ? $expected->toArray() : null;
         $this->pointer = $pointer;
         $this->strict = $strict;
     }

@@ -21,6 +21,8 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestObject;
+use Illuminate\Support\Collection;
 
 class ErrorsTest extends TestCase
 {
@@ -48,6 +50,7 @@ class ErrorsTest extends TestCase
     {
         $http = $this->createError(422, $this->error422);
         $http->assertErrorStatus($this->error422);
+        $http->assertErrorStatus(new TestObject($this->error422));
 
         $partial = $this->error422;
         unset($partial['source']);
@@ -64,7 +67,7 @@ class ErrorsTest extends TestCase
 
         $this->assertThatItFails(
             'status 422 is 400',
-            fn() => $http->assertErrorStatus($this->error400),
+            fn() => $http->assertErrorStatus(new TestObject($this->error400)),
         );
 
         $this->assertThatItFails(
@@ -77,6 +80,7 @@ class ErrorsTest extends TestCase
     {
         $http = $this->createError(422, $this->error422);
         $http->assertExactErrorStatus($this->error422);
+        $http->assertExactErrorStatus(new TestObject($this->error422));
 
         $partial = $this->error422;
         unset($partial['source']);
@@ -96,7 +100,7 @@ class ErrorsTest extends TestCase
 
         $this->assertThatItFails(
             'status 422 is 400',
-            fn() => $http->assertExactErrorStatus($this->error400),
+            fn() => $http->assertExactErrorStatus(new TestObject($this->error400)),
         );
 
         $this->assertThatItFails(
@@ -134,6 +138,7 @@ class ErrorsTest extends TestCase
         $invalid['detail'] = 'Oops! Something went wrong.';
 
         $http->assertErrors(400, $expected);
+        $http->assertErrors(400, new Collection($expected));
         $http->assertErrors(400, [$partial, $this->error422]);
 
         $this->assertThatItFails(
@@ -159,6 +164,7 @@ class ErrorsTest extends TestCase
         $invalid['detail'] = 'Oops! Something went wrong.';
 
         $http->assertExactErrors(400, $expected);
+        $http->assertExactErrors(400, new Collection($expected));
 
         $this->assertThatItFails(
             'list at [/errors] only contains the values',

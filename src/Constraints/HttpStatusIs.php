@@ -81,7 +81,7 @@ class HttpStatusIs extends Constraint
      */
     protected function matches($other): bool
     {
-        if (!is_numeric($other)) {
+        if (!is_string($other) && !is_int($other)) {
             return false;
         }
 

@@ -24,8 +24,11 @@ use CloudCreativity\JsonApi\Testing\Concerns\HasDocumentAssertions;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use JsonException;
 use JsonSerializable;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
+use RuntimeException;
+use function json_decode;
 
 /**
  * Class Document
@@ -44,7 +47,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * Safely create a document.
      *
-     * @param $content
+     * @param Document|iterable|string $content
      * @return Document|null
      */
     public static function create($content): ?self
@@ -59,7 +62,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
     /**
      * Cast a document to an instance of this document class.
      *
-     * @param Document|array|string $document
+     * @param Document|iterable|string $document
      * @return Document
      */
     public static function cast($document): self
@@ -83,24 +86,24 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      */
     public static function fromIterable(iterable $input): self
     {
-        return new self(collect($input)->all());
+        return self::decode(
+            Collection::make($input)->toJson()
+        );
     }
 
     /**
-     * Create a document from a string.
+     * Safely create a document from a string.
      *
      * @param string $json
      * @return Document|null
      */
     public static function fromString(string $json): ?self
     {
-        $document = \json_decode($json, true);
-
-        if (JSON_ERROR_NONE !== \json_last_error() || !\is_array($document)) {
+        try {
+            return self::decode($json);
+        } catch (RuntimeException $ex) {
             return null;
         }
-
-        return new self($document);
     }
 
     /**
@@ -108,14 +111,21 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      *
      * @param string $json
      * @return Document
+     * @throws RuntimeException
      */
     public static function decode(string $json): self
     {
-        if (!$document = self::fromString($json)) {
-            throw new \InvalidArgumentException('Invalid JSON string.');
+        try {
+            $document = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException $ex) {
+            throw new RuntimeException('Failed to decode JSON string.', 0, $ex);
         }
 
-        return $document;
+        if (is_array($document)) {
+            return new self($document);
+        }
+
+        throw new RuntimeException('Expecting JSON to decode to an array.');
     }
 
     /**
@@ -193,7 +203,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      */
     public function has(string ...$pointers): bool
     {
-        $paths = collect($pointers)->map(function ($pointer) {
+        $paths = Collection::make($pointers)->map(function ($pointer) {
             return Compare::path($pointer);
         })->filter()->all();
 
@@ -233,7 +243,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      */
     public function assertExists($pointers, string $message = ''): self
     {
-        $missing = collect((array) $pointers)->reject(function ($pointer) {
+        $missing = Collection::make((array) $pointers)->reject(function ($pointer) {
             return $this->has($pointer);
         })->implode(', ');
 
@@ -251,7 +261,7 @@ class Document implements Arrayable, JsonSerializable, ArrayAccess
      */
     public function assertNotExists($pointers, string $message = ''): self
     {
-        $unexpected = collect((array) $pointers)->filter(function ($pointer) {
+        $unexpected = Collection::make((array) $pointers)->filter(function ($pointer) {
             return $this->has($pointer);
         })->implode(', ');
 

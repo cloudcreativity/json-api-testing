@@ -19,6 +19,7 @@ declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
+use Carbon\Carbon;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -65,14 +66,7 @@ class IncludedTest extends TestCase
     /**
      * @var array
      */
-    private array $author = [
-        'type' => 'users',
-        'id' => '2',
-        'attributes' => [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-        ],
-    ];
+    private array $author;
 
     /**
      * @var array
@@ -107,6 +101,16 @@ class IncludedTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->author = [
+            'type' => 'users',
+            'id' => '2',
+            'attributes' => [
+                'name' => 'John Doe',
+                'email' => 'john@example.com',
+                'registeredAt' => Carbon::yesterday(),
+            ],
+        ];
 
         $document = [
             'data' => $this->post,
@@ -328,6 +332,35 @@ class IncludedTest extends TestCase
                 ['type' => 'users', 'id' => $author],
                 ['type' => 'tags', 'id' => $tag1],
                 ['type' => 'tags', 'id' => $invalid],
+            ])
+        );
+    }
+
+    public function testIncludedWithResources(): void
+    {
+        $this->http->assertIncluded([$this->author, $this->tag1, $this->tag2]);
+
+        // order is not significant
+        $this->http->assertIncluded(new Collection([
+            $this->tag1,
+            $this->author,
+            $this->tag2,
+        ]));
+
+        $this->assertThatItFails(
+            'array at [/included] only contains the subsets',
+            fn() => $this->http->assertIncluded([
+                $this->tag2,
+                $this->author,
+            ])
+        );
+
+        $this->assertThatItFails(
+            'array at [/included] only contains the subsets',
+            fn() => $this->http->assertIncluded([
+                $this->author,
+                $this->tag2,
+                $this->post,
             ])
         );
     }

@@ -19,10 +19,11 @@ declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing;
 
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use SebastianBergmann\Comparator\ComparisonFailure;
+use function array_replace_recursive;
+use function is_array;
 
 /**
  * Class Compare
@@ -35,12 +36,12 @@ class Compare
     /**
      * Does the actual value match the expected value?
      *
-     * @param array $expected
-     * @param $actual
+     * @param array|null $expected
+     * @param mixed $actual
      * @param bool $strict
      * @return bool
      */
-    public static function exact($expected, $actual, bool $strict = true): bool
+    public static function exact(?array $expected, $actual, bool $strict = true): bool
     {
         $expected = self::normalize($expected);
         $actual = self::normalize($actual);
@@ -56,7 +57,7 @@ class Compare
      * Does the expected subset appear within the actual value?
      *
      * @param array $expected
-     * @param $actual
+     * @param mixed $actual
      * @param bool $strict
      * @return bool
      */
@@ -80,7 +81,7 @@ class Compare
      * - attributes
      * - relationships
      *
-     * @param $value
+     * @param mixed $value
      * @return bool
      */
     public static function resourceIdentifier($value): bool
@@ -107,7 +108,7 @@ class Compare
      */
     public static function patch(array $value, array $patch): array
     {
-        return \array_replace_recursive($value, $patch);
+        return array_replace_recursive($value, $patch);
     }
 
     /**
@@ -124,8 +125,8 @@ class Compare
     /**
      * Normalize a value for comparison.
      *
-     * @param $value
-     * @return array
+     * @param mixed $value
+     * @return mixed
      */
     public static function normalize($value)
     {
@@ -144,7 +145,7 @@ class Compare
             ksort($value);
         }
 
-        return collect($value)->map(function ($item) {
+        return Collection::make($value)->map(function ($item) {
             return self::normalize($item);
         })->all();
     }
@@ -161,8 +162,8 @@ class Compare
     }
 
     /**
-     * @param $expected
-     * @param $actual
+     * @param mixed $expected
+     * @param mixed $actual
      * @param bool $subset
      *      whether the expected is meant to be a subset of the actual.
      * @return ComparisonFailure
@@ -197,75 +198,5 @@ class Compare
         }
 
         return str_replace('/', '.', ltrim($pointer, '/'));
-    }
-
-    /**
-     * Ensure the value is an array of identifiers.
-     *
-     * @param UrlRoutable|string|int|iterable $ids
-     * @param string|null $type
-     *      the type to use if $id does not already have a type.
-     * @return array
-     */
-    public static function identifiers($ids, ?string $type): array
-    {
-        if (self::identifiable($ids)) {
-            return [self::identifier($ids, $type)];
-        }
-
-        return Collection::make($ids)->map(function ($id) use ($type) {
-            return self::identifier($id, $type);
-        })->values()->all();
-    }
-
-    /**
-     * Ensure the value is a resource identifier.
-     *
-     * @param UrlRoutable|string|int|array $id
-     * @param string|null $type
-     *      the type to use if $id does not already have a type.
-     * @return array
-     */
-    public static function identifier($id, ?string $type): array
-    {
-        if ($id instanceof UrlRoutable) {
-            $id = (string) $id->getRouteKey();
-        }
-
-        if (is_string($id) || is_int($id)) {
-            return ['type' => $type, 'id' => (string) $id];
-        }
-
-        if (!Compare::hash($id)) {
-            throw new \InvalidArgumentException('Expecting a URL routable, string, integer or array hash.');
-        }
-
-        if (isset($id['id']) && $id['id'] instanceof UrlRoutable) {
-            $id['id'] = (string) $id['id']->getRouteKey();
-        }
-
-        if (isset($id['id']) && is_int($id['id'])) {
-            $id['id'] = (string) $id['id'];
-        }
-
-        if ($type && !array_key_exists('type', $id)) {
-            $id['type'] = $type;
-        }
-
-        return $id;
-    }
-
-    /**
-     * Does the value identify a resource?
-     *
-     * @param $value
-     * @return bool
-     */
-    public static function identifiable($value): bool
-    {
-        return $value instanceof UrlRoutable ||
-            is_string($value) ||
-            is_int($value) ||
-            self::hash($value);
     }
 }

@@ -20,17 +20,15 @@ declare(strict_types=1);
 namespace CloudCreativity\JsonApi\Testing;
 
 use ArrayAccess;
-use CloudCreativity\JsonApi\Testing\Concerns\HasHttpAssertions;
 
 /**
  * Class HttpMessage
  *
  * @package CloudCreativity\JsonApi\Testing
- * @mixin Document
  */
 class HttpMessage implements ArrayAccess
 {
-    use HasHttpAssertions;
+    use Concerns\HasHttpAssertions;
 
     /**
      * @var int
@@ -70,18 +68,6 @@ class HttpMessage implements ArrayAccess
         $this->contentType = $contentType;
         $this->content = $content;
         $this->headers = $headers;
-    }
-
-    /**
-     * @param $name
-     * @param $arguments
-     * @return mixed
-     */
-    public function __call($name, $arguments)
-    {
-        $document = $this->getDocument();
-
-        return $document->{$name}(...$arguments);
     }
 
     /**
@@ -220,5 +206,4 @@ class HttpMessage implements ArrayAccess
 
         return $copy;
     }
-
 }

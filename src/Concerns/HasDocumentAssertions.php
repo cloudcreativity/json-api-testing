@@ -20,6 +20,8 @@ declare(strict_types=1);
 namespace CloudCreativity\JsonApi\Testing\Concerns;
 
 use CloudCreativity\JsonApi\Testing\Assert;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use JsonSerializable;
 
 /**
  * Trait HasDocumentAssertions
@@ -80,7 +82,7 @@ trait HasDocumentAssertions
     /**
      * Assert that the expected value is in the document at the specified path.
      *
-     * @param array|null $expected
+     * @param array|JsonSerializable|null $expected
      *      the expected value.
      * @param string $pointer
      *      the JSON pointer to where the object is expected to exist within the document.
@@ -125,7 +127,7 @@ trait HasDocumentAssertions
     /**
      * Assert that the expected hash is in the document at the specified path.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      *      the expected resource object.
      * @param string $pointer
      *      the JSON pointer to where the object is expected to exist within the document.
@@ -135,7 +137,7 @@ trait HasDocumentAssertions
      * @return $this
      */
     public function assertHash(
-        array $expected,
+        $expected,
         string $pointer = '/data',
         bool $strict = true,
         string $message = ''
@@ -222,14 +224,14 @@ trait HasDocumentAssertions
      * This assertion does not check that the expected and actual lists are in the same order.
      * To assert the order, use `assertListInOrder`.
      *
-     * @param array $expected
+     * @param iterable $expected
      * @param string $pointer
      * @param bool $strict
      * @param string $message
      * @return $this
      */
     public function assertList(
-        array $expected,
+        iterable $expected,
         string $pointer = '/data',
         bool $strict = true,
         string $message = ''
@@ -267,41 +269,20 @@ trait HasDocumentAssertions
     /**
      * Assert that a list in the document contains the hashes in the specified order.
      *
-     * @param array $expected
+     * @param iterable $expected
      * @param string $pointer
      * @param bool $strict
      * @param string $message
      * @return $this
      */
     public function assertListInOrder(
-        array $expected,
+        iterable $expected,
         string $pointer = '/data',
         bool $strict = true,
         string $message = ''
     ): self
     {
         Assert::assertListInOrder($this, $expected, $pointer, $strict, $message);
-
-        return $this;
-    }
-
-    /**
-     * Assert that an array in the document contains the values in the specified order.
-     *
-     * @param array $expected
-     * @param string $pointer
-     * @param bool $strict
-     * @param string $message
-     * @return $this
-     */
-    public function assertExactListInOrder(
-        array $expected,
-        string $pointer = '/data',
-        bool $strict = true,
-        string $message = ''
-    ): self
-    {
-        Assert::assertExactListInOrder($this, $expected, $pointer, $strict, $message);
 
         return $this;
     }
@@ -316,14 +297,14 @@ trait HasDocumentAssertions
      * This assertion does not check that the expected and actual lists are in the same order.
      * To assert the order, use `assertListInOrder`.
      *
-     * @param array $expected
+     * @param iterable $expected
      * @param string $pointer
      * @param bool $strict
      * @param string $message
      * @return $this
      */
     public function assertIdentifiersList(
-        array $expected,
+        iterable $expected,
         string $pointer = '/data',
         bool $strict = true,
         string $message = ''
@@ -341,14 +322,14 @@ trait HasDocumentAssertions
      * list is a resource object. I.e. to pass as an identifier, it must not contain
      * `attributes` and/or `relationships` members.
      *
-     * @param array $expected
+     * @param iterable $expected
      * @param string $pointer
      * @param bool $strict
      * @param string $message
      * @return $this
      */
     public function assertIdentifiersListInOrder(
-        array $expected,
+        iterable $expected,
         string $pointer = '/data',
         bool $strict = true,
         string $message = ''
@@ -455,12 +436,12 @@ trait HasDocumentAssertions
      * This does not assert the order of the included member because there is no significance to
      * the order of resources in the included member.
      *
-     * @param array $expected
+     * @param iterable $expected
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertIncluded(array $expected, bool $strict = true, string $message = ''): self
+    public function assertIncluded(iterable $expected, bool $strict = true, string $message = ''): self
     {
         Assert::assertIncluded($this, $expected, $strict, $message);
 
@@ -471,11 +452,11 @@ trait HasDocumentAssertions
      * Assert that the expected identifier is included in the document.
      *
      * @param string $type
-     * @param string $id
+     * @param UrlRoutable|string|int $id
      * @param string $message
      * @return $this
      */
-    public function assertIncludedContainsResource(string $type, string $id, string $message = ''): self
+    public function assertIncludedContainsResource(string $type, $id, string $message = ''): self
     {
         Assert::assertIncludedContainsResource($this, $type, $id, $message);
 
@@ -485,12 +466,12 @@ trait HasDocumentAssertions
     /**
      * Assert that the included member contains the supplied hash.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertIncludedContainsHash(array $expected, bool $strict = true, string $message = ''): self
+    public function assertIncludedContainsHash($expected, bool $strict = true, string $message = ''): self
     {
         Assert::assertIncludedContainsHash($this, $expected, $strict, $message);
 
@@ -511,12 +492,12 @@ trait HasDocumentAssertions
     /**
      * Assert that the top-level meta matches the expected values.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertMeta(array $expected, bool $strict = true, string $message = ''): self
+    public function assertMeta($expected, bool $strict = true, string $message = ''): self
     {
         Assert::assertHash($this, $expected, '/meta', $strict, $message);
 
@@ -526,12 +507,12 @@ trait HasDocumentAssertions
     /**
      * Assert that the top-level meta is exactly the expected meta.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertExactMeta(array $expected, bool $strict = true, string $message = ''): self
+    public function assertExactMeta($expected, bool $strict = true, string $message = ''): self
     {
         Assert::assertExact($this, $expected, '/meta', $strict, $message);
 
@@ -541,12 +522,12 @@ trait HasDocumentAssertions
     /**
      * Assert that the top-level links match the expected values.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertLinks(array $expected, bool $strict = true, string $message = ''): self
+    public function assertLinks($expected, bool $strict = true, string $message = ''): self
     {
         Assert::assertHash($this, $expected, '/links', $strict, $message);
 
@@ -556,12 +537,12 @@ trait HasDocumentAssertions
     /**
      * Assert that the top-level links are exactly the expected links.
      *
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertExactLinks(array $expected, bool $strict = true, string $message = ''): self
+    public function assertExactLinks($expected, bool $strict = true, string $message = ''): self
     {
         Assert::assertExact($this, $expected, '/links', $strict, $message);
 
@@ -571,12 +552,12 @@ trait HasDocumentAssertions
     /**
      * Assert the document contains a single error that matches the supplied error.
      *
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertError(array $error, bool $strict = true, string $message = ''): self
+    public function assertError($error, bool $strict = true, string $message = ''): self
     {
         Assert::assertError($this, $error, $strict, $message);
 
@@ -586,12 +567,12 @@ trait HasDocumentAssertions
     /**
      * Assert the document contains a single error that exactly matches the supplied error.
      *
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertExactError(array $error, bool $strict = true, string $message = ''): self
+    public function assertExactError($error, bool $strict = true, string $message = ''): self
     {
         Assert::assertExactError($this, $error, $strict, $message);
 
@@ -633,12 +614,12 @@ trait HasDocumentAssertions
      *
      * This does not assert the order of the errors, as the error order does not have any significance.
      *
-     * @param array $errors
+     * @param iterable $errors
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertErrors(array $errors, bool $strict = true, string $message = ''): self
+    public function assertErrors(iterable $errors, bool $strict = true, string $message = ''): self
     {
         Assert::assertErrors($this, $errors, $strict, $message);
 
@@ -650,12 +631,12 @@ trait HasDocumentAssertions
      *
      * This does not assert the order of the errors, as the error order does not have any significance.
      *
-     * @param array $errors
+     * @param iterable $errors
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertExactErrors(array $errors, bool $strict = true, string $message = ''): self
+    public function assertExactErrors(iterable $errors, bool $strict = true, string $message = ''): self
     {
         Assert::assertExactErrors($this, $errors, $strict, $message);
 

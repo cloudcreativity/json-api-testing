@@ -21,7 +21,10 @@ namespace CloudCreativity\JsonApi\Testing;
 
 use CloudCreativity\JsonApi\Testing\Constraints\HttpStatusIs;
 use CloudCreativity\JsonApi\Testing\Constraints\HttpStatusIsSuccessful;
+use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
+use CloudCreativity\JsonApi\Testing\Utils\JsonStack;
 use Illuminate\Support\Str;
+use JsonSerializable;
 use PHPUnit\Framework\Assert as PHPUnitAssert;
 
 /**
@@ -46,16 +49,16 @@ class HttpAssert
      * the HTTP status does not match. This is useful for understanding why the status
      * is not the expected status when an error has occurred.
      *
-     * @param $status
+     * @param string|int $status
      * @param int $expected
-     * @param mixed|null $content
+     * @param string|null $content
      * @param string $message
      * @return void
      */
     public static function assertStatusCode(
         $status,
         int $expected,
-        $content = null,
+        string $content = null,
         string $message = ''
     ): void
     {
@@ -72,11 +75,11 @@ class HttpAssert
      * The HTTP content must be provided for this assertion, because a 204 No Content status
      * would not be valid if there is content.
      *
-     * @param int $status
+     * @param string|int $status
      * @param string|null $content
      * @param string $message
      */
-    public static function assertStatusIsSuccessful(int $status, ?string $content, string $message = ''): void
+    public static function assertStatusIsSuccessful($status, ?string $content, string $message = ''): void
     {
         PHPUnitAssert::assertThat(
             $status,
@@ -88,20 +91,20 @@ class HttpAssert
     /**
      * Assert that there is content with the expected media type.
      *
-     * @param $type
-     * @param $content
+     * @param string|null $contentType
+     * @param string|null $content
      * @param string $expected
      * @param string $message
      * @return Document
      */
     public static function assertContent(
-        $type,
-        $content,
-        $expected = self::JSON_API_MEDIA_TYPE,
+        ?string $contentType,
+        ?string $content,
+        string $expected = self::JSON_API_MEDIA_TYPE,
         string $message = ''
     ): Document
     {
-        PHPUnitAssert::assertSame($expected, $type, $message ?: "Expecting content with media type {$expected}.");
+        PHPUnitAssert::assertSame($expected, $contentType, $message ?: "Expecting content with media type {$expected}.");
         PHPUnitAssert::assertNotEmpty($content, $message ?: 'Expecting HTTP body to have content.');
 
         return Document::cast($content);
@@ -110,9 +113,9 @@ class HttpAssert
     /**
      * Assert a JSON HTTP message with an expected status.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expected
      *      the expected HTTP status.
      * @param string $message
@@ -120,8 +123,8 @@ class HttpAssert
      */
     public static function assertJson(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expected = self::STATUS_OK,
         string $message = ''
     ): Document
@@ -134,9 +137,9 @@ class HttpAssert
     /**
      * Assert a JSON API HTTP message with an expected status.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expected
      *      the expected HTTP status.
      * @param string $message
@@ -144,8 +147,8 @@ class HttpAssert
      */
     public static function assertJsonApi(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expected = self::STATUS_OK,
         string $message = ''
     ): Document
@@ -159,14 +162,14 @@ class HttpAssert
      * Assert a JSON API HTTP message with a successful status.
      *
      * @param int $status
-     * @param string $contentType
+     * @param string|null $contentType
      * @param string|null $content
      * @param string $message
      * @return Document
      */
     public static function assertJsonApiIsSuccessful(
         int $status,
-        string $contentType,
+        ?string $contentType,
         ?string $content,
         string $message = ''
     ): Document
@@ -179,10 +182,10 @@ class HttpAssert
     /**
      * Assert that a resource was fetched.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param array|JsonSerializable $expected
      *      the expected resource, or a subset of the expected resource.
      * @param bool $strict
      * @param string $message
@@ -190,9 +193,9 @@ class HttpAssert
      */
     public static function assertFetchedOne(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        $expected,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -204,10 +207,10 @@ class HttpAssert
     /**
      * Assert that an exact resource or resource collection was fetched.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param array|JsonSerializable $expected
      *      the expected content of the document's data member.
      * @param bool $strict
      * @param string $message
@@ -215,9 +218,9 @@ class HttpAssert
      */
     public static function assertFetchedExact(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        $expected,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -229,13 +232,18 @@ class HttpAssert
     /**
      * Assert that the fetched data is null.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param string $message
      * @return Document
      */
-    public static function assertFetchedNull($status, $contentType, $content, string $message = ''): Document
+    public static function assertFetchedNull(
+        $status,
+        ?string $contentType,
+        ?string $content,
+        string $message = ''
+    ): Document
     {
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
             ->assertNull('/data', $message);
@@ -244,19 +252,19 @@ class HttpAssert
     /**
      * Assert that a resource collection was fetched.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param iterable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertFetchedMany(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        iterable $expected,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -268,24 +276,26 @@ class HttpAssert
     /**
      * Assert that a resource collection was fetched in the expected order.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param iterable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertFetchedManyInOrder(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        iterable $expected,
         bool $strict = true,
         string $message = ''
     ): Document
     {
-        if (empty($expected)) {
+        $expected = JsonStack::cast($expected);
+
+        if ($expected->isEmpty()) {
             return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
@@ -296,13 +306,18 @@ class HttpAssert
     /**
      * Assert that an empty resource collection was fetched.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param string $message
      * @return Document
      */
-    public static function assertFetchedNone($status, $contentType, $content, string $message = ''): Document
+    public static function assertFetchedNone(
+        $status,
+        ?string $contentType,
+        ?string $content,
+        string $message = ''
+    ): Document
     {
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
             ->assertListEmpty('/data', $message);
@@ -311,30 +326,23 @@ class HttpAssert
     /**
      * Assert that a to-one relationship was fetched.
      *
-     * If either type or id are null, then it will be asserted that the data member of the content
-     * is null.
-     *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param string|null $type
-     * @param string|null $id
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param string $type
+     * @param string $id
      * @param string $message
      * @return Document
      */
     public static function assertFetchedToOne(
         $status,
-        $contentType,
-        $content,
-        ?string $type,
-        string $id = null,
+        ?string $contentType,
+        ?string $content,
+        string $type,
+        string $id,
         string $message = ''
     ): Document
     {
-        if (is_null($type) || is_null($id)) {
-            return self::assertFetchedNull($status, $contentType, $content, $message);
-        }
-
         return self::assertJsonApi($status, $contentType, $content, self::STATUS_OK, $message)
             ->assertIdentifier($type, $id, '/data', $message);
     }
@@ -342,24 +350,26 @@ class HttpAssert
     /**
      * Assert that a to-many relationship was fetched.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param iterable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertFetchedToMany(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        iterable $expected,
         bool $strict = true,
         string $message = ''
     ): Document
     {
-        if (empty($expected)) {
+        $expected = JsonStack::cast($expected);
+
+        if ($expected->isEmpty()) {
             return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
@@ -370,9 +380,9 @@ class HttpAssert
     /**
      * Assert that a to-many relationship was fetched in the expected order.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param array $expected
      * @param bool $strict
      * @param string $message
@@ -380,14 +390,16 @@ class HttpAssert
      */
     public static function assertFetchedToManyInOrder(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        iterable $expected,
         bool $strict = true,
         string $message = ''
     ): Document
     {
-        if (empty($expected)) {
+        $expected = JsonStack::cast($expected);
+
+        if ($expected->isEmpty()) {
             return self::assertFetchedNone($status, $contentType, $content, $message);
         }
 
@@ -398,24 +410,24 @@ class HttpAssert
     /**
      * Assert that a resource was created with a server generated id.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param $location
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param string|null $location
      * @param string|null $expectedLocation
      *      the expected location without the id, or null if none is expected.
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertCreatedWithServerId(
         $status,
-        $contentType,
-        $content,
-        $location,
+        ?string $contentType,
+        ?string $content,
+        ?string $location,
         ?string $expectedLocation,
-        array $expected,
+        $expected,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -440,28 +452,29 @@ class HttpAssert
     /**
      * Assert that a resource was created with a client generated id.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param $location
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param string|null $location
      * @param string|null $expectedLocation
      *      the expected location without the id, or null if none is expected.
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertCreatedWithClientId(
         $status,
-        $contentType,
-        $content,
-        $location,
+        ?string $contentType,
+        ?string $content,
+        ?string $location,
         ?string $expectedLocation,
-        array $expected,
+        $expected,
         bool $strict = true,
         string $message = ''
     ): Document
     {
+        $expected = JsonObject::cast($expected);
         $expectedId = $expected['id'] ?? null;
 
         if (!$expectedId) {
@@ -491,16 +504,16 @@ class HttpAssert
     /**
      * Assert that a resource was created with a no content response.
      *
-     * @param $status
-     * @param $location
-     * @param $expectedLocation
+     * @param string|int $status
+     * @param string|null $location
+     * @param string|null $expectedLocation
      * @param string $message = ''
      * @return void
      */
     public static function assertCreatedNoContent(
         $status,
-        $location,
-        $expectedLocation,
+        ?string $location,
+        ?string $expectedLocation,
         string $message = ''
     ): void
     {
@@ -517,23 +530,23 @@ class HttpAssert
     /**
      * Assert that an asynchronous process was accepted with a server id.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param $contentLocation
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param string|null $contentLocation
      * @param string $expectedLocation
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertAcceptedWithId(
         $status,
-        $contentType,
-        $content,
-        $contentLocation,
+        ?string $contentType,
+        ?string $content,
+        ?string $contentLocation,
         string $expectedLocation,
-        array $expected,
+        $expected,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -552,8 +565,8 @@ class HttpAssert
     /**
      * Assert a no content response.
      *
-     * @param $status
-     * @param string|null
+     * @param string|int $status
+     * @param string|null $content
      * @param string $message
      * @return void
      */
@@ -566,19 +579,19 @@ class HttpAssert
     /**
      * Assert a top-level meta response without data.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertMetaWithoutData(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        $expected,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -591,19 +604,19 @@ class HttpAssert
     /**
      * Assert an exact top-level meta response without data.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertExactMetaWithoutData(
         $status,
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        $expected,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -616,21 +629,21 @@ class HttpAssert
     /**
      * Assert the document contains a single error that matches the supplied error.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expectedStatus
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertError(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expectedStatus,
-        array $error = [],
+        $error = [],
         bool $strict = true,
         string $message = ''
     ): Document
@@ -638,7 +651,9 @@ class HttpAssert
         $document = self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
             ->assertNotExists('/data', $message);
 
-        if ($error) {
+        $error = JsonObject::cast($error);
+
+        if ($error->isNotEmpty()) {
             $document->assertError($error, $strict, $message);
         } else {
             $document->assertExists('/error', $message);
@@ -650,52 +665,51 @@ class HttpAssert
     /**
      * Assert the document contains an exact single error that matches the supplied error.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expectedStatus
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertExactError(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expectedStatus,
-        array $error,
+        $error,
         bool $strict = true,
         string $message = ''
     ): Document
     {
-        $document = self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
+        return self::assertJsonApi($status, $contentType, $content, $expectedStatus, $message)
             ->assertNotExists('/data', $message)
             ->assertExactError($error, $strict, $message);
-
-        return $document;
     }
 
     /**
      * Assert the document contains a single error that matches the supplied error and has a status member.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $error
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertErrorStatus(
         $status,
-        $contentType,
-        $content,
-        array $error = [],
+        ?string $contentType,
+        ?string $content,
+        $error = [],
         bool $strict = true,
         string $message = ''
     ): Document
     {
+        $error = JsonObject::cast($error);
         $expectedStatus = $error['status'] ?? null;
 
         if (!$expectedStatus) {
@@ -716,23 +730,24 @@ class HttpAssert
     /**
      * Assert the document contains an exact single error that matches the supplied error and has a status member.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
-     * @param array $error
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertExactErrorStatus(
         $status,
-        $contentType,
-        $content,
-        array $error,
+        ?string $contentType,
+        ?string $content,
+        $error,
         bool $strict = true,
         string $message = ''
     ): Document
     {
+        $error = JsonObject::cast($error);
         $expectedStatus = $error['status'] ?? null;
 
         if (!$expectedStatus) {
@@ -753,26 +768,28 @@ class HttpAssert
     /**
      * Assert the HTTP message contains the supplied error within its errors member.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int  $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expectedStatus
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertHasError(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expectedStatus,
-        array $error = [],
+        $error = [],
         bool $strict = true,
         string $message = ''
     ): Document
     {
-        if (empty($error)) {
+        $error = JsonObject::cast($error);
+
+        if ($error->isEmpty()) {
             $error = ['status' => (string) $status];
         }
 
@@ -783,26 +800,28 @@ class HttpAssert
     /**
      * Assert the HTTP message contains the supplied error within its errors member.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expectedStatus
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertHasExactError(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expectedStatus,
-        array $error,
+        $error,
         bool $strict = true,
         string $message = ''
     ): Document
     {
-        if (empty($error)) {
+        $error = JsonObject::cast($error);
+
+        if ($error->isEmpty()) {
             $error = ['status' => (string) $status];
         }
 
@@ -813,21 +832,21 @@ class HttpAssert
     /**
      * Assert the HTTP status contains the supplied errors.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expectedStatus
-     * @param array $errors
+     * @param iterable $errors
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertErrors(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expectedStatus,
-        array $errors,
+        iterable $errors,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -839,21 +858,21 @@ class HttpAssert
     /**
      * Assert the HTTP status contains the exact supplied errors.
      *
-     * @param $status
-     * @param $contentType
-     * @param $content
+     * @param string|int $status
+     * @param string|null $contentType
+     * @param string|null $content
      * @param int $expectedStatus
-     * @param array $errors
+     * @param iterable $errors
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     public static function assertExactErrors(
         $status,
-        $contentType,
-        $content,
+        ?string $contentType,
+        ?string $content,
         int $expectedStatus,
-        array $errors,
+        iterable $errors,
         bool $strict = true,
         string $message = ''
     ): Document
@@ -863,17 +882,17 @@ class HttpAssert
     }
 
     /**
-     * @param $contentType
-     * @param $content
-     * @param array $expected
+     * @param string|null $contentType
+     * @param string|null $content
+     * @param array|JsonSerializable $expected
      * @param bool $strict
      * @param string $message
      * @return Document
      */
     private static function assertServerGeneratedId(
-        $contentType,
-        $content,
-        array $expected,
+        ?string $contentType,
+        ?string $content,
+        $expected,
         bool $strict,
         string $message = ''
     ): Document
