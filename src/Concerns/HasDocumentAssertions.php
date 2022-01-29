@@ -582,12 +582,12 @@ trait HasDocumentAssertions
     /**
      * Assert the document contains the supplied error within its errors member.
      *
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertHasError(array $error, bool $strict = true, string $message = ''): self
+    public function assertHasError($error, bool $strict = true, string $message = ''): self
     {
         Assert::assertHasError($this, $error, $strict, $message);
 
@@ -597,12 +597,12 @@ trait HasDocumentAssertions
     /**
      * Assert the document contains the exact supplied error within its errors member.
      *
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return $this
      */
-    public function assertHasExactError(array $error, bool $strict = true, string $message = ''): self
+    public function assertHasExactError($error, bool $strict = true, string $message = ''): self
     {
         Assert::assertHasExactError($this, $error, $strict, $message);
 

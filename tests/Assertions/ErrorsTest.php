@@ -109,7 +109,7 @@ class ErrorsTest extends TestCase
         );
     }
 
-    public function testErrorInvalidContentType(): void
+    public function testErrorStatusInvalidContentType(): void
     {
         $http = $this
             ->createError(400, $this->error400)
@@ -123,6 +123,86 @@ class ErrorsTest extends TestCase
         $this->assertThatItFails(
             'media type',
             fn() => $http->assertExactErrorStatus($this->error400),
+        );
+    }
+
+    public function testError(): void
+    {
+        $http = $this->createError(400, $this->error422);
+        $http->assertError(400, $this->error422);
+        $http->assertError(400, new TestObject($this->error422));
+
+        $partial = $this->error422;
+        unset($partial['source']);
+
+        $invalid = $this->error422;
+        $invalid['detail'] = 'Something went wrong.';
+
+        $http->assertError(400, $partial);
+
+        $this->assertThatItFails(
+            'status 422 is 400',
+            fn() => $http->withStatusCode(422)->assertError(400, $this->error422),
+        );
+
+        $this->assertThatItFails(
+            'status 400 is 422',
+            fn() => $http->assertError(422, new TestObject($this->error400)),
+        );
+
+        $this->assertThatItFails(
+            'array at [/errors] only contains the subsets',
+            fn() => $http->assertError(400, $invalid),
+        );
+    }
+
+    public function testExactError(): void
+    {
+        $http = $this->createError(400, $this->error422);
+        $http->assertExactError(400, $this->error422);
+        $http->assertExactError(400, new TestObject($this->error422));
+
+        $partial = $this->error422;
+        unset($partial['source']);
+
+        $invalid = $this->error422;
+        $invalid['detail'] = 'Something went wrong.';
+
+        $this->assertThatItFails(
+            'list at [/errors] only contains the values',
+            fn() => $http->assertExactError(400, $partial),
+        );
+
+        $this->assertThatItFails(
+            'status 422 is 400',
+            fn() => $http->withStatusCode(422)->assertExactError(400, $this->error422),
+        );
+
+        $this->assertThatItFails(
+            'status 400 is 422',
+            fn() => $http->assertExactError(422, new TestObject($this->error400)),
+        );
+
+        $this->assertThatItFails(
+            'list at [/errors] only contains the values',
+            fn() => $http->assertExactError(400, $invalid),
+        );
+    }
+
+    public function testErrorInvalidContentType(): void
+    {
+        $http = $this
+            ->createError(400, $this->error422)
+            ->withContentType('application/json');
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $http->assertError(400, $this->error422),
+        );
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $http->assertExactError(400, $this->error422),
         );
     }
 
@@ -198,6 +278,79 @@ class ErrorsTest extends TestCase
         $this->assertThatItFails(
             'media type',
             fn() => $http->assertExactErrors(400, $expected),
+        );
+    }
+
+    public function testHasError(): void
+    {
+        $http = $this->createErrors();
+
+        $http->assertHasError(400, $this->error422);
+        $http->assertHasError(400, new TestObject($this->error400));
+
+        $partial = $this->error422;
+        unset($partial['detail']);
+
+        $http->assertHasError(400, $partial);
+
+        $invalid = $this->error422;
+        $invalid['detail'] = 'Blah!';
+
+        $this->assertThatItFails(
+            'the array at [/errors] contains the subset',
+            fn() => $http->assertHasError(400, $invalid),
+        );
+
+        $this->assertThatItFails(
+            '422 is 400',
+            fn() => $http->withStatusCode(422)->assertHasError(400, $this->error400),
+        );
+    }
+
+    public function testHasExactError(): void
+    {
+        $http = $this->createErrors();
+
+        $http->assertHasExactError(400, $this->error422);
+        $http->assertHasExactError(400, new TestObject($this->error400));
+
+        $partial = $this->error422;
+        unset($partial['detail']);
+
+
+        $this->assertThatItFails(
+            'the list at [/errors] contains the values',
+            fn() => $http->assertHasExactError(400, $partial),
+        );
+
+        $invalid = $this->error422;
+        $invalid['detail'] = 'Blah!';
+
+        $this->assertThatItFails(
+            'the list at [/errors] contains the values',
+            fn() => $http->assertHasExactError(400, $invalid),
+        );
+
+        $this->assertThatItFails(
+            '422 is 400',
+            fn() => $http->withStatusCode(422)->assertHasExactError(400, $this->error400),
+        );
+    }
+
+    public function testHasErrorInvalidContentType(): void
+    {
+        $http = $this
+            ->createErrors()
+            ->withContentType('application/json');
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $http->assertHasError(400, $this->error400),
+        );
+
+        $this->assertThatItFails(
+            'media type',
+            fn() => $http->assertHasExactError(400, $this->error422),
         );
     }
 

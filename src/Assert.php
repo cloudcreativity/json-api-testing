@@ -511,7 +511,7 @@ class Assert
      *
      * @param Document|iterable|string $document
      *      the JSON:API document.
-     * @param array $expected
+     * @param array|JsonSerializable $expected
      * @param string $pointer
      * @param bool $strict
      * @param string $message
@@ -519,7 +519,7 @@ class Assert
      */
     public static function assertListContainsExact(
         $document,
-        array $expected,
+        $expected,
         string $pointer = '/data',
         bool $strict = true,
         string $message = ''
@@ -643,12 +643,12 @@ class Assert
      *
      * @param Document|iterable|string $document
      *      the JSON:API document.
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return void
      */
-    public static function assertHasError($document, array $error, bool $strict = true, string $message = ''): void
+    public static function assertHasError($document, $error, bool $strict = true, string $message = ''): void
     {
         self::assertListContainsHash($document, $error, '/errors', $strict, $message);
     }
@@ -658,14 +658,14 @@ class Assert
      *
      * @param Document|iterable|string $document
      *      the JSON:API document.
-     * @param array $error
+     * @param array|JsonSerializable $error
      * @param bool $strict
      * @param string $message
      * @return void
      */
     public static function assertHasExactError(
         $document,
-        array $error,
+        $error,
         bool $strict = true,
         string $message = ''
     ): void
