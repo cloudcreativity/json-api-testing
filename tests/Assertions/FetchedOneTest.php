@@ -23,8 +23,8 @@ use Carbon\Carbon;
 use Closure;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use CloudCreativity\JsonApi\Testing\Tests\TestObject;
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Collection;
 
 class FetchedOneTest extends TestCase
@@ -83,8 +83,7 @@ class FetchedOneTest extends TestCase
     {
         $this->http->willSeeType($this->resource['type']);
 
-        $model = $this->createMock(UrlRoutable::class);
-        $model->method('getRouteKey')->willReturn((int) $this->resource['id']);
+        $model = new TestModel((int) $this->resource['id']);
 
         $this->http->assertFetchedOne($model);
         $this->http->assertFetchedOne([
@@ -92,8 +91,7 @@ class FetchedOneTest extends TestCase
             'id' => $model,
         ]);
 
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn($this->resource['id'] + 1);
+        $invalid = new TestModel($this->resource['id'] + 1);
 
         $this->assertThatItFails(
             'member at [/data] matches',
@@ -300,8 +298,7 @@ class FetchedOneTest extends TestCase
     {
         $this->http->willSeeType($this->resource['type']);
 
-        $model = $this->createMock(UrlRoutable::class);
-        $model->method('getRouteKey')->willReturn((int) $this->resource['id']);
+        $model = new TestModel((int) $this->resource['id']);
 
         $this->assertThatItFails(
             'member at [/data] exactly matches',

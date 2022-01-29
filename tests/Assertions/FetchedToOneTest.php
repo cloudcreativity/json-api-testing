@@ -22,8 +22,8 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 use Closure;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use CloudCreativity\JsonApi\Testing\Tests\TestObject;
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Support\Collection;
 
 class FetchedToOneTest extends TestCase
@@ -63,8 +63,7 @@ class FetchedToOneTest extends TestCase
     {
         $this->http->willSeeType($this->identifier['type']);
 
-        $model = $this->createMock(UrlRoutable::class);
-        $model->method('getRouteKey')->willReturn((int) $this->identifier['id']);
+        $model = new TestModel((int) $this->identifier['id']);
 
         $this->http->assertFetchedToOne($model);
         $this->http->assertFetchedToOne([
@@ -72,8 +71,7 @@ class FetchedToOneTest extends TestCase
             'id' => $model,
         ]);
 
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn($this->identifier['id'] + 1);
+        $invalid = new TestModel($this->identifier['id'] + 1);
 
         $this->assertThatItFails(
             'member at [/data] matches',

@@ -22,6 +22,7 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 use Carbon\Carbon;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use CloudCreativity\JsonApi\Testing\Tests\TestObject;
 
 class CreatedTest extends TestCase
@@ -161,6 +162,43 @@ class CreatedTest extends TestCase
         $this->http->assertCreatedWithClientId(
             'http://localhost/api/v1/posts/' . $this->resource['id'],
             new TestObject($this->resource),
+        );
+    }
+
+    public function testWithClientIdWithUrlRoutable(): void
+    {
+        $this->http->willSeeType($this->resource['type']);
+
+        $model = new TestModel($this->resource['id']);
+
+        $this->http->assertCreatedWithClientId(
+            'http://localhost/api/v1/posts',
+            $model,
+        );
+    }
+
+    public function testWithClientIdWithString(): void
+    {
+        $this->http->willSeeType($this->resource['type']);
+
+        $this->http->assertCreatedWithClientId(
+            'http://localhost/api/v1/posts',
+            $this->resource['id'],
+        );
+    }
+
+    public function testWithClientIdWithInteger(): void
+    {
+        $this->resource['id'] = '123';
+
+        $http = $this->http
+            ->withContent(json_encode(['data' => $this->resource]))
+            ->withHeader('Location', 'http://localhost/api/v1/posts/123')
+            ->willSeeType($this->resource['type']);
+
+        $http->assertCreatedWithClientId(
+            'http://localhost/api/v1/posts/123',
+            123,
         );
     }
 

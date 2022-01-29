@@ -22,7 +22,7 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 use Carbon\Carbon;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use Illuminate\Support\Collection;
 
 class IncludedTest extends TestCase
@@ -174,8 +174,7 @@ class IncludedTest extends TestCase
      */
     public function testIsIncludedWithUrlRoutable(bool $expected, string $type, string $id): void
     {
-        $model = $this->createMock(UrlRoutable::class);
-        $model->method('getRouteKey')->willReturn((int) $id);
+        $model = new TestModel((int) $id);
 
         if ($expected) {
             $this->http->assertIsIncluded($type, $model);
@@ -229,17 +228,10 @@ class IncludedTest extends TestCase
 
     public function testIncludedWithUrlRoutables(): void
     {
-        $author = $this->createMock(UrlRoutable::class);
-        $author->method('getRouteKey')->willReturn((int) $this->author['id']);
-
-        $tag1 = $this->createMock(UrlRoutable::class);
-        $tag1->method('getRouteKey')->willReturn((int) $this->tag1['id']);
-
-        $tag2 = $this->createMock(UrlRoutable::class);
-        $tag2->method('getRouteKey')->willReturn((int) $this->tag2['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn(99);
+        $author = new TestModel((int) $this->author['id']);
+        $tag1 = new TestModel((int) $this->tag1['id']);
+        $tag2 = new TestModel((int) $this->tag2['id']);
+        $invalid = new TestModel(99);
 
         // order is not significant.
         $this->http->assertIncluded($values = [

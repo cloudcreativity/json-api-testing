@@ -22,8 +22,7 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 use Closure;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
-use CloudCreativity\JsonApi\Testing\Tests\TestObject;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use Illuminate\Support\Collection;
 
 class FetchedToManyTest extends TestCase
@@ -77,17 +76,10 @@ class FetchedToManyTest extends TestCase
     {
         $this->http->willSeeType($this->post1['type']);
 
-        $model1 = $this->createMock(UrlRoutable::class);
-        $model1->method('getRouteKey')->willReturn((int) $this->post1['id']);
-
-        $model2 = $this->createMock(UrlRoutable::class);
-        $model2->method('getRouteKey')->willReturn((int) $this->post2['id']);
-
-        $model3 = $this->createMock(UrlRoutable::class);
-        $model3->method('getRouteKey')->willReturn((int) $this->post3['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn((int) ($this->post3['id'] + 1));
+        $model1 = new TestModel((int) $this->post1['id']);
+        $model2 = new TestModel((int) $this->post2['id']);
+        $model3 = new TestModel((int) $this->post3['id']);
+        $invalid = new TestModel((int) ($this->post3['id'] + 1));
 
         $models = [$model2, $model1, $model3]; // order is not asserted.
 
@@ -268,17 +260,10 @@ class FetchedToManyTest extends TestCase
     {
         $this->http->willSeeType($this->post1['type']);
 
-        $model1 = $this->createMock(UrlRoutable::class);
-        $model1->method('getRouteKey')->willReturn((int) $this->post1['id']);
-
-        $model2 = $this->createMock(UrlRoutable::class);
-        $model2->method('getRouteKey')->willReturn((int) $this->post2['id']);
-
-        $model3 = $this->createMock(UrlRoutable::class);
-        $model3->method('getRouteKey')->willReturn((int) $this->post3['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn((int) ($this->post3['id'] + 1));
+        $model1 = new TestModel((int) $this->post1['id']);
+        $model2 = new TestModel((int) $this->post2['id']);
+        $model3 = new TestModel((int) $this->post3['id']);
+        $invalid = new TestModel((int) ($this->post3['id'] + 1));
 
         $models = [$model1, $model2, $model3];
 

@@ -206,4 +206,19 @@ class HttpMessage implements ArrayAccess
 
         return $copy;
     }
+
+    /**
+     * Return a new instance with the provided header.
+     *
+     * @param string $name
+     * @param string $value
+     * @return $this
+     */
+    public function withHeader(string $name, string $value): self
+    {
+        $copy = clone $this;
+        $copy->headers[$name] = $value;
+
+        return $copy;
+    }
 }
