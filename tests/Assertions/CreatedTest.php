@@ -2,25 +2,28 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
+use Carbon\Carbon;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
+use CloudCreativity\JsonApi\Testing\Tests\TestObject;
 
 class CreatedTest extends TestCase
 {
@@ -48,6 +51,7 @@ class CreatedTest extends TestCase
             'attributes' => [
                 'title' => 'Hello World!',
                 'content' => '...',
+                'publishedAt' => Carbon::yesterday(),
             ],
             'relationships' => [
                 'tags' => [
@@ -74,8 +78,6 @@ class CreatedTest extends TestCase
                 'Location' => $this->resource['links']['self'],
             ],
         );
-
-        $this->http->willSeeType($this->resource['type']);
     }
 
     public function testWithServerId(): void
@@ -83,6 +85,11 @@ class CreatedTest extends TestCase
         $this->http->assertCreatedWithServerId(
             'http://localhost/api/v1/posts',
             $this->dataForServerId()
+        );
+
+        $this->http->assertCreatedWithServerId(
+            'http://localhost/api/v1/posts',
+            new TestObject($this->dataForServerId())
         );
     }
 
@@ -149,12 +156,49 @@ class CreatedTest extends TestCase
     {
         $this->http->assertCreatedWithClientId(
             'http://localhost/api/v1/posts',
-            $this->resource
+            $this->resource,
         );
 
         $this->http->assertCreatedWithClientId(
             'http://localhost/api/v1/posts/' . $this->resource['id'],
-            $this->resource
+            new TestObject($this->resource),
+        );
+    }
+
+    public function testWithClientIdWithUrlRoutable(): void
+    {
+        $this->http->willSeeType($this->resource['type']);
+
+        $model = new TestModel($this->resource['id']);
+
+        $this->http->assertCreatedWithClientId(
+            'http://localhost/api/v1/posts',
+            $model,
+        );
+    }
+
+    public function testWithClientIdWithString(): void
+    {
+        $this->http->willSeeType($this->resource['type']);
+
+        $this->http->assertCreatedWithClientId(
+            'http://localhost/api/v1/posts',
+            $this->resource['id'],
+        );
+    }
+
+    public function testWithClientIdWithInteger(): void
+    {
+        $this->resource['id'] = '123';
+
+        $http = $this->http
+            ->withContent(json_encode(['data' => $this->resource]))
+            ->withHeader('Location', 'http://localhost/api/v1/posts/123')
+            ->willSeeType($this->resource['type']);
+
+        $http->assertCreatedWithClientId(
+            'http://localhost/api/v1/posts/123',
+            123,
         );
     }
 

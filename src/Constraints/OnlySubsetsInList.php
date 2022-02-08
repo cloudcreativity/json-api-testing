@@ -2,23 +2,27 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use CloudCreativity\JsonApi\Testing\Utils\JsonStack;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Constraint\Constraint;
 use SebastianBergmann\Comparator\ComparisonFailure;
 
@@ -33,30 +37,30 @@ class OnlySubsetsInList extends Constraint
     /**
      * @var array
      */
-    protected $expected;
+    protected array $expected;
 
     /**
      * @var string
      */
-    protected $pointer;
+    protected string $pointer;
 
     /**
      * @var bool
      */
-    protected $strict;
+    protected bool $strict;
 
     /**
      * OnlySubsetsInList constructor.
      *
-     * @param array $expected
+     * @param iterable $expected
      *      the expected object
      * @param string $pointer
      *      the JSON pointer to the array in the JSON API document.
      * @param bool $strict
      */
-    public function __construct(array $expected, string $pointer, bool $strict = true)
+    public function __construct(iterable $expected, string $pointer, bool $strict = true)
     {
-        $this->expected = $expected;
+        $this->expected = JsonStack::cast($expected)->toArray();
         $this->pointer = $pointer;
         $this->strict = $strict;
     }
@@ -72,15 +76,15 @@ class OnlySubsetsInList extends Constraint
             return false;
         }
 
-        $allValid = collect($other)->every(function ($item) {
+        $allValid = Collection::make($other)->every(function ($item) {
             return $this->expected((array) $item);
         });
 
         if (!$allValid) {
-            return $allValid;
+            return false;
         }
 
-        return collect($this->expected)->every(function ($expected) use ($other) {
+        return Collection::make($this->expected)->every(function ($expected) use ($other) {
             return $this->exists($expected, $other);
         });
     }
@@ -128,7 +132,7 @@ class OnlySubsetsInList extends Constraint
      */
     protected function expected(array $actual): bool
     {
-        return collect($this->expected)->contains(function ($expected) use ($actual) {
+        return Collection::make($this->expected)->contains(function ($expected) use ($actual) {
             return $this->compare($expected, $actual);
         });
     }
@@ -146,7 +150,7 @@ class OnlySubsetsInList extends Constraint
             return false;
         }
 
-        return collect($actual)->contains(function ($item) use ($expected) {
+        return Collection::make($actual)->contains(function ($item) use ($expected) {
             return $this->compare($expected, $item);
         });
     }

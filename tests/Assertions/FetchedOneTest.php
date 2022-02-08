@@ -2,27 +2,30 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
+use Carbon\Carbon;
 use Closure;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
+use CloudCreativity\JsonApi\Testing\Tests\TestObject;
+use Illuminate\Support\Collection;
 
 class FetchedOneTest extends TestCase
 {
@@ -50,6 +53,8 @@ class FetchedOneTest extends TestCase
             'attributes' => [
                 'title' => 'Hello World!',
                 'content' => '...',
+                'rating' => 4.0,
+                'publishedAt' => Carbon::yesterday(),
             ],
             'relationships' => [
                 'tags' => [
@@ -72,14 +77,13 @@ class FetchedOneTest extends TestCase
             json_encode(['data' => $this->resource]),
             ['Content-Type' => 'application/vnd.api+json', 'Accept' => 'application/vnd.api+json'],
         );
-
-        $this->http->willSeeType($this->resource['type']);
     }
 
     public function testFetchedOneWithUrlRoutable(): void
     {
-        $model = $this->createMock(UrlRoutable::class);
-        $model->method('getRouteKey')->willReturn((int) $this->resource['id']);
+        $this->http->willSeeType($this->resource['type']);
+
+        $model = new TestModel((int) $this->resource['id']);
 
         $this->http->assertFetchedOne($model);
         $this->http->assertFetchedOne([
@@ -87,8 +91,7 @@ class FetchedOneTest extends TestCase
             'id' => $model,
         ]);
 
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn($this->resource['id'] + 1);
+        $invalid = new TestModel($this->resource['id'] + 1);
 
         $this->assertThatItFails(
             'member at [/data] matches',
@@ -106,6 +109,8 @@ class FetchedOneTest extends TestCase
 
     public function testFetchedOneWithIntegerAndString(): void
     {
+        $this->http->willSeeType($this->resource['type']);
+
         $this->http->assertFetchedOne($this->resource['id']);
         $this->http->assertFetchedOne((int) $this->resource['id']);
 
@@ -263,10 +268,37 @@ class FetchedOneTest extends TestCase
         }
     }
 
+    /**
+     * @param bool $expected
+     * @param Closure $provider
+     * @return void
+     * @dataProvider fetchedOneArrayProvider
+     */
+    public function testFetchedOneWithObject(bool $expected, Closure $provider): void
+    {
+        $value = $provider($this->resource);
+
+        if ($expected) {
+            $this->http->assertFetchedOne(new TestObject($value));
+            $this->http->assertFetchedOne(new Collection($value));
+        } else {
+            $this->assertThatItFails(
+                'member at [/data] matches',
+                fn() => $this->http->assertFetchedOne(new TestObject($value))
+            );
+
+            $this->assertThatItFails(
+                'member at [/data] matches',
+                fn() => $this->http->assertFetchedOne(new Collection($value))
+            );
+        }
+    }
+
     public function testFetchOneExactWithUrlRoutable(): void
     {
-        $model = $this->createMock(UrlRoutable::class);
-        $model->method('getRouteKey')->willReturn((int) $this->resource['id']);
+        $this->http->willSeeType($this->resource['type']);
+
+        $model = new TestModel((int) $this->resource['id']);
 
         $this->assertThatItFails(
             'member at [/data] exactly matches',
@@ -276,6 +308,8 @@ class FetchedOneTest extends TestCase
 
     public function testFetchOneExactWithStringAndInteger(): void
     {
+        $this->http->willSeeType($this->resource['type']);
+
         $id = $this->resource['id'];
 
         $this->assertThatItFails(
@@ -412,6 +446,32 @@ class FetchedOneTest extends TestCase
             $this->assertThatItFails(
                 'member at [/data] exactly matches',
                 fn() => $this->http->assertFetchedOneExact($value)
+            );
+        }
+    }
+
+    /**
+     * @param bool $expected
+     * @param Closure $provider
+     * @return void
+     * @dataProvider fetchedOneExactArrayProvider
+     */
+    public function testFetchedOneExactWithObject(bool $expected, Closure $provider): void
+    {
+        $value = $provider($this->resource);
+
+        if ($expected) {
+            $this->http->assertFetchedOneExact(new TestObject($value));
+            $this->http->assertFetchedOneExact(new Collection($value));
+        } else {
+            $this->assertThatItFails(
+                'member at [/data] exactly matches',
+                fn() => $this->http->assertFetchedOneExact(new TestObject($value))
+            );
+
+            $this->assertThatItFails(
+                'member at [/data] exactly matches',
+                fn() => $this->http->assertFetchedOneExact(new Collection($value))
             );
         }
     }

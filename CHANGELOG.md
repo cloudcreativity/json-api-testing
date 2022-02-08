@@ -3,6 +3,52 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [4.0.0] - 2022-02-08
+
+### Added
+
+- Package now supports PHP 8.1.
+- Package now supports Laravel 9.
+- The package now correctly JSON encodes then decodes the expected values for assertions. This means an expected value
+  can now contain JSON serializable objects, which improves the developer experience. For example, when using `Carbon`
+  dates, the developer previously had to manually call `$date->jsonSerialize()` to put the expected JSON string value
+  in their expected resource arrays. This also fixes a bug where the assertions failed to correctly compare floats that
+  encoded to integers in JSON - e.g. `4.0` encodes as `4` but the assertion failed as it was attempting to compare a
+  float to a decoded integer.
+
+### Changed
+
+- Added return types to internal methods to remove deprecation messages in PHP 8.1.
+- Added property type hints to all classes and amended method type-hints where these needed updating.
+- The `assertStatusCode` method now expects the status code to be an integer. Previously it allowed
+  strings.
+- The `assertIncluded` method type-hint for the expected value has changed from `array` to `iterable`.
+- Renamed the `IdentifiersInDocument` constraint `IdentifiersInOrder`. In addition, this now extends the 
+  `SubsetsInOrder` constraint, rather than the `SubsetInDocument` constraint.
+- The `HasHttpAssertions` trait now does not throw an exception for its `getExpectedType()` method if the expected 
+  string is empty. Instead an exception is thrown from the `JsonObject` method that casts an id value to a resource
+  identifier if the expected type is empty. This is an improvement because it means an expected type only needs to be
+  set if you are using a `UrlRoutable`, `int` or `string` value for an assertion. Previously an exception would be
+  thrown stating that an expected type needed to be set even if the expected type did not need to be used, e.g. if using
+  an array value that had the `type` key set.
+
+### Removed
+
+- Removed the `Assert::assertExactListInOrder` assertion. Use `Assert::assertExact` instead.
+- Removed the `HasDocumentAssertions::assertExactListInOrder` assertion, which means it is also removed from the
+  `Document` class. Use `assertExact` instead.
+- Removed the following methods from the `Compare` class and the `HasHttpAssertions` trait. The `Utils\JsonObject` and
+  `Utils\JsonStack` classes should be used instead:
+  - `identifiers()`
+  - `identifier()`
+  - `identifiable()`
+- Removed the following deprecated methods:
+  - `assertDeleted()` - use `assertNoContent()` or `assertMetaWithoutData()` depending on your expected response.
+  - `assertUpdated()` - use `assertNoContent()` or `assertFetchedOne()` depending on your expected response.
+- The `HttpMessage` class previously delegated methods calls to the `Document` class if the method did not exist on the
+  message. This was not actually in use and unnecessarily increased the complexity of the messsage class. It has 
+  therefore been removed. Call methods directly on the document if needed.  
+
 ## [3.5.0] - 2022-01-22
 
 ### Added

@@ -8,20 +8,24 @@
          convertErrorsToExceptions="true"
          convertNoticesToExceptions="true"
          convertWarningsToExceptions="true"
+         convertDeprecationsToExceptions="true"
          processIsolation="false"
          stopOnError="false"
          stopOnFailure="false"
          verbose="true"
          xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 >
-  <coverage>
-    <include>
-      <directory suffix="Test.php">src/</directory>
-    </include>
-  </coverage>
-  <testsuites>
-    <testsuite name="Unit">
-      <directory>./tests/</directory>
-    </testsuite>
-  </testsuites>
+    <coverage>
+        <include>
+            <directory suffix="Test.php">src/</directory>
+        </include>
+    </coverage>
+    <testsuites>
+        <testsuite name="Unit">
+            <directory>./tests/</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="error_reporting" value="E_ALL"/>
+    </php>
 </phpunit>

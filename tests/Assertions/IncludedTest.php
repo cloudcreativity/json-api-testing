@@ -2,26 +2,28 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
+use Carbon\Carbon;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
+use Illuminate\Support\Collection;
 
 class IncludedTest extends TestCase
 {
@@ -64,14 +66,7 @@ class IncludedTest extends TestCase
     /**
      * @var array
      */
-    private array $author = [
-        'type' => 'users',
-        'id' => '2',
-        'attributes' => [
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-        ],
-    ];
+    private array $author;
 
     /**
      * @var array
@@ -106,6 +101,16 @@ class IncludedTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->author = [
+            'type' => 'users',
+            'id' => '2',
+            'attributes' => [
+                'name' => 'John Doe',
+                'email' => 'john@example.com',
+                'registeredAt' => Carbon::yesterday(),
+            ],
+        ];
 
         $document = [
             'data' => $this->post,
@@ -169,8 +174,7 @@ class IncludedTest extends TestCase
      */
     public function testIsIncludedWithUrlRoutable(bool $expected, string $type, string $id): void
     {
-        $model = $this->createMock(UrlRoutable::class);
-        $model->method('getRouteKey')->willReturn((int) $id);
+        $model = new TestModel((int) $id);
 
         if ($expected) {
             $this->http->assertIsIncluded($type, $model);
@@ -224,24 +228,19 @@ class IncludedTest extends TestCase
 
     public function testIncludedWithUrlRoutables(): void
     {
-        $author = $this->createMock(UrlRoutable::class);
-        $author->method('getRouteKey')->willReturn((int) $this->author['id']);
-
-        $tag1 = $this->createMock(UrlRoutable::class);
-        $tag1->method('getRouteKey')->willReturn((int) $this->tag1['id']);
-
-        $tag2 = $this->createMock(UrlRoutable::class);
-        $tag2->method('getRouteKey')->willReturn((int) $this->tag2['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn(99);
+        $author = new TestModel((int) $this->author['id']);
+        $tag1 = new TestModel((int) $this->tag1['id']);
+        $tag2 = new TestModel((int) $this->tag2['id']);
+        $invalid = new TestModel(99);
 
         // order is not significant.
-        $this->http->assertIncluded([
+        $this->http->assertIncluded($values = [
             ['type' => 'tags', 'id' => $tag2],
             ['type' => 'users', 'id' => $author],
             ['type' => 'tags', 'id' => $tag1],
         ]);
+
+        $this->http->assertIncluded(Collection::make($values));
 
         $this->assertThatItFails(
             'array at [/included] only contains the subsets',
@@ -269,11 +268,13 @@ class IncludedTest extends TestCase
         $invalid = 99;
 
         // order is not significant.
-        $this->http->assertIncluded([
+        $this->http->assertIncluded($values = [
             ['type' => 'tags', 'id' => $tag2],
             ['type' => 'users', 'id' => $author],
             ['type' => 'tags', 'id' => $tag1],
         ]);
+
+        $this->http->assertIncluded(Collection::make($values));
 
         $this->assertThatItFails(
             'array at [/included] only contains the subsets',
@@ -301,11 +302,13 @@ class IncludedTest extends TestCase
         $invalid = '99';
 
         // order is not significant.
-        $this->http->assertIncluded([
+        $this->http->assertIncluded($values = [
             ['type' => 'tags', 'id' => $tag2],
             ['type' => 'users', 'id' => $author],
             ['type' => 'tags', 'id' => $tag1],
         ]);
+
+        $this->http->assertIncluded(Collection::make($values));
 
         $this->assertThatItFails(
             'array at [/included] only contains the subsets',
@@ -321,6 +324,35 @@ class IncludedTest extends TestCase
                 ['type' => 'users', 'id' => $author],
                 ['type' => 'tags', 'id' => $tag1],
                 ['type' => 'tags', 'id' => $invalid],
+            ])
+        );
+    }
+
+    public function testIncludedWithResources(): void
+    {
+        $this->http->assertIncluded([$this->author, $this->tag1, $this->tag2]);
+
+        // order is not significant
+        $this->http->assertIncluded(new Collection([
+            $this->tag1,
+            $this->author,
+            $this->tag2,
+        ]));
+
+        $this->assertThatItFails(
+            'array at [/included] only contains the subsets',
+            fn() => $this->http->assertIncluded([
+                $this->tag2,
+                $this->author,
+            ])
+        );
+
+        $this->assertThatItFails(
+            'array at [/included] only contains the subsets',
+            fn() => $this->http->assertIncluded([
+                $this->author,
+                $this->tag2,
+                $this->post,
             ])
         );
     }

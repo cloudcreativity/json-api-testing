@@ -2,23 +2,27 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Constraints;
 
 use CloudCreativity\JsonApi\Testing\Compare;
 use CloudCreativity\JsonApi\Testing\Document;
+use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
+use JsonSerializable;
 use PHPUnit\Framework\Constraint\Constraint;
 
 /**
@@ -30,24 +34,24 @@ class ExactInDocument extends Constraint
 {
 
     /**
-     * @var mixed
+     * @var array|null
      */
-    private $expected;
+    private ?array $expected;
 
     /**
      * @var string
      */
-    private $pointer;
+    private string $pointer;
 
     /**
      * @var bool
      */
-    private $strict;
+    private bool $strict;
 
     /**
      * ExactInDocument constructor.
      *
-     * @param mixed $expected
+     * @param JsonSerializable|array|null $expected
      *      the expected value
      * @param string $pointer
      *      the JSON pointer to the object in the JSON API document.
@@ -55,7 +59,8 @@ class ExactInDocument extends Constraint
      */
     public function __construct($expected, string $pointer, bool $strict = true)
     {
-        $this->expected = $expected;
+        $expected = JsonObject::nullable($expected);
+        $this->expected = $expected ? $expected->toArray() : null;
         $this->pointer = $pointer;
         $this->strict = $strict;
     }

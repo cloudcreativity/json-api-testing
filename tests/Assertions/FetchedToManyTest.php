@@ -2,17 +2,17 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 declare(strict_types=1);
@@ -22,7 +22,7 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 use Closure;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use Illuminate\Support\Collection;
 
 class FetchedToManyTest extends TestCase
@@ -70,23 +70,16 @@ class FetchedToManyTest extends TestCase
             json_encode(['data' => [$this->post1, $this->post2, $this->post3]]),
             ['Content-Type' => 'application/vnd.api+json', 'Accept' => 'application/vnd.api+json'],
         );
-
-        $this->http->willSeeType($this->post1['type']);
     }
 
     public function testFetchedToManyWithUrlRoutables(): void
     {
-        $model1 = $this->createMock(UrlRoutable::class);
-        $model1->method('getRouteKey')->willReturn((int) $this->post1['id']);
+        $this->http->willSeeType($this->post1['type']);
 
-        $model2 = $this->createMock(UrlRoutable::class);
-        $model2->method('getRouteKey')->willReturn((int) $this->post2['id']);
-
-        $model3 = $this->createMock(UrlRoutable::class);
-        $model3->method('getRouteKey')->willReturn((int) $this->post3['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn((int) ($this->post3['id'] + 1));
+        $model1 = new TestModel((int) $this->post1['id']);
+        $model2 = new TestModel((int) $this->post2['id']);
+        $model3 = new TestModel((int) $this->post3['id']);
+        $invalid = new TestModel((int) ($this->post3['id'] + 1));
 
         $models = [$model2, $model1, $model3]; // order is not asserted.
 
@@ -111,6 +104,8 @@ class FetchedToManyTest extends TestCase
 
     public function testFetchedToManyWithIntegers(): void
     {
+        $this->http->willSeeType($this->post1['type']);
+
         $id1 = (int) $this->post1['id'];
         $id2 = (int) $this->post2['id'];
         $id3 = (int) $this->post3['id'];
@@ -139,6 +134,8 @@ class FetchedToManyTest extends TestCase
 
     public function testFetchedToManyWithStrings(): void
     {
+        $this->http->willSeeType($this->post1['type']);
+
         $id1 = $this->post1['id'];
         $id2 = $this->post2['id'];
         $id3 = $this->post3['id'];
@@ -226,6 +223,27 @@ class FetchedToManyTest extends TestCase
         }
     }
 
+    /**
+     * @param bool $expected
+     * @param Closure $provider
+     * @return void
+     * @dataProvider fetchedToManyArrayProvider
+     */
+    public function testFetchedToManyWithObject(bool $expected, Closure $provider): void
+    {
+        $value = $provider($this->post1, $this->post2, $this->post3);
+
+        if ($expected) {
+            $this->http->assertFetchedToMany($value);
+            $this->http->assertFetchedToMany(new Collection($value));
+        } else {
+            $this->assertThatItFails(
+                'the list at [/data] only contains the values',
+                fn() => $this->http->assertFetchedToMany(new Collection($value))
+            );
+        }
+    }
+
     public function testFetchedToManyWithResources(): void
     {
         [$post1, $post2, $post3] = $this->createResources();
@@ -240,17 +258,12 @@ class FetchedToManyTest extends TestCase
 
     public function testFetchedToManyInOrderWithUrlRoutables(): void
     {
-        $model1 = $this->createMock(UrlRoutable::class);
-        $model1->method('getRouteKey')->willReturn((int) $this->post1['id']);
+        $this->http->willSeeType($this->post1['type']);
 
-        $model2 = $this->createMock(UrlRoutable::class);
-        $model2->method('getRouteKey')->willReturn((int) $this->post2['id']);
-
-        $model3 = $this->createMock(UrlRoutable::class);
-        $model3->method('getRouteKey')->willReturn((int) $this->post3['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn((int) ($this->post3['id'] + 1));
+        $model1 = new TestModel((int) $this->post1['id']);
+        $model2 = new TestModel((int) $this->post2['id']);
+        $model3 = new TestModel((int) $this->post3['id']);
+        $invalid = new TestModel((int) ($this->post3['id'] + 1));
 
         $models = [$model1, $model2, $model3];
 
@@ -263,18 +276,20 @@ class FetchedToManyTest extends TestCase
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the resource identifiers',
+            'array at [/data] contains the resource identifiers in order',
             fn() => $this->http->assertFetchedToManyInOrder([$model1, $model3, $model2]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the resource identifiers',
+            'array at [/data] contains the resource identifiers in order',
             fn() => $this->http->assertFetchedToManyInOrder([$model1, $invalid, $model3]),
         );
     }
 
     public function testFetchedToManyInOrderWithIntegers(): void
     {
+        $this->http->willSeeType($this->post1['type']);
+
         $id1 = (int) $this->post1['id'];
         $id2 = (int) $this->post2['id'];
         $id3 = (int) $this->post3['id'];
@@ -291,18 +306,20 @@ class FetchedToManyTest extends TestCase
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the resource identifiers',
+            'array at [/data] contains the resource identifiers in order',
             fn() => $this->http->assertFetchedToManyInOrder([$id1, $id3, $id2]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the resource identifiers',
+            'array at [/data] contains the resource identifiers in order',
             fn() => $this->http->assertFetchedToManyInOrder([$id1, $invalid, $id3]),
         );
     }
 
     public function testFetchedToManyInOrderWithStrings(): void
     {
+        $this->http->willSeeType($this->post1['type']);
+
         $id1 = $this->post1['id'];
         $id2 = $this->post2['id'];
         $id3 = $this->post3['id'];
@@ -319,12 +336,12 @@ class FetchedToManyTest extends TestCase
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the resource identifiers',
+            'array at [/data] contains the resource identifiers in order',
             fn() => $this->http->assertFetchedToManyInOrder([$id1, $id3, $id2]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the resource identifiers',
+            'array at [/data] contains the resource identifiers in order',
             fn() => $this->http->assertFetchedToManyInOrder([$id1, $invalid, $id3]),
         );
     }
@@ -384,8 +401,28 @@ class FetchedToManyTest extends TestCase
             $this->http->assertFetchedToManyInOrder($value);
         } else {
             $this->assertThatItFails(
-                'member at [/data] matches the resource identifiers',
+                'array at [/data] contains the resource identifiers in order',
                 fn() => $this->http->assertFetchedToManyInOrder($value)
+            );
+        }
+    }
+
+    /**
+     * @param bool $expected
+     * @param Closure $provider
+     * @return void
+     * @dataProvider fetchedToManyInOrderArrayProvider
+     */
+    public function testFetchedToManyInOrderWithObject(bool $expected, Closure $provider): void
+    {
+        $value = $provider($this->post1, $this->post2, $this->post3);
+
+        if ($expected) {
+            $this->http->assertFetchedToManyInOrder(new Collection($value));
+        } else {
+            $this->assertThatItFails(
+                'array at [/data] contains the resource identifiers in order',
+                fn() => $this->http->assertFetchedToManyInOrder(new Collection($value))
             );
         }
     }
@@ -397,7 +434,7 @@ class FetchedToManyTest extends TestCase
         $http = $this->http->withContent(json_encode(['data' => [$post1, $post2, $post3]]));
 
         $this->assertThatItFails(
-            'member at [/data] matches the resource identifiers',
+            'array at [/data] contains the resource identifiers in order',
             fn() => $http->assertFetchedToManyInOrder([$this->post1, $this->post2, $this->post3]),
         );
     }

@@ -2,27 +2,28 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 declare(strict_types=1);
 
 namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
+use Carbon\Carbon;
 use Closure;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
-use Illuminate\Contracts\Routing\UrlRoutable;
+use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use Illuminate\Support\Collection;
 
 class FetchedManyTest extends TestCase
@@ -60,6 +61,7 @@ class FetchedManyTest extends TestCase
             'attributes' => [
                 'title' => 'My First Post',
                 'content' => '...',
+                'publishedAt' => Carbon::now(),
             ],
             'relationships' => [
                 'author' => [
@@ -84,6 +86,7 @@ class FetchedManyTest extends TestCase
             'attributes' => [
                 'title' => 'My Second Post',
                 'content' => '###',
+                'publishedAt' => Carbon::yesterday(),
             ],
             'relationships' => [
                 'author' => [
@@ -108,6 +111,7 @@ class FetchedManyTest extends TestCase
             'attributes' => [
                 'title' => 'My Second Post',
                 'content' => '###',
+                'publishedAt' => Carbon::now()->subWeek(),
             ],
             'relationships' => [
                 'author' => [
@@ -132,23 +136,16 @@ class FetchedManyTest extends TestCase
             json_encode(['data' => [$this->post1, $this->post2, $this->post3]]),
             ['Content-Type' => 'application/vnd.api+json', 'Accept' => 'application/vnd.api+json'],
         );
-
-        $this->http->willSeeType('posts');
     }
 
     public function testFetchedManyWithUrlRoutables(): void
     {
-        $model1 = $this->createMock(UrlRoutable::class);
-        $model1->method('getRouteKey')->willReturn((int) $this->post1['id']);
+        $this->http->willSeeType('posts');
 
-        $model2 = $this->createMock(UrlRoutable::class);
-        $model2->method('getRouteKey')->willReturn((int) $this->post2['id']);
-
-        $model3 = $this->createMock(UrlRoutable::class);
-        $model3->method('getRouteKey')->willReturn((int) $this->post3['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn((int) ($this->post3['id'] + 1));
+        $model1 = new TestModel((int) $this->post1['id']);
+        $model2 = new TestModel((int) $this->post2['id']);
+        $model3 = new TestModel((int) $this->post3['id']);
+        $invalid = new TestModel((int) ($this->post3['id'] + 1));
 
         $models = [$model2, $model1, $model3]; // order is not asserted.
 
@@ -173,6 +170,8 @@ class FetchedManyTest extends TestCase
 
     public function testFetchedManyWithIntegers(): void
     {
+        $this->http->willSeeType('posts');
+
         $id1 = (int) $this->post1['id'];
         $id2 = (int) $this->post2['id'];
         $id3 = (int) $this->post3['id'];
@@ -201,6 +200,8 @@ class FetchedManyTest extends TestCase
 
     public function testFetchedManyWithStrings(): void
     {
+        $this->http->willSeeType('posts');
+
         $id1 = $this->post1['id'];
         $id2 = $this->post2['id'];
         $id3 = $this->post3['id'];
@@ -386,19 +387,34 @@ class FetchedManyTest extends TestCase
         }
     }
 
+    /**
+     * @param bool $expected
+     * @param Closure $provider
+     * @return void
+     * @dataProvider fetchedManyArrayProvider
+     */
+    public function testFetchedManyWithObject(bool $expected, Closure $provider): void
+    {
+        $value = $provider($this->post1, $this->post2, $this->post3);
+
+        if ($expected) {
+            $this->http->assertFetchedMany(new Collection($value));
+        } else {
+            $this->assertThatItFails(
+                'array at [/data] only contains the subsets',
+                fn() => $this->http->assertFetchedMany(new Collection($value))
+            );
+        }
+    }
+
     public function testFetchedManyInOrderWithUrlRoutables(): void
     {
-        $model1 = $this->createMock(UrlRoutable::class);
-        $model1->method('getRouteKey')->willReturn((int) $this->post1['id']);
+        $this->http->willSeeType('posts');
 
-        $model2 = $this->createMock(UrlRoutable::class);
-        $model2->method('getRouteKey')->willReturn((int) $this->post2['id']);
-
-        $model3 = $this->createMock(UrlRoutable::class);
-        $model3->method('getRouteKey')->willReturn((int) $this->post3['id']);
-
-        $invalid = $this->createMock(UrlRoutable::class);
-        $invalid->method('getRouteKey')->willReturn((int) ($this->post3['id'] + 1));
+        $model1 = new TestModel((int) $this->post1['id']);
+        $model2 = new TestModel((int) $this->post2['id']);
+        $model3 = new TestModel((int) $this->post3['id']);
+        $invalid = new TestModel((int) ($this->post3['id'] + 1));
 
         $models = [$model1, $model2, $model3];
 
@@ -411,23 +427,25 @@ class FetchedManyTest extends TestCase
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$model1, $model3]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$model1, $model3, $model2]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$model1, $invalid, $model3]),
         );
     }
 
     public function testFetchedManyInOrderWithIntegers(): void
     {
+        $this->http->willSeeType('posts');
+
         $id1 = (int) $this->post1['id'];
         $id2 = (int) $this->post2['id'];
         $id3 = (int) $this->post3['id'];
@@ -444,23 +462,25 @@ class FetchedManyTest extends TestCase
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$id1, $id3]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$id1, $id3, $id2]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$id1, $invalid, $id3]),
         );
     }
 
     public function testFetchedManyInOrderWithStrings(): void
     {
+        $this->http->willSeeType('posts');
+
         $id1 = $this->post1['id'];
         $id2 = $this->post2['id'];
         $id3 = $this->post3['id'];
@@ -477,17 +497,17 @@ class FetchedManyTest extends TestCase
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$id1, $id3]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$id1, $id3, $id2]),
         );
 
         $this->assertThatItFails(
-            'member at [/data] matches the subset',
+            'array at [/data] contains the subsets in order',
             fn() => $this->http->assertFetchedManyInOrder([$id1, $invalid, $id3]),
         );
     }
@@ -675,22 +695,39 @@ class FetchedManyTest extends TestCase
             $this->http->assertFetchedManyInOrder($value);
         } else {
             $this->assertThatItFails(
-                'member at [/data] matches the subset',
+                'array at [/data] contains the subsets in order',
                 fn() => $this->http->assertFetchedManyInOrder($value)
+            );
+        }
+    }
+
+    /**
+     * @param bool $expected
+     * @param Closure $provider
+     * @return void
+     * @dataProvider fetchedManyInOrderArrayProvider
+     */
+    public function testFetchedManyInOrderWithObject(bool $expected, Closure $provider): void
+    {
+        $value = $provider($this->post1, $this->post2, $this->post3);
+
+        if ($expected) {
+            $this->http->assertFetchedManyInOrder(new Collection($value));
+        } else {
+            $this->assertThatItFails(
+                'array at [/data] contains the subsets in order',
+                fn() => $this->http->assertFetchedManyInOrder(new Collection($value))
             );
         }
     }
 
     public function testFetchedManyExactWithUrlRoutables(): void
     {
-        $model1 = $this->createMock(UrlRoutable::class);
-        $model1->method('getRouteKey')->willReturn((int) $this->post1['id']);
+        $this->http->willSeeType('posts');
 
-        $model2 = $this->createMock(UrlRoutable::class);
-        $model2->method('getRouteKey')->willReturn((int) $this->post2['id']);
-
-        $model3 = $this->createMock(UrlRoutable::class);
-        $model3->method('getRouteKey')->willReturn((int) $this->post3['id']);
+        $model1 = new TestModel((int) $this->post1['id']);
+        $model2 = new TestModel((int) $this->post2['id']);
+        $model3 = new TestModel((int) $this->post3['id']);
 
         $models = [$model1, $model2, $model3];
 
@@ -707,6 +744,8 @@ class FetchedManyTest extends TestCase
 
     public function testFetchedManyExactWithIntegers(): void
     {
+        $this->http->willSeeType('posts');
+
         $id1 = (int) $this->post1['id'];
         $id2 = (int) $this->post2['id'];
         $id3 = (int) $this->post3['id'];
@@ -721,6 +760,8 @@ class FetchedManyTest extends TestCase
 
     public function testFetchedManyExactWithStrings(): void
     {
+        $this->http->willSeeType('posts');
+
         $id1 = $this->post1['id'];
         $id2 = $this->post2['id'];
         $id3 = $this->post3['id'];

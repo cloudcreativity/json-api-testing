@@ -2,17 +2,17 @@
 /*
  * Copyright 2022 Cloud Creativity Limited
  *
- *  Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
+ * You may obtain a copy of the License at
  *
- *  http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 declare(strict_types=1);
@@ -21,6 +21,8 @@ namespace CloudCreativity\JsonApi\Testing\Tests\Assertions;
 
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
+use CloudCreativity\JsonApi\Testing\Tests\TestObject;
+use CloudCreativity\JsonApi\Testing\Utils\JsonObject;
 
 class LinksTest extends TestCase
 {
@@ -73,6 +75,7 @@ class LinksTest extends TestCase
         $invalid['related'] = '/api/foo/bar';
 
         $this->http->assertLinks($this->links);
+        $this->http->assertLinks(new TestObject($this->links));
         $this->http->assertLinks($partial);
 
         $this->assertThatItFails(
@@ -90,6 +93,7 @@ class LinksTest extends TestCase
         $invalid['related'] = '/api/foo/bar';
 
         $this->http->assertExactLinks($this->links);
+        $this->http->assertExactLinks(new JsonObject($this->links));
 
         $this->assertThatItFails(
             'member at [/links] exactly matches',
