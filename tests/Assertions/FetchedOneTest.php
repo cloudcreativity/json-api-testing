@@ -130,7 +130,7 @@ class FetchedOneTest extends TestCase
     /**
      * @return array
      */
-    public function fetchedOneArrayProvider(): array
+    public static function fetchedOneArrayProvider(): array
     {
         return [
             'identifier' => [
@@ -326,7 +326,7 @@ class FetchedOneTest extends TestCase
     /**
      * @return array
      */
-    public function fetchedOneExactArrayProvider(): array
+    public static function fetchedOneExactArrayProvider(): array
     {
         return [
             'identifier' => [

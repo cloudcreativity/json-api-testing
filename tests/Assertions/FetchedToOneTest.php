@@ -110,7 +110,7 @@ class FetchedToOneTest extends TestCase
     /**
      * @return array
      */
-    public function fetchedToOneArrayProvider(): array
+    public static function fetchedToOneArrayProvider(): array
     {
         return [
             'identifier' => [
@@ -183,7 +183,7 @@ class FetchedToOneTest extends TestCase
     /**
      * @return array[]
      */
-    public function resourceProvider(): array
+    public static function resourceProvider(): array
     {
         return [
             'full' => [

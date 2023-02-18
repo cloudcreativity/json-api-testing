@@ -165,7 +165,7 @@ class FetchedToManyTest extends TestCase
     /**
      * @return array[]
      */
-    public function fetchedToManyArrayProvider(): array
+    public static function fetchedToManyArrayProvider(): array
     {
         return [
             'in order' => [
@@ -349,7 +349,7 @@ class FetchedToManyTest extends TestCase
     /**
      * @return array[]
      */
-    public function fetchedToManyInOrderArrayProvider(): array
+    public static function fetchedToManyInOrderArrayProvider(): array
     {
         return [
             'in order' => [
