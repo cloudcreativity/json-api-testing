@@ -231,7 +231,7 @@ class FetchedManyTest extends TestCase
     /**
      * @return array
      */
-    public function fetchedManyArrayProvider(): array
+    public static function fetchedManyArrayProvider(): array
     {
         return [
             'identifiers (any order)' => [
@@ -515,7 +515,7 @@ class FetchedManyTest extends TestCase
     /**
      * @return array
      */
-    public function fetchedManyInOrderArrayProvider(): array
+    public static function fetchedManyInOrderArrayProvider(): array
     {
         return [
             'identifiers' => [
@@ -777,7 +777,7 @@ class FetchedManyTest extends TestCase
     /**
      * @return array
      */
-    public function fetchedManyExactArrayProvider(): array
+    public static function fetchedManyExactArrayProvider(): array
     {
         return [
             'identifiers' => [

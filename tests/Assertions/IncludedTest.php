@@ -134,7 +134,7 @@ class IncludedTest extends TestCase
     /**
      * @return array
      */
-    public function isIncludedProvider(): array
+    public static function isIncludedProvider(): array
     {
         return [
             'author' => [

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## Unreleased
+
+### Changed
+
+- Package now supports PHPUnit 9 and 10 - this adds PHPUnit 10 and drops support for PHPUnit 8.
+- Minimum PHP version is now 8.1 - dropping support for PHP 7.4 and 8.0.
+- Drop support for Laravel 8.
+
 ## [4.1.0] - 2023-02-14
 
 ### Added

@@ -77,7 +77,7 @@ class MetaTest extends TestCase
     /**
      * @return array
      */
-    public function statusCodeProvider(): array
+    public static function statusCodeProvider(): array
     {
         return [
             '200' => [200],
@@ -148,7 +148,7 @@ class MetaTest extends TestCase
     /**
      * @return array
      */
-    public function invalidStatusCodeProvider(): array
+    public static function invalidStatusCodeProvider(): array
     {
         return [
             '100' => [100],
