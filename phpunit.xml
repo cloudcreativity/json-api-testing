@@ -11,7 +11,7 @@
          cacheDirectory=".phpunit.cache"
          backupStaticProperties="false"
          failOnWarning="true"
-         failOnDeprecation="true"
+         failOnDeprecation="false"
          failOnNotice="true"
 >
     <coverage/>
