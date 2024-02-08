@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Changed
 
-- **BREAKING** Package now requires Laravel 10 or 11, dropping support for 9.
+- **BREAKING** Package now requires `illuminate/support` 10 or 11, dropping support for 9.
 - **BREAKING** Package now requires PHPUnit 10 or 11, dropping support for 9.
 - Minimum PHP version is now `8.2`.
 
