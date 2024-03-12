@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [6.0.0] - 2024-03-12
+
 ### Changed
 
 - Package is now licensed under the [MIT License.](./LICENSE)
