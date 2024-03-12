@@ -43,7 +43,7 @@
             "dev-laravel11": "6.x-dev"
         }
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
         "sort-packages": true
