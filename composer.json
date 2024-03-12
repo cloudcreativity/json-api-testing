@@ -39,8 +39,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-develop": "5.x-dev",
-            "dev-laravel11": "6.x-dev"
+            "dev-develop": "6.x-dev"
         }
     },
     "minimum-stability": "stable",
