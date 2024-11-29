@@ -32,7 +32,7 @@ class HttpStatusIsSuccessful extends Constraint
      *
      * @param string|null $content
      */
-    public function __construct(string $content = null)
+    public function __construct(?string $content = null)
     {
         $this->content = $content;
     }
