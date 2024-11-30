@@ -13,6 +13,7 @@
          failOnWarning="true"
          failOnDeprecation="false"
          failOnNotice="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
 >
     <coverage/>
     <testsuites>

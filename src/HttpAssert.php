@@ -50,7 +50,7 @@ class HttpAssert
     public static function assertStatusCode(
         $status,
         int $expected,
-        string $content = null,
+        ?string $content = null,
         string $message = ''
     ): void
     {
@@ -562,7 +562,7 @@ class HttpAssert
      * @param string $message
      * @return void
      */
-    public static function assertNoContent($status, string $content = null, string $message = ''): void
+    public static function assertNoContent($status, ?string $content = null, string $message = ''): void
     {
         self::assertStatusCode($status, self::STATUS_NO_CONTENT, $content, $message);
         PHPUnitAssert::assertEmpty($content, $message ?: 'Expecting HTTP body content to be empty.');

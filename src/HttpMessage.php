@@ -52,8 +52,8 @@ class HttpMessage implements ArrayAccess
      */
     public function __construct(
         int $status,
-        string $contentType = null,
-        string $content = null,
+        ?string $contentType = null,
+        ?string $content = null,
         array $headers = []
     ) {
         $this->status = $status;
