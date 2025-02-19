@@ -2,46 +2,49 @@ name: Tests
 
 on:
   push:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
   pull_request:
-    branches: [ main, develop ]
+    branches:
+      - main
+      - develop
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     strategy:
       fail-fast: true
       matrix:
         php: [8.2, 8.3, 8.4]
-        laravel: [10, 11]
-        phpunit: [10.5, 11]
+        laravel: [10, 11, '12']
+        phpunit: ['8.2', '8.3', '8.4', 10.5, 11]
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout Code
+        uses: actions/checkout@v3
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: ${{ matrix.php }}
-        extensions: dom, curl, libxml, mbstring, zip
-        tools: composer:v2
-        coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip
+          tools: composer:v2
+          coverage: none
 
-    - name: Set Laravel Version
-      run: composer require "illuminate/contracts:^${{ matrix.laravel }}" --no-update
+      - name: Set Laravel Version
+        run: composer require "illuminate/contracts:^${{ matrix.laravel }}" --no-update
 
-    - name: Set PHPUnit Version
-      run: composer require "phpunit/phpunit:^${{ matrix.laravel }}" --no-update
+      - name: Set PHPUnit Version
+        run: composer require "phpunit/phpunit:^${{ matrix.laravel }}" --no-update
 
-    - name: Install dependencies
-      uses: nick-fields/retry@v2
-      with:
-        timeout_minutes: 5
-        max_attempts: 5
-        command: composer update --prefer-dist --no-interaction --no-progress
+      - name: Install dependencies
+        uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 5
+          max_attempts: 5
+          command: composer update --prefer-dist --no-interaction --no-progress
 
-    - name: Execute tests
-      run: vendor/bin/phpunit
+      - name: Execute tests
+        run: vendor/bin/phpunit
