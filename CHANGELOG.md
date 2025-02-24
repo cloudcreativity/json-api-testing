@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [6.1.0] - 2025-02-24
+
+### Added
+
+- Package now requires `illuminate/support` 11 or 12.
+
 ## [6.0.1] - 2024-11-30
 
 ### Fixed
