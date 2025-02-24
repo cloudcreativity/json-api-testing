@@ -23,8 +23,8 @@
     "require": {
         "php": "^8.2",
         "ext-json": "*",
-        "illuminate/contracts": "^10.0|^11.0",
-        "illuminate/support": "^10.0|^11.0",
+        "illuminate/contracts": "^10.0|^11.0|^12.0",
+        "illuminate/support": "^10.0|^11.0|^12.0",
         "phpunit/phpunit": "^10.5|^11.0"
     },
     "autoload": {
