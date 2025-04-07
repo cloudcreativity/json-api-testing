@@ -15,6 +15,7 @@ use Carbon\Carbon;
 use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use CloudCreativity\JsonApi\Testing\Tests\TestObject;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class MetaTest extends TestCase
 {
@@ -82,8 +83,8 @@ class MetaTest extends TestCase
     /**
      * @param int $status
      * @return void
-     * @dataProvider statusCodeProvider
      */
+    #[DataProvider('statusCodeProvider')]
     public function testMetaWithoutData(int $status): void
     {
         $http = $this->http->withStatusCode($status);
@@ -109,8 +110,8 @@ class MetaTest extends TestCase
     /**
      * @param int $status
      * @return void
-     * @dataProvider statusCodeProvider
      */
+    #[DataProvider('statusCodeProvider')]
     public function testExactMetaWithoutData(int $status): void
     {
         $http = $this->http->withStatusCode($status);
@@ -160,8 +161,8 @@ class MetaTest extends TestCase
      * @param int $status
      * @param string $expected
      * @return void
-     * @dataProvider invalidStatusCodeProvider
      */
+    #[DataProvider('invalidStatusCodeProvider')]
     public function testInvalidStatusCode(int $status, string $expected = ''): void
     {
         $expected = $expected ?: "HTTP status {$status} is successful";

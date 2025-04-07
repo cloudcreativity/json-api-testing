@@ -18,6 +18,7 @@ use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use CloudCreativity\JsonApi\Testing\Tests\TestObject;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FetchedOneTest extends TestCase
 {
@@ -244,8 +245,8 @@ class FetchedOneTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedOneArrayProvider
      */
+     #[DataProvider('fetchedOneArrayProvider')]
     public function testFetchedOneWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->resource);
@@ -264,8 +265,8 @@ class FetchedOneTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedOneArrayProvider
      */
+     #[DataProvider('fetchedOneArrayProvider')]
     public function testFetchedOneWithObject(bool $expected, Closure $provider): void
     {
         $value = $provider($this->resource);
@@ -426,8 +427,8 @@ class FetchedOneTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedOneExactArrayProvider
      */
+     #[DataProvider('fetchedOneExactArrayProvider')]
     public function testFetchedOneExactWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->resource);
@@ -446,8 +447,8 @@ class FetchedOneTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedOneExactArrayProvider
      */
+     #[DataProvider('fetchedOneExactArrayProvider')]
     public function testFetchedOneExactWithObject(bool $expected, Closure $provider): void
     {
         $value = $provider($this->resource);
