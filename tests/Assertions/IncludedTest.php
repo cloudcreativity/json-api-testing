@@ -16,6 +16,7 @@ use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class IncludedTest extends TestCase
 {
@@ -162,8 +163,8 @@ class IncludedTest extends TestCase
      * @param string $type
      * @param string $id
      * @return void
-     * @dataProvider isIncludedProvider
      */
+    #[DataProvider('isIncludedProvider')]
     public function testIsIncludedWithUrlRoutable(bool $expected, string $type, string $id): void
     {
         $model = new TestModel((int) $id);
@@ -183,8 +184,8 @@ class IncludedTest extends TestCase
      * @param string $type
      * @param string $id
      * @return void
-     * @dataProvider isIncludedProvider
      */
+    #[DataProvider('isIncludedProvider')]
     public function testIsIncludedWithString(bool $expected, string $type, string $id): void
     {
         if ($expected) {
@@ -202,8 +203,8 @@ class IncludedTest extends TestCase
      * @param string $type
      * @param string $id
      * @return void
-     * @dataProvider isIncludedProvider
      */
+    #[DataProvider('isIncludedProvider')]
     public function testIsIncludedWithInteger(bool $expected, string $type, string $id): void
     {
         $id = (int) $id;

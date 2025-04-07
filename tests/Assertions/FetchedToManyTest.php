@@ -16,6 +16,7 @@ use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FetchedToManyTest extends TestCase
 {
@@ -199,8 +200,8 @@ class FetchedToManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedToManyArrayProvider
      */
+     #[DataProvider('fetchedToManyArrayProvider')]
     public function testFetchedToManyWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
@@ -219,8 +220,8 @@ class FetchedToManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedToManyArrayProvider
      */
+     #[DataProvider('fetchedToManyArrayProvider')]
     public function testFetchedToManyWithObject(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
@@ -383,8 +384,8 @@ class FetchedToManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedToManyInOrderArrayProvider
      */
+     #[DataProvider('fetchedToManyInOrderArrayProvider')]
     public function testFetchedToManyInOrderWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
@@ -403,8 +404,8 @@ class FetchedToManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedToManyInOrderArrayProvider
      */
+     #[DataProvider('fetchedToManyInOrderArrayProvider')]
     public function testFetchedToManyInOrderWithObject(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
