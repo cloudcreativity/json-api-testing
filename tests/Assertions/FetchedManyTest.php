@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2024 Cloud Creativity Limited
+ * Copyright 2025 Cloud Creativity Limited
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
@@ -17,6 +17,7 @@ use CloudCreativity\JsonApi\Testing\HttpMessage;
 use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FetchedManyTest extends TestCase
 {
@@ -363,8 +364,8 @@ class FetchedManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedManyArrayProvider
      */
+    #[DataProvider('fetchedManyArrayProvider')]
     public function testFetchedManyWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
@@ -383,8 +384,8 @@ class FetchedManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedManyArrayProvider
      */
+     #[DataProvider('fetchedManyArrayProvider')]
     public function testFetchedManyWithObject(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
@@ -677,8 +678,8 @@ class FetchedManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedManyInOrderArrayProvider
      */
+     #[DataProvider('fetchedManyInOrderArrayProvider')]
     public function testFetchedManyInOrderWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
@@ -697,8 +698,8 @@ class FetchedManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedManyInOrderArrayProvider
      */
+     #[DataProvider('fetchedManyInOrderArrayProvider')]
     public function testFetchedManyInOrderWithObject(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);
@@ -879,8 +880,8 @@ class FetchedManyTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedManyExactArrayProvider
      */
+     #[DataProvider('fetchedManyExactArrayProvider')]
     public function testFetchedManyExactWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->post1, $this->post2, $this->post3);

@@ -1,6 +1,6 @@
 <?php
 /*
- * Copyright 2024 Cloud Creativity Limited
+ * Copyright 2025 Cloud Creativity Limited
  *
  * Use of this source code is governed by an MIT-style
  * license that can be found in the LICENSE file or at
@@ -17,6 +17,7 @@ use CloudCreativity\JsonApi\Testing\Tests\TestCase;
 use CloudCreativity\JsonApi\Testing\Tests\TestModel;
 use CloudCreativity\JsonApi\Testing\Tests\TestObject;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class FetchedToOneTest extends TestCase
 {
@@ -130,8 +131,8 @@ class FetchedToOneTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedToOneArrayProvider
      */
+    #[DataProvider('fetchedToOneArrayProvider')]
     public function testFetchedOneWithArray(bool $expected, Closure $provider): void
     {
         $value = $provider($this->identifier);
@@ -150,8 +151,8 @@ class FetchedToOneTest extends TestCase
      * @param bool $expected
      * @param Closure $provider
      * @return void
-     * @dataProvider fetchedToOneArrayProvider
      */
+    #[DataProvider('fetchedToOneArrayProvider')]
     public function testFetchedOneWithObject(bool $expected, Closure $provider): void
     {
         $value = $provider($this->identifier);
@@ -230,8 +231,8 @@ class FetchedToOneTest extends TestCase
     /**
      * @param Closure $provider
      * @return void
-     * @dataProvider resourceProvider
      */
+    #[DataProvider('resourceProvider')]
     public function testFetchedToOneWithResource(Closure $provider): void
     {
         $value = $provider($this->identifier);
