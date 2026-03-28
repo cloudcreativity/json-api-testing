@@ -23,6 +23,9 @@ jobs:
         exclude:
           - php: 8.2
             laravel: 13
+            phpunit: 10.5
+          - php: 8.2
+            laravel: 13
             phpunit: 12
           - php: 8.2
             laravel: 12
