@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [6.3.0] - 2026-03-28
+
+### Added
+
+- Package now supports Laravel 13.
+
 ## [6.2.0] - 2025-04-09
 
 ### Added
@@ -66,9 +72,9 @@ All notable changes to this project will be documented in this file. This projec
 - The `assertStatusCode` method now expects the status code to be an integer. Previously it allowed
   strings.
 - The `assertIncluded` method type-hint for the expected value has changed from `array` to `iterable`.
-- Renamed the `IdentifiersInDocument` constraint `IdentifiersInOrder`. In addition, this now extends the 
+- Renamed the `IdentifiersInDocument` constraint `IdentifiersInOrder`. In addition, this now extends the
   `SubsetsInOrder` constraint, rather than the `SubsetInDocument` constraint.
-- The `HasHttpAssertions` trait now does not throw an exception for its `getExpectedType()` method if the expected 
+- The `HasHttpAssertions` trait now does not throw an exception for its `getExpectedType()` method if the expected
   string is empty. Instead an exception is thrown from the `JsonObject` method that casts an id value to a resource
   identifier if the expected type is empty. This is an improvement because it means an expected type only needs to be
   set if you are using a `UrlRoutable`, `int` or `string` value for an assertion. Previously an exception would be
@@ -89,8 +95,8 @@ All notable changes to this project will be documented in this file. This projec
   - `assertDeleted()` - use `assertNoContent()` or `assertMetaWithoutData()` depending on your expected response.
   - `assertUpdated()` - use `assertNoContent()` or `assertFetchedOne()` depending on your expected response.
 - The `HttpMessage` class previously delegated methods calls to the `Document` class if the method did not exist on the
-  message. This was not actually in use and unnecessarily increased the complexity of the messsage class. It has 
-  therefore been removed. Call methods directly on the document if needed.  
+  message. This was not actually in use and unnecessarily increased the complexity of the messsage class. It has
+  therefore been removed. Call methods directly on the document if needed.
 
 ## [3.5.0] - 2022-01-22
 
