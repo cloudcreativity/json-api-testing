@@ -19,26 +19,29 @@ jobs:
       matrix:
         php: [8.2, 8.3, 8.4, 8.5]
         laravel: [10, 11, 12, 13]
-        phpunit: [10.5, 11, 12]
+        phpunit: [10.5, 11, 12, 13]
         exclude:
+          # PHPUnit Requirements
           - php: 8.2
-            laravel: 13
             phpunit: 12
           - php: 8.2
-            laravel: 13
-            phpunit: 11
+            phpunit: 13
+          - php: 8.3
+            phpunit: 13
+          # Laravel Requirements
           - php: 8.2
             laravel: 13
+          # Combinations
+          - laravel: 10
+            phpunit: 12
+          - laravel: 10
+            phpunit: 13
+          - laravel: 11
+            phpunit: 13
+          - laravel: 12
+            phpunit: 13
+          - laravel: 13
             phpunit: 10.5
-          - php: 8.2
-            laravel: 12
-            phpunit: 12
-          - php: 8.2
-            laravel: 11
-            phpunit: 12
-          - php: 8.2
-            laravel: 10
-            phpunit: 12
 
     steps:
       - name: Checkout Code
