@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+## [6.4.0] - 2026-04-02
+
+### Added
+
+- Package now supports PHPUnit 13.
+
 ## [6.3.0] - 2026-03-28
 
 ### Added
